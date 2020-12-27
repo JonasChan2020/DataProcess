@@ -141,20 +141,32 @@ namespace Yuebon.Commons.CodeGenerator
                IEnumerable<dynamic> dlist = conn.Query(sql);
                 foreach(var item in dlist)
                 {
-                    DbFieldInfo dbFieldInfo = new DbFieldInfo
-                    {
-                        FieldName = item.FieldName,
-                        Increment = item.Increment == "1" ? true : false,
-                        IsIdentity = item.IsIdentity == "1" ? true : false,
-                        FieldType = item.FieldType,
-                        DataType = item.FieldType,
-                        FieldMaxLength = item.FieldMaxLength,
-                        FieldPrecision = item.FieldPrecision,
-                        FieldScale = item.FieldScale,
-                        IsNullable = item.IsNullable == "1" ? true : false,
-                        FieldDefaultValue = item.FieldDefaultValue,
-                        Description = item.Description
-                    };
+                    DbFieldInfo dbFieldInfo = new DbFieldInfo();
+                    dbFieldInfo.FieldName = item.FieldName;
+                    dbFieldInfo.Increment = item.Increment == "1" ? true : false;
+                    dbFieldInfo.IsIdentity = item.IsIdentity == "1" ? true : false;
+                    dbFieldInfo.FieldType = item.FieldType;
+                    dbFieldInfo.DataType = item.FieldType;
+                    dbFieldInfo.FieldMaxLength =Convert.ToInt32(item.FieldMaxLength);
+                    dbFieldInfo.FieldPrecision = Convert.ToInt32(item.FieldPrecision); 
+                    dbFieldInfo.FieldScale = Convert.ToInt32(item.FieldScale);
+                    dbFieldInfo.IsNullable = item.IsNullable == "1" ? true : false;
+                    dbFieldInfo.FieldDefaultValue = item.FieldDefaultValue;
+                    dbFieldInfo.Description = item.Description;
+                    //DbFieldInfo dbFieldInfo = new DbFieldInfo
+                    //{
+                    //    FieldName = item.FieldName,
+                    //    Increment = item.Increment == "1" ? true : false,
+                    //    IsIdentity = item.IsIdentity == "1" ? true : false,
+                    //    FieldType = item.FieldType,
+                    //    DataType = item.FieldType,
+                    //    FieldMaxLength = item.FieldMaxLength,
+                    //    FieldPrecision = item.FieldPrecision,
+                    //    FieldScale = item.FieldScale,
+                    //    IsNullable = item.IsNullable == "1" ? true : false,
+                    //    FieldDefaultValue = item.FieldDefaultValue,
+                    //    Description = item.Description
+                    //};
                     list.Add(dbFieldInfo);
                 }
             }

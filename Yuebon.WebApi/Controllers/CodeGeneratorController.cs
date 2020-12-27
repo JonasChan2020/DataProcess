@@ -1,16 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Yuebon.AspNetCore.Controllers;
 using Yuebon.AspNetCore.Models;
 using Yuebon.AspNetCore.Mvc;
 using Yuebon.AspNetCore.Mvc.Filter;
 using Yuebon.AspNetCore.ViewModel;
+using Yuebon.Commons.Cache;
 using Yuebon.Commons.CodeGenerator;
+using Yuebon.Commons.Helpers;
+using Yuebon.Commons.Json;
 using Yuebon.Commons.Log;
 using Yuebon.Commons.Models;
 using Yuebon.Commons.Pages;
+using Yuebon.Security.Models;
 
 namespace Yuebon.WebApi.Controllers
 {
@@ -43,7 +48,8 @@ namespace Yuebon.WebApi.Controllers
                 where += " and TableName like '%"+ search.Keywords + "%'";
             }
             PagerInfo pagerInfo = GetPagerInfo();
-            MssqlExtractor mssqlExtractor = new MssqlExtractor();
+            
+            MysqlExtractor mssqlExtractor = new MysqlExtractor(); //切换数据库需要修改
             List<DbTableInfo> listTable = mssqlExtractor.GetAllTables(where, orderFlied, order,pagerInfo);
            
             PageResult<DbTableInfo> pageResult = new PageResult<DbTableInfo>();
@@ -78,21 +84,21 @@ namespace Yuebon.WebApi.Controllers
                 else
                 {
                     CodeGenerator.Generate(baseSpace, tables, replaceTableNameStr);
-                    //var path = AppDomain.CurrentDomain.BaseDirectory;
-                    ////path = path.Substring(0, path.IndexOf("\\bin"));
-                    //var parentPath = path.Substring(0, path.LastIndexOf("\\"));
-                    //var servicesPath = parentPath + "\\" + baseSpace + "\\";
-                    ////生成压缩包
+                    var path = AppDomain.CurrentDomain.BaseDirectory;
+                    //path = path.Substring(0, path.IndexOf("\\bin"));
+                    var parentPath = path.Substring(0, path.LastIndexOf("\\"));
+                    var servicesPath = parentPath + "\\" + baseSpace + "\\";
+                    //生成压缩包
 
-                    //YuebonCacheHelper yuebonCacheHelper = new YuebonCacheHelper();
-                    //SysSetting sysSetting = JsonSerializer.Deserialize<SysSetting>(yuebonCacheHelper.Get("SysSetting").ToJson());
-                    //string returnFileName = DateTime.Now.ToString("yyyyMMddHHmmss") + ".zip";
-                    //string zipFileName = sysSetting.LocalPath + "\\export\\Generatecode\\" + returnFileName;
-                    //if (System.IO.File.Exists(zipFileName))
-                    //{
-                    //    System.IO.File.Delete(zipFileName);
-                    //}
-                    //FileHelper.ZipFiles(servicesPath, zipFileName, 7, "", "", "*.*");
+                    YuebonCacheHelper yuebonCacheHelper = new YuebonCacheHelper();
+                    SysSetting sysSetting = JsonSerializer.Deserialize<SysSetting>(yuebonCacheHelper.Get("SysSetting").ToJson());
+                    string returnFileName = DateTime.Now.ToString("yyyyMMddHHmmss") + ".zip";
+                    string zipFileName = sysSetting.LocalPath + "\\export\\Generatecode\\" + returnFileName;
+                    if (System.IO.File.Exists(zipFileName))
+                    {
+                        System.IO.File.Delete(zipFileName);
+                    }
+                    FileHelper.ZipFiles(servicesPath, zipFileName, 7, "", "", "*.*");
                     result.ErrMsg = "代码生成完毕";
                     result.ErrCode = ErrCode.successCode;
                     result.Success = true;
