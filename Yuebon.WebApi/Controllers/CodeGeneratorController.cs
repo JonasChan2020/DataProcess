@@ -98,7 +98,7 @@ namespace Yuebon.WebApi.Controllers
                     {
                         System.IO.File.Delete(zipFileName);
                     }
-                    FileHelper.ZipFiles(servicesPath, zipFileName, 7, "", "", "*.*");
+                    FileHelper.ZipFileDirectory(servicesPath, zipFileName, 7, "", "", "*.*");
                     result.ErrMsg = "代码生成完毕";
                     result.ErrCode = ErrCode.successCode;
                     result.Success = true;
