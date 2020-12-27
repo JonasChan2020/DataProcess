@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Company>上海越邦网络科技有限公司</Company>
+    <Authors>Yuebon</Authors>
+    <Product>YuebonNetCore开发框架定时处理库</Product>
+    <Description>YuebonNetCore开发框架定时处理库</Description>
+    <Copyright>上海越邦网络科技有限公司</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.2</Version>
+    <RootNamespace>Yuebon.Quartz.Jobs</RootNamespace>
+    <AssemblyName>Yuebon.Quartz.Jobs</AssemblyName>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
+    <PackageReference Include="Quartz" Version="3.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Yuebon.Email.Core\Yuebon.Email.Core.csproj" />
+    <ProjectReference Include="..\Yuebon.Messages\Yuebon.Messages.Core\Yuebon.Messages.Core.csproj" />
+    <ProjectReference Include="..\Yuebon.NetCore\Yuebon.Security.Core\Yuebon.Security.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Yuebon.Commons.Dtos;
+using Yuebon.Commons.Mapping;
+using Yuebon.Commons.Pages;
+using Yuebon.Commons.Services;
+using Yuebon.Security.IServices;
+using {IRepositoriesNamespace};
+using {IServicsNamespace};
+using {DtosNamespace};
+using {ModelsNamespace};
+
+namespace {ServicesNamespace}
+{
+    /// <summary>
+    /// {TableNameDesc}服务接口实现
+    /// </summary>
+    public class {ModelTypeName}Service: BaseService<{ModelTypeName},{ModelTypeName}OutputDto, {KeyTypeName}>, I{ModelTypeName}Service
+    {
+		private readonly I{ModelTypeName}Repository _repository;
+        private readonly ILogService _logService;
+        public {ModelTypeName}Service(I{ModelTypeName}Repository repository,ILogService logService) : base(repository)
+        {
+			_repository=repository;
+			_logService=logService;
+            _repository.OnOperationLog += _logService.OnOperationLog;
+        }
+    }
+}

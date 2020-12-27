@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <ApplicationIcon />
+    <StartupObject />
+    <RootNamespace>Yuebon.Security</RootNamespace>
+    <Company>上海越邦网络科技有限公司</Company>
+    <Copyright>上海越邦网络科技有限公司 版权所有</Copyright>
+    <Product>YuebonNetCore开发框架权限管理系统类库</Product>
+    <Description>YuebonNetCore开发框架权限管理系统类库</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.3.2.24</Version>
+    <PackageReleaseNotes>更新最新公共库</PackageReleaseNotes>
+    <Authors>Yuebon</Authors>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageIconUrl></PackageIconUrl>
+    <PackageProjectUrl>https://gitee.com/yuebon/YuebonNetCore</PackageProjectUrl>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <RepositoryUrl>https://gitee.com/yuebon/YuebonNetCore</RepositoryUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageIcon>logo.png</PackageIcon>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>bin\Debug\netcoreapp3.0\</OutputPath>
+    <DocumentationFile>bin\Debug\netcoreapp3.0\Yuebon.Security.Core.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>bin\Release\Yuebon.Security.Core.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Application\APPApp.cs" />
+    <Compile Remove="Application\ItemsApp.cs" />
+    <Compile Remove="Application\LogApp.cs" />
+    <Compile Remove="Application\RoleApp.cs" />
+    <Compile Remove="Application\RoleAuthorizeApp.cs" />
+    <Compile Remove="Application\RoleDataApp.cs" />
+    <Compile Remove="Dtos\TenantInputDto.cs" />
+    <Compile Remove="Dtos\TenantOutputDto.cs" />
+    <Compile Remove="IRepositories\ITenantRepository.cs" />
+    <Compile Remove="IServices\ITenantService.cs" />
+    <Compile Remove="Models\Tenant.cs" />
+    <Compile Remove="SecurityDBContent.cs" />
+    <Compile Remove="Services\TenantService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\..\logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Yuebon.Commons\Yuebon.Commons.csproj" />
+  </ItemGroup>
+
+</Project>

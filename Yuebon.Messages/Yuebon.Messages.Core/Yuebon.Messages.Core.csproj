@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Version>1.1.5.3</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Company>上海越邦网络科技有限公司</Company>
+    <Product>YuebonNetCore开发框架基础库</Product>
+    <Authors>Yuebon</Authors>
+    <Copyright>上海越邦网络科技有限公司 版权所有</Copyright>
+    <PackageProjectUrl>https://gitee.com/yuebon/YuebonNetCore</PackageProjectUrl>
+    <PackageIconUrl>http://www.yuebon.com/upload/201804/01/201804011125140585.jpg</PackageIconUrl>
+    <RepositoryUrl>https://gitee.com/yuebon/YuebonNetCore</RepositoryUrl>
+    <PackageReleaseNotes>修复短信发送成功返回结果为false的bug</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Mail\**" />
+    <Compile Remove="SMS\**" />
+    <EmbeddedResource Remove="Mail\**" />
+    <EmbeddedResource Remove="SMS\**" />
+    <None Remove="Mail\**" />
+    <None Remove="SMS\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Yuebon.Email.Core\Yuebon.Email.Core.csproj" />
+    <ProjectReference Include="..\..\Yuebon.NetCore\Yuebon.Security.Core\Yuebon.Security.Core.csproj" />
+    <ProjectReference Include="..\..\Yuebon.SMS.Core\Yuebon.SMS.Core.csproj" />
+    <ProjectReference Include="..\..\Yuebon.WeChat.Core\Yuebon.WeChat.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

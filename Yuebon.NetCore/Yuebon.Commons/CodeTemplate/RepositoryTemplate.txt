@@ -1,0 +1,18 @@
+﻿using System;
+
+using Yuebon.Commons.Repositories;
+using {IRepositoriesNamespace};
+using {ModelsNamespace};
+
+namespace {RepositoriesNamespace}
+{
+    /// <summary>
+    /// {TableNameDesc}仓储接口的实现
+    /// </summary>
+    public class {ModelTypeName}Repository : BaseRepository<{ModelTypeName}, {KeyTypeName}>, I{ModelTypeName}Repository
+    {
+		public {ModelTypeName}Repository()
+        {
+        }
+    }
+}

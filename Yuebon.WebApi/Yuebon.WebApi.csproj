@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>4d454771-6ff7-43f2-a2b6-7c3bada83304</UserSecretsId>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\Yuebon.WebApi.xml</DocumentationFile>
+    <OutputPath>bin\Release\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\Yuebon.WebApi.xml</DocumentationFile>
+    <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Areas\Authorizer\**" />
+    <Content Remove="Areas\Authorizer\**" />
+    <EmbeddedResource Remove="Areas\Authorizer\**" />
+    <None Remove="Areas\Authorizer\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="index.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="index.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Yuebon.Messages\Yuebon.Messages.Core\Yuebon.Messages.Core.csproj" />
+    <ProjectReference Include="..\Yuebon.NetCore\Yuebon.AspNetCore\Yuebon.AspNetCore.csproj" />
+    <ProjectReference Include="..\Yuebon.NetCore\Yuebon.Security.Core\Yuebon.Security.Core.csproj" />
+    <ProjectReference Include="..\Yuebon.Quartz.Jobs\Yuebon.Quartz.Jobs.csproj" />
+    <ProjectReference Include="..\Yuebon.Tenants.Core\Yuebon.Tenants.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="4.2.0" />
+    <PackageReference Include="Quartz.AspNetCore" Version="3.2.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="wwwroot\swagger\ui\index.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Yuebon.WebApi.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+
+</Project>
