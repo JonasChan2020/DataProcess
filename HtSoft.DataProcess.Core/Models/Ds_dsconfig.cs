@@ -15,22 +15,27 @@ namespace HtSoft.DataProcess.Models
         /// 设置或获取数据源配置信息
         /// </summary>
         public string Dsconfig { get; set; }
-        /// <summary>
+
+        /// <summary>
         /// 设置或获取创建人
         /// </summary>
         public string Cuid { get; set; }
-        /// <summary>
+
+        /// <summary>
         /// 设置或获取创建时间
         /// </summary>
         public DateTime? Ctime { get; set; }
-        /// <summary>
+
+        /// <summary>
         /// 设置或获取更新人
         /// </summary>
         public string Uuid { get; set; }
-        /// <summary>
+
+        /// <summary>
         /// 设置或获取更新时间
         /// </summary>
         public DateTime? Utime { get; set; }
-
+
+
     }
 }

@@ -15,50 +15,62 @@ namespace HtSoft.DataProcess.Models
         /// 设置或获取类型编码
         /// </summary>
         public string Ptcode { get; set; }
-        /// <summary>
+
+        /// <summary>
         /// 设置或获取类型名称
         /// </summary>
         public string Ptname { get; set; }
-        /// <summary>
+
+        /// <summary>
         /// 设置或获取类型描述
         /// </summary>
         public string Ptdesc { get; set; }
-        /// <summary>
+
+        /// <summary>
         /// 设置或获取类型接口名称
         /// </summary>
         public string Ptiname { get; set; }
-        /// <summary>
+
+        /// <summary>
         /// 设置或获取父ID
         /// </summary>
         public string Parentid { get; set; }
-        /// <summary>
+
+        /// <summary>
         /// 设置或获取层级路径
         /// </summary>
         public string Levelpath { get; set; }
-        /// <summary>
+
+        /// <summary>
         /// 设置或获取排序
         /// </summary>
         public int? Dsort { get; set; }
-        /// <summary>
+
+        /// <summary>
         /// 设置或获取状态
         /// </summary>
         public string State { get; set; }
-        /// <summary>
+
+        /// <summary>
         /// 设置或获取创建人
         /// </summary>
         public string Cuid { get; set; }
-        /// <summary>
+
+        /// <summary>
         /// 设置或获取创建时间
         /// </summary>
         public DateTime? Ctime { get; set; }
-        /// <summary>
+
+        /// <summary>
         /// 设置或获取更新人
         /// </summary>
         public string Uuid { get; set; }
-        /// <summary>
+
+        /// <summary>
         /// 设置或获取更新时间
         /// </summary>
         public DateTime? Utime { get; set; }
-
+
+
     }
 }
