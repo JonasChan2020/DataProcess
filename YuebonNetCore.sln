@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yuebon.SMS.Core", "Yuebon.S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yuebon.Tenants.Core", "Yuebon.Tenants.Core\Yuebon.Tenants.Core.csproj", "{A99022D9-5450-446E-86FD-0A11C16B2BBE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtSoft.DataProcess.Core", "HtSoft.DataProcess.Core\HtSoft.DataProcess.Core.csproj", "{B035ACB6-2C40-4B3B-B852-68DCF5EB4BDF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HtSoft.DataProcess.Core", "HtSoft.DataProcess.Core\HtSoft.DataProcess.Core.csproj", "{B035ACB6-2C40-4B3B-B852-68DCF5EB4BDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

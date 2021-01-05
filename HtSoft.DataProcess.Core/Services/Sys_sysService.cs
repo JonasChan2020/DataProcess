@@ -14,7 +14,7 @@ using HtSoft.DataProcess.Models;
 namespace HtSoft.DataProcess.Services
 {
     /// <summary>
-    /// 系统表服务接口实现
+    /// 服务接口实现
     /// </summary>
     public class Sys_sysService: BaseService<Sys_sys,Sys_sysOutputDto, string>, ISys_sysService
     {

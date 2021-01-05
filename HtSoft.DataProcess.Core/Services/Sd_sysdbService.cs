@@ -14,7 +14,7 @@ using HtSoft.DataProcess.Models;
 namespace HtSoft.DataProcess.Services
 {
     /// <summary>
-    /// 目标库表服务接口实现
+    /// 服务接口实现
     /// </summary>
     public class Sd_sysdbService: BaseService<Sd_sysdb,Sd_sysdbOutputDto, string>, ISd_sysdbService
     {

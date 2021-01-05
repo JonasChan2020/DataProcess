@@ -14,7 +14,7 @@ using HtSoft.DataProcess.Models;
 namespace HtSoft.DataProcess.Services
 {
     /// <summary>
-    /// 插件表服务接口实现
+    /// 服务接口实现
     /// </summary>
     public class Plug_plugService: BaseService<Plug_plug,Plug_plugOutputDto, string>, IPlug_plugService
     {

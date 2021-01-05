@@ -1,12 +1,12 @@
 using AutoMapper;
 using System;
-using HtSoft.DataProcess.Models;
 using Yuebon.Commons.Dtos;
+using HtSoft.DataProcess.Models;
 
 namespace HtSoft.DataProcess.Dtos
 {
     /// <summary>
-    /// 插件表输入对象模型
+    /// 输入对象模型
     /// </summary>
     [AutoMap(typeof(Plug_plug))]
     [Serializable]
@@ -29,10 +29,6 @@ namespace HtSoft.DataProcess.Dtos
         /// </summary>
         public string Pdesc { get; set; }
         /// <summary>
-        /// 设置或获取所属目标库ID
-        /// </summary>
-        public string Dbid { get; set; }
-        /// <summary>
         /// 设置或获取插件类型
         /// </summary>
         public string Ptype { get; set; }
@@ -45,29 +41,25 @@ namespace HtSoft.DataProcess.Dtos
         /// </summary>
         public string Ptag { get; set; }
         /// <summary>
-        /// 设置或获取排序
+        /// 设置或获取是否为公共插件 0否，1是
         /// </summary>
-        public int? Dsort { get; set; }
+        public bool? Is_public { get; set; }
         /// <summary>
         /// 设置或获取状态
         /// </summary>
         public string State { get; set; }
         /// <summary>
-        /// 设置或获取创建人
+        /// 设置或获取排序字段
         /// </summary>
-        public string Cuid { get; set; }
+        public int? SortCode { get; set; }
         /// <summary>
-        /// 设置或获取创建时间
+        /// 设置或获取启用标记
         /// </summary>
-        public DateTime? Ctime { get; set; }
+        public bool? EnabledMark { get; set; }
         /// <summary>
-        /// 设置或获取更新人
+        /// 设置或获取描述
         /// </summary>
-        public string Uuid { get; set; }
-        /// <summary>
-        /// 设置或获取更新时间
-        /// </summary>
-        public DateTime? Utime { get; set; }
+        public string Description { get; set; }
 
     }
 }

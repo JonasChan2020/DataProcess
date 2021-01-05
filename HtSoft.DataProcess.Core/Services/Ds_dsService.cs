@@ -14,7 +14,7 @@ using HtSoft.DataProcess.Models;
 namespace HtSoft.DataProcess.Services
 {
     /// <summary>
-    /// 数据源表服务接口实现
+    /// 服务接口实现
     /// </summary>
     public class Ds_dsService: BaseService<Ds_ds,Ds_dsOutputDto, string>, IDs_dsService
     {

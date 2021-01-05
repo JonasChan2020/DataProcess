@@ -14,7 +14,7 @@ using HtSoft.DataProcess.Models;
 namespace HtSoft.DataProcess.Services
 {
     /// <summary>
-    /// 数据源分类表服务接口实现
+    /// 服务接口实现
     /// </summary>
     public class Ds_classifyService: BaseService<Ds_classify,Ds_classifyOutputDto, string>, IDs_classifyService
     {

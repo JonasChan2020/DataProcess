@@ -55,5 +55,9 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\DataProcess\Controllers\" />
+  </ItemGroup>
+
 
 </Project>

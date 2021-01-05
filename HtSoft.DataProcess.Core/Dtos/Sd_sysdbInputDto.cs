@@ -1,12 +1,12 @@
 using AutoMapper;
 using System;
-using HtSoft.DataProcess.Models;
 using Yuebon.Commons.Dtos;
+using HtSoft.DataProcess.Models;
 
 namespace HtSoft.DataProcess.Dtos
 {
     /// <summary>
-    /// 目标库表输入对象模型
+    /// 输入对象模型
     /// </summary>
     [AutoMap(typeof(Sd_sysdb))]
     [Serializable]
@@ -27,39 +27,35 @@ namespace HtSoft.DataProcess.Dtos
         /// <summary>
         /// 设置或获取目标库分类
         /// </summary>
-        public string Sysclassify { get; set; }
+        public string Classify_id { get; set; }
         /// <summary>
         /// 设置或获取目标库类型
         /// </summary>
         public string Sdtype { get; set; }
         /// <summary>
-        /// 设置或获取所属组织ID
+        /// 设置或获取连接字符串
         /// </summary>
-        public string Orgid { get; set; }
+        public string Sdconnectionstr { get; set; }
         /// <summary>
-        /// 设置或获取排序
+        /// 设置或获取所属系统ID
         /// </summary>
-        public int? Dsort { get; set; }
+        public string Sys_id { get; set; }
         /// <summary>
         /// 设置或获取状态
         /// </summary>
         public string State { get; set; }
         /// <summary>
-        /// 设置或获取创建人
+        /// 设置或获取排序字段
         /// </summary>
-        public string Cuid { get; set; }
+        public int? SortCode { get; set; }
         /// <summary>
-        /// 设置或获取创建时间
+        /// 设置或获取启用标记
         /// </summary>
-        public DateTime? Ctime { get; set; }
+        public bool? EnabledMark { get; set; }
         /// <summary>
-        /// 设置或获取更新人
+        /// 设置或获取描述
         /// </summary>
-        public string Uuid { get; set; }
-        /// <summary>
-        /// 设置或获取更新时间
-        /// </summary>
-        public DateTime? Utime { get; set; }
+        public string Description { get; set; }
 
     }
 }

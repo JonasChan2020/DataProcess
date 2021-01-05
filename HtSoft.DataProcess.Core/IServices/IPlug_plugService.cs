@@ -6,7 +6,7 @@ using HtSoft.DataProcess.Models;
 namespace HtSoft.DataProcess.IServices
 {
     /// <summary>
-    /// 定义插件表服务接口
+    /// 定义服务接口
     /// </summary>
     public interface IPlug_plugService:IService<Plug_plug,Plug_plugOutputDto, string>
     {

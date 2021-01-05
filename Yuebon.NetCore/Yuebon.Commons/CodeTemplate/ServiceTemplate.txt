@@ -24,7 +24,7 @@ namespace {ServicesNamespace}
         {
 			_repository=repository;
 			_logService=logService;
-            _repository.OnOperationLog += _logService.OnOperationLog;
+            //_repository.OnOperationLog += _logService.OnOperationLog;
         }
     }
 }

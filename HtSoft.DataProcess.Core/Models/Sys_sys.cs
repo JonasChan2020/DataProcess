@@ -1,71 +1,75 @@
+using AutoMapper;
 using System;
+using System.Collections.Generic;
+using System.Text;
 using System.ComponentModel.DataAnnotations.Schema;
 using Yuebon.Commons.Models;
 
 namespace HtSoft.DataProcess.Models
 {
     /// <summary>
-    /// 系统表，数据实体对象
+    /// ，数据实体对象
     /// </summary>
     [Table("dp_sys_sys")]
     [Serializable]
-    public class Sys_sys:BaseEntity<string>
+    public class Sys_sys:BaseEntity<string>, ICreationAudited, IModificationAudited, IDeleteAudited
     {
         /// <summary>
         /// 设置或获取系统编码
         /// </summary>
         public string Syscode { get; set; }
-
-        /// <summary>
+        /// <summary>
         /// 设置或获取系统名称
         /// </summary>
         public string Sysname { get; set; }
-
-        /// <summary>
+        /// <summary>
         /// 设置或获取系统分类
         /// </summary>
-        public string Sysclassify { get; set; }
-
-        /// <summary>
-        /// 设置或获取系统描述
-        /// </summary>
-        public string Sysdesc { get; set; }
-
-        /// <summary>
-        /// 设置或获取所属组织
-        /// </summary>
-        public string Orgid { get; set; }
-
-        /// <summary>
-        /// 设置或获取排序
-        /// </summary>
-        public int? Dsort { get; set; }
-
-        /// <summary>
+        public string Classify_id { get; set; }
+        /// <summary>
         /// 设置或获取状态
         /// </summary>
         public string State { get; set; }
-
-        /// <summary>
-        /// 设置或获取创建人
+        /// <summary>
+        /// 设置或获取排序字段
         /// </summary>
-        public string Cuid { get; set; }
-
-        /// <summary>
+        public int? SortCode { get; set; }
+        /// <summary>
+        /// 设置或获取删除标记
+        /// </summary>
+        public bool? DeleteMark { get; set; }
+        /// <summary>
+        /// 设置或获取启用标记
+        /// </summary>
+        public bool? EnabledMark { get; set; }
+        /// <summary>
+        /// 设置或获取描述
+        /// </summary>
+        public string Description { get; set; }
+        /// <summary>
         /// 设置或获取创建时间
         /// </summary>
-        public DateTime? Ctime { get; set; }
-
-        /// <summary>
-        /// 设置或获取更新人
+        public DateTime? CreatorTime { get; set; }
+        /// <summary>
+        /// 设置或获取创建人
         /// </summary>
-        public string Uuid { get; set; }
-
-        /// <summary>
-        /// 设置或获取更新时间
+        public string CreatorUserId { get; set; }
+        /// <summary>
+        /// 设置或获取最后修改时间
         /// </summary>
-        public DateTime? Utime { get; set; }
-
-
+        public DateTime? LastModifyTime { get; set; }
+        /// <summary>
+        /// 设置或获取最后修改人
+        /// </summary>
+        public string LastModifyUserId { get; set; }
+        /// <summary>
+        /// 设置或获取删除时间
+        /// </summary>
+        public DateTime? DeleteTime { get; set; }
+        /// <summary>
+        /// 设置或获取删除人
+        /// </summary>
+        public string DeleteUserId { get; set; }
+
     }
 }
