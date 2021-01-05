@@ -10,10 +10,20 @@ namespace Yuebon.Commons.CodeGenerator
     /// </summary>
    public class MssqlExtractor: DbExtractorAbstract
     {
+
         /// <summary>
-        /// 获取数据库的所有表的信息
+        /// 获取数据库信息
         /// </summary>
-        /// <param name="tablelist"></param>
+        /// <returns></returns>
+        public List<DataBaseInfo> GetAllDataBases()
+        {
+            var sql = string.Format(@"select name as DbName from master..sysdatabases as dbs");
+            return GetAllDataBaseInternal(sql);
+        }
+        /// <summary>
+        /// 根据表名获取数据库表的信息
+        /// </summary>
+        /// <param name="tablelist">表名称</param>
         /// <returns></returns>
         public List<DbTableInfo> GetAllTables(string tablelist)
         {

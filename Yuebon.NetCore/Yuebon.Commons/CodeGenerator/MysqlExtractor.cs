@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,24 +8,32 @@ using Yuebon.Commons.Pages;
 namespace Yuebon.Commons.CodeGenerator
 {
     /// <summary>
-    /// MYSQL
+    /// mysql
     /// </summary>
-    public class MysqlExtractor : DbExtractorAbstract
+    public class MySqlExtractor : DbExtractorAbstract
     {
+
+        /// <summary>
+        /// 获取数据库信息
+        /// </summary>
+        /// <returns></returns>
+        public List<DataBaseInfo> GetAllDataBases()
+        {
+            var sql = string.Format(@"select schema_name as DbName from information_schema.schemata");
+            return GetAllDataBaseInternal(sql);
+        }
         /// <summary>
         /// 获取数据库的所有表的信息
         /// </summary>
-        /// <param name="tablelist"></param>
+        /// <param name="dbName"></param>
+        /// <param name="tableList"></param>
         /// <returns></returns>
-        public List<DbTableInfo> GetAllTables(string tablelist)
+        public List<DbTableInfo> GetAllTables(string dbName,string tableList)
         {
-            DbConnection conn = OpenSharedConnection();
-            string dbName = conn.Database;
-            var sql = string.Format(@"SELECT tbs.TABLE_NAME as TableName ,tbs.TABLE_COMMENT as Description FROM information_schema.tables tbs
-where tbs.TABLE_SCHEMA='" + dbName.ToLower() + "' and tbs.TABLE_TYPE='BASE TABLE'");
-            if (!string.IsNullOrEmpty(tablelist))
+            var sql = string.Format(@"select table_name as TableName from information_schema.tables where table_schema='{0}' ", dbName);
+            if (!string.IsNullOrEmpty(tableList))
             {
-                sql += string.Format(@" and tbs.TABLE_NAME in('{0}')", tablelist.Replace(",", "','"));
+                sql += string.Format(@" and table_name in('{0}')", tableList.Replace(",", "','"));
             }
             return GetAllTablesInternal(sql);
         }
@@ -35,17 +42,15 @@ where tbs.TABLE_SCHEMA='" + dbName.ToLower() + "' and tbs.TABLE_TYPE='BASE TABLE
         /// <summary>
         /// 获取数据库的所有表的信息
         /// </summary>
+        /// <param name="dbName"></param>
         /// <param name="strwhere"></param>
         /// <param name="fieldNameToSort"></param>
         /// <param name="isDescending"></param>
         /// <param name="info"></param>
         /// <returns></returns>
-        public List<DbTableInfo> GetAllTables(string strwhere, string fieldNameToSort, bool isDescending, PagerInfo info)
+        public List<DbTableInfo> GetAllTables(string dbName,string strwhere, string fieldNameToSort, bool isDescending, PagerInfo info)
         {
-            DbConnection conn = OpenSharedConnection();
-            string dbName = conn.Database;
-            var sql = string.Format(@"SELECT tbs.TABLE_NAME as TableName ,tbs.TABLE_COMMENT as Description FROM information_schema.tables tbs
-where tbs.TABLE_SCHEMA='" + dbName.ToLower() + "' and tbs.TABLE_TYPE='BASE TABLE'");
+            var sql = string.Format(@"select table_name AS TableName,TABLE_COMMENT as Description from information_schema.tables where table_schema='{0}'", dbName);
 
             string sqlcount = string.Format(@"select count(*) as Total from({0}) AA where {1}", sql, strwhere);
 
@@ -53,48 +58,32 @@ where tbs.TABLE_SCHEMA='" + dbName.ToLower() + "' and tbs.TABLE_TYPE='BASE TABLE
             int minRow = info.PageSize * (info.CurrenetPageIndex - 1) + 1;
             int maxRow = info.PageSize * info.CurrenetPageIndex;
 
-            string pagesql = string.Format(@"With Paging AS
-                ( SELECT ROW_NUMBER() OVER ({0}) as RowNumber, {1} FROM ({2}) AA Where {3})
-                SELECT * FROM Paging WHERE RowNumber Between {4} and {5}", strOrder, "AA.*", sql, strwhere,
-            minRow, maxRow);
+            string pagesql = string.Format(@" {0} and  {1} {2} LIMIT {3},{4}", sql, strwhere, strOrder,minRow, maxRow);
             pagesql = sqlcount + ";" + pagesql;
             return GetAllTablesInternal(pagesql, info);
         }
         /// <summary>
         /// 获取表的所有字段名及字段类型
         /// </summary>
+        /// <param name="dbName">dbName</param>
         /// <param name="tableName">数据表的名称</param>
         /// <returns></returns>
-        public List<DbFieldInfo> GetAllColumns(string tableName)
+        public List<DbFieldInfo> GetAllColumns(string dbName, string tableName)
         {
             if (tableName == null)
                 throw new ArgumentNullException(nameof(tableName));
 
-            DbConnection conn = OpenSharedConnection();
-            string dbName = conn.Database;
-
-            var sqlFields = string.Format(@"
-               SELECT
-	COLUMN_NAME as FieldName,
-	(case when COLUMN_KEY='PRI' then '1'else '0' end) as Increment,
-	(case when COLUMN_KEY='PRI' then '1'else '0' end) as IsIdentity,
-	DATA_TYPE as FieldType,
-	CHARACTER_OCTET_LENGTH AS FieldPrecision,
-	CHARACTER_MAXIMUM_LENGTH AS FieldMaxLength,
-    (case when CHARACTER_OCTET_LENGTH is null then '0'else CHARACTER_OCTET_LENGTH end) as FieldPrecision,
-    (case when CHARACTER_MAXIMUM_LENGTH is null then '0'else CHARACTER_MAXIMUM_LENGTH end) as FieldScale,
-    (case when NUMERIC_SCALE is null then '0'else NUMERIC_SCALE end) as FieldScale,
-    (case when IS_NULLABLE='YES' then '1'else '0' end) as IsNullable,
-    COLUMN_DEFAULT as FieldDefaultValue,
-	COLUMN_COMMENT AS Description
-	
-FROM
-	information_schema.COLUMNS 
-WHERE
-	table_schema = '{1}' 
-	AND table_name = '{0}' 
-ORDER BY
-	ORDINAL_POSITION", tableName, dbName);
+            var sqlFields = string.Format(@"select 
+column_name as FieldName,
+(case when is_nullable = 'YES' then '1' else '0'  end)  as  IsNullable,
+ (case when Column_key = 'PRI' then '1' else '0'  end) as IsIdentity,
+data_type as FieldType,
+ (case when column_default is null then '' else column_default  end)  as FieldDefaultValue,
+(case when character_maximum_length is null then 0 else character_maximum_length  end)  as FieldMaxLength,
+(case when Numeric_Precision is null then 0 else Numeric_Precision  end)  as FieldPrecision,
+(case when Numeric_scale is null then 0 else Numeric_scale  end)   as FieldScale,
+column_comment as Description
+from information_schema.columns where table_schema='{0}' and table_name='{1}'", dbName,tableName);
             List<DbFieldInfo> list = new List<DbFieldInfo>();
             list = GetAllColumnsInternal(sqlFields);
             List<DbFieldInfo> reslist = new List<DbFieldInfo>();
@@ -151,13 +140,12 @@ ORDER BY
                     val = "long";
                     break;
                 case "tinyint":
-                    val = "byte";
+                    val = "bool";
                     break;
 
                 case "binary":
                 case "image":
                 case "varbinary":
-                case "mediumblob":
                     val = "byte[]";
                     allowNull = true;
                     break;
@@ -170,14 +158,12 @@ ORDER BY
                     break;
 
                 case "float":
-                case "double":
                     val = "float";
                     break;
                 case "real":
                     val = "Single";
                     break;
 
-                case "date":
                 case "datetime":
                 case "smalldatetime":
                 case "timestamp":
@@ -194,8 +180,6 @@ ORDER BY
 
                 case "text":
                 case "ntext":
-                case "mediumtext":
-                case "longtext":
                 case "char":
                 case "nchar":
                 case "varchar":

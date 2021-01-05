@@ -1,22 +1,19 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-/**
- * 重写路由的push方法
- */
-const routerPush = Router.prototype.push
-Router.prototype.push = function push (location) {
-  return routerPush.call(this, location).catch(error => error)
-}
 Vue.use(Router)
 
+// 获取原型对象上的push函数
+const originalPush = Router.prototype.push
+// 修改原型对象中的push方法
+Router.prototype.push = function push (location) {
+  return originalPush.call(this, location).catch(err => err)
+}
 /* Layout */
 import Layout from '@/layout'
 
 /**
- * constantRoutes
- * a base page that does not have permission requirements
- * all roles can be accessed
+ * 所有人都可以访问的路由
  */
 export const constantRoutes = [
   {
@@ -50,7 +47,7 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: '控制台', icon: 'icon-dashboard' }
+      meta: { title: '控制台', icon: 'icon-dashboard', affix: true }
     }]
   },
   {
@@ -77,8 +74,6 @@ export const constantRoutes = [
 ]
 
 const createRouter = () => new Router({
-  base: '/',
-  mode: 'hash', // require service support
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 })

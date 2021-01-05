@@ -181,11 +181,10 @@ export default {
           this.companyLogo = res.ResData.SysLogo
           this.companyName = res.ResData.CompanyName
           this.copyRight = res.ResData.CopyRight
-
-          this.pageLoading.close()
-
-          this.isShow = true
         })
+        this.pageLoading.close()
+
+        this.isShow = true
       })
     },
     showPwd () {
@@ -205,8 +204,7 @@ export default {
           this.$store
             .dispatch('user/userlogin', this.loginForm)
             .then(res => {
-              // this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
-              this.$router.push('/')
+              this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
               this.loading = false
             })
             .catch(res => {

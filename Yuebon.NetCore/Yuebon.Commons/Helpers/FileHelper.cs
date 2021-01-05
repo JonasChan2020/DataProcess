@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Yuebon.Commons.Extend;
+using Yuebon.Commons.Log;
 
 namespace Yuebon.Commons.Helpers
 {
@@ -187,6 +188,49 @@ namespace Yuebon.Commons.Helpers
                 stream.Write(by, 0, by.Length);
             }
         }
+
+        #region 直接删除指定目录下的所有文件及文件夹(保留目录)
+        /// <summary>
+        /// 删除指定目录下的所有文件及文件夹(保留目录)
+        /// </summary>
+        /// <param name="file">文件目录</param>
+        public static void DeleteDirectory(string file)
+        {
+            try
+            {
+                //判断文件夹是否还存在
+                if (Directory.Exists(file))
+                {
+                    DirectoryInfo fileInfo = new DirectoryInfo(file);
+                    //去除文件夹的只读属性
+                    fileInfo.Attributes = FileAttributes.Normal & FileAttributes.Directory;
+                    foreach (string f in Directory.GetFileSystemEntries(file))
+                    {
+                        if (File.Exists(f))
+                        {
+                            //去除文件的只读属性
+                            File.SetAttributes(file, FileAttributes.Normal);
+                            //如果有子文件删除文件
+                            File.Delete(f);
+                        }
+                        else
+                        {
+                            //循环递归删除子文件夹
+                            DeleteDirectory(f);
+                        }
+                    }
+                    //删除空文件夹
+                    Directory.Delete(file);
+                }
+
+            }
+            catch (Exception ex) // 异常处理
+            {
+                Log4NetHelper.Error("代码生成异常", ex);
+            }
+        }
+
+        #endregion
 
     }
 }

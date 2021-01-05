@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Yuebon.Commons.Cache;
+using Yuebon.Commons.IoC;
 using Yuebon.Commons.Json;
 using Yuebon.Commons.Mapping;
 using Yuebon.Commons.Tree;
@@ -17,74 +18,10 @@ namespace Yuebon.Security.Application
     public class FunctionApp
     {
 
-        private IFunctionRepository service = new FunctionRepository();
-        private ISystemTypeRepository serviceSystemType = new SystemTypeRepository();
-        private IRoleRepository serviceRole = new RoleRepository();
-        private IUserRepository serviceUser = new UserRepository();
-
-        /// <summary>
-        /// 系统功能树形展开treeview需要
-        /// </summary>
-        /// <returns></returns>
-        public List<TreeViewModel> FuntionTreeViewJson()
-        {
-            List<TreeViewModel> list = new List<TreeViewModel>();
-            List<SystemType> systemTypeList = serviceSystemType.GetAll().OrderBy(t=>t.SortCode).ToList();
-            foreach(SystemType item in systemTypeList)
-            {
-                TreeViewModel treeViewModel = new TreeViewModel();
-                treeViewModel.nodeId = item.Id;
-                treeViewModel.text = item.FullName;
-                treeViewModel.icon = "fas fa-sitemap";
-                string sqlwhere = string.Format("SystemTypeId='{0}'", item.Id);
-                List<Function> listFunction = service.GetListWhere(sqlwhere).OrderBy(t => t.SortCode).ToList();
-                treeViewModel.nodes = TreeViewJson(listFunction, "");
-                treeViewModel.tags = item.Id;
-                list.Add(treeViewModel);
-            }
-            
-            return list;
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="parentId"></param>
-        /// <returns></returns>
-        public List<TreeViewModel> TreeViewJson(List<Function> data, string parentId)
-        {
-            List<TreeViewModel> list = new List<TreeViewModel>();
-            var ChildNodeList = data.FindAll(t => t.ParentId == parentId).ToList();
-            foreach (Function entity in ChildNodeList)
-            {
-                TreeViewModel treeViewModel = new TreeViewModel();
-                treeViewModel.nodeId = entity.Id;
-                treeViewModel.pid = entity.ParentId;
-                treeViewModel.text = entity.FullName;
-                treeViewModel.icon = string.IsNullOrEmpty(entity.Icon)? "far fa-circle" : entity.Icon;
-                treeViewModel.nodes = ChildrenTreeViewList(data, entity.Id);
-                treeViewModel.tags = entity.Id;
-                list.Add(treeViewModel);
-            }
-            return list;
-        }
-        public List<TreeViewModel> ChildrenTreeViewList(List<Function> data, string parentId)
-        {
-            List<TreeViewModel> listChildren = new List<TreeViewModel>();
-            var ChildNodeList = data.FindAll(t => t.ParentId == parentId).ToList();
-            foreach (Function entity in ChildNodeList)
-            {
-                TreeViewModel treeViewModel = new TreeViewModel();
-                treeViewModel.nodeId = entity.Id;
-                treeViewModel.pid = entity.ParentId;
-                treeViewModel.text = entity.FullName;
-                treeViewModel.icon = string.IsNullOrEmpty(entity.Icon) ? "far fa-circle" : entity.Icon;
-                treeViewModel.nodes = ChildrenTreeViewList(data, entity.Id);
-                treeViewModel.tags = entity.Id;
-                listChildren.Add(treeViewModel);
-            }
-            return listChildren;
-        }
+        IFunctionRepository service = IoCContainer.Resolve<IFunctionRepository>();
+        ISystemTypeRepository serviceSystemType = IoCContainer.Resolve<ISystemTypeRepository>();
+        IRoleRepository serviceRole = IoCContainer.Resolve<IRoleRepository>();
+        IUserRepository serviceUser = IoCContainer.Resolve<IUserRepository>();
 
         /// <summary>
         /// 根据用户ID，获取对应的功能列表
