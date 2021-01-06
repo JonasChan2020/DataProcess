@@ -46,7 +46,8 @@ module.exports = {
   apiHostUrl: 'http://localhost:54678/api/', // 基础接口
   apiSecurityUrl: 'http://localhost:54678/api/Security/', // 权限管理系统接口
   fileUrl: 'http://localhost:54678/', // 文件访问路径
-  fileUploadUrl: 'http://localhost:54678/api/Files/Upload'// 文件上传路径
+  fileUploadUrl: 'http://localhost:54678/api/Files/Upload', // 文件上传路径
+  apiDataProcessUrl: 'http://localhost:54678/api/DataProcess/' // 权限管理系统接口
 
   // apiHostUrl: 'http://193.168.25.137:8082/api/', // 基础接口
   // apiSecurityUrl: 'http://193.168.25.137:8082/api/Security/', // 权限管理系统接口

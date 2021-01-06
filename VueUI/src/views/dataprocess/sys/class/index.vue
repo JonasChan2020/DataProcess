@@ -83,9 +83,11 @@
         @sort-change="handleSortChange"
       >
         <el-table-column type="selection" width="30" />
-        <el-table-column prop="Syscode" label="系统编码" sortable="custom" width="120" />
-        <el-table-column prop="Sysname" label="系统名称" sortable="custom" width="120" />
-        <el-table-column prop="Classify_id" label="系统分类" sortable="custom" width="120" />
+        <el-table-column prop="Stcode" label="类型编码" sortable="custom" width="120" />
+        <el-table-column prop="Stname" label="类型名称" sortable="custom" width="120" />
+        <el-table-column prop="Stdesc" label="类型描述" sortable="custom" width="120" />
+        <el-table-column prop="Parentid" label="父ID" sortable="custom" width="120" />
+        <el-table-column prop="Levelpath" label="层级路径" sortable="custom" width="120" />
         <el-table-column prop="State" label="状态" sortable="custom" width="120" />
         <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="120" />
         <el-table-column prop="DeleteMark" label="删除标记" sortable="custom" width="120" />
@@ -119,14 +121,20 @@
       width="640px"
     >
       <el-form ref="editFrom" :model="editFrom" :rules="rules">
-        <el-form-item label="系统编码" :label-width="formLabelWidth" prop="Syscode">
-          <el-input v-model="editFrom.Syscode" placeholder="请输入系统编码" autocomplete="off" clearable />
+        <el-form-item label="类型编码" :label-width="formLabelWidth" prop="Stcode">
+          <el-input v-model="editFrom.Stcode" placeholder="请输入类型编码" autocomplete="off" clearable />
         </el-form-item>
-        <el-form-item label="系统名称" :label-width="formLabelWidth" prop="Sysname">
-          <el-input v-model="editFrom.Sysname" placeholder="请输入系统名称" autocomplete="off" clearable />
+        <el-form-item label="类型名称" :label-width="formLabelWidth" prop="Stname">
+          <el-input v-model="editFrom.Stname" placeholder="请输入类型名称" autocomplete="off" clearable />
         </el-form-item>
-        <el-form-item label="系统分类" :label-width="formLabelWidth" prop="Classify_id">
-          <el-input v-model="editFrom.Classify_id" placeholder="请输入系统分类" autocomplete="off" clearable />
+        <el-form-item label="类型描述" :label-width="formLabelWidth" prop="Stdesc">
+          <el-input v-model="editFrom.Stdesc" placeholder="请输入类型描述" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="父ID" :label-width="formLabelWidth" prop="Parentid">
+          <el-input v-model="editFrom.Parentid" placeholder="请输入父ID" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="层级路径" :label-width="formLabelWidth" prop="Levelpath">
+          <el-input v-model="editFrom.Levelpath" placeholder="请输入层级路径" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="状态" :label-width="formLabelWidth" prop="State">
           <el-input v-model="editFrom.State" placeholder="请输入状态" autocomplete="off" clearable />
@@ -173,10 +181,10 @@
 
 <script>
 
-import { getSys_sysListWithPager, getSys_sysDetail,
-  saveSys_sys, setSys_sysEnable, deleteSoftSys_sys,
-  deleteSys_sys
-} from '@/api/dataprocess/sys/class/sys_sys'
+import { getSys_classifyListWithPager, getSys_classifyDetail,
+  saveSys_classify, setSys_classifyEnable, deleteSoftSys_classify,
+  deleteSys_classify
+} from '@/api/dataprocess/sys_classify'
 
 export default {
   data () {
@@ -199,9 +207,11 @@ export default {
       dialogEditFormVisible: false,
       editFormTitle: '',
       editFrom: {
-        Syscode: '',
-        Sysname: '',
-        Classify_id: '',
+        Stcode: '',
+        Stname: '',
+        Stdesc: '',
+        Parentid: '',
+        Levelpath: '',
         State: '',
         SortCode: '',
         DeleteMark: '',
@@ -247,7 +257,7 @@ export default {
         Order: this.sortableData.order,
         Sort: this.sortableData.sort
       }
-      getSys_sysListWithPager(seachdata).then(res => {
+      getSys_classifyListWithPager(seachdata).then(res => {
         this.tableData = res.ResData.Items
         this.pagination.pageTotal = res.ResData.TotalItems
         this.tableloading = false
@@ -281,10 +291,12 @@ export default {
       }
     },
     bindEditInfo: function () {
-      getSys_sysDetail(this.currentId).then(res => {
-        this.editFrom.Syscode = res.ResData.Syscode
-        this.editFrom.Sysname = res.ResData.Sysname
-        this.editFrom.Classify_id = res.ResData.Classify_id
+      getSys_classifyDetail(this.currentId).then(res => {
+        this.editFrom.Stcode = res.ResData.Stcode
+        this.editFrom.Stname = res.ResData.Stname
+        this.editFrom.Stdesc = res.ResData.Stdesc
+        this.editFrom.Parentid = res.ResData.Parentid
+        this.editFrom.Levelpath = res.ResData.Levelpath
         this.editFrom.State = res.ResData.State
         this.editFrom.SortCode = res.ResData.SortCode
         this.editFrom.DeleteMark = res.ResData.DeleteMark
@@ -305,9 +317,11 @@ export default {
       this.$refs['editFrom'].validate((valid) => {
         if (valid) {
           const data = {
-            'Syscode': this.editFrom.Syscode,
-            'Sysname': this.editFrom.Sysname,
-            'Classify_id': this.editFrom.Classify_id,
+            'Stcode': this.editFrom.Stcode,
+            'Stname': this.editFrom.Stname,
+            'Stdesc': this.editFrom.Stdesc,
+            'Parentid': this.editFrom.Parentid,
+            'Levelpath': this.editFrom.Levelpath,
             'State': this.editFrom.State,
             'SortCode': this.editFrom.SortCode,
             'DeleteMark': this.editFrom.DeleteMark,
@@ -322,7 +336,7 @@ export default {
 
             'Id': this.currentId
           }
-          saveSys_sys(data).then(res => {
+          saveSys_classify(data).then(res => {
             if (res.Success) {
               this.$message({
                 message: '恭喜你，操作成功',
@@ -358,7 +372,7 @@ export default {
           Ids: currentIds,
           Flag: val
         }
-        setSys_sysEnable(data).then(res => {
+        setSys_classifyEnable(data).then(res => {
           if (res.Success) {
             this.$message({
               message: '恭喜你，操作成功',
@@ -388,7 +402,7 @@ export default {
           Ids: currentIds,
           Flag: val
         }
-        deleteSoftSys_sys(data).then(res => {
+        deleteSoftSys_classify(data).then(res => {
           if (res.Success) {
             this.$message({
               message: '恭喜你，操作成功',
@@ -417,7 +431,7 @@ export default {
         const data = {
           Ids: currentIds
         }
-        deleteSys_sys(data).then(res => {
+        deleteSys_classify(data).then(res => {
           if (res.Success) {
             this.$message({
               message: '恭喜你，操作成功',
