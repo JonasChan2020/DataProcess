@@ -61,8 +61,6 @@ namespace Yuebon.Commons.CodeGenerator
                
                 List<DbFieldInfo> listField = dbExtractor.GetAllColumns(dbTableInfo.TableName);
                 GenerateSingle(listField, dbTableInfo, ifExsitedCovered);
-
-                //string tableName = dbTableInfo.TableName.Substring(0,1).ToUpper() + dbTableInfo.TableName.Substring(1);// 
                 string tableName = dbTableInfo.TableName;
                 if (!string.IsNullOrEmpty(_option.ReplaceTableNameStr))
                 {
@@ -76,7 +74,6 @@ namespace Yuebon.Commons.CodeGenerator
                     }
                 }
                 tableName = tableName.Substring(0, 1).ToUpper() + tableName.Substring(1);
-
                 profileContent += string.Format("           CreateMap<{0}, {0}OutputDto>();\n", tableName);
                 profileContent += string.Format("           CreateMap<{0}InputDto, {0}>();\n", tableName);
             }            
@@ -236,7 +233,6 @@ namespace Yuebon.Commons.CodeGenerator
         {
             var currentAssembly = Assembly.GetExecutingAssembly();
             var content = string.Empty;
-            string xx= $"{currentAssembly.GetName().Name}.CodeTemplate.{templateName}";
             using (var stream = currentAssembly.GetManifestResourceStream($"{currentAssembly.GetName().Name}.CodeTemplate.{templateName}"))
             {
                 if (stream != null)
