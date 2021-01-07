@@ -328,9 +328,12 @@ namespace Yuebon.WebApi
             IoCContainer.RegisterNew("Yuebon.Messages.Core", "Yuebon.Messages");
             IoCContainer.Register("Yuebon.Tenants.Core");
             IoCContainer.RegisterNew("Yuebon.Tenants.Core", "Yuebon.Tenants");
+            IoCContainer.Register("Yuebon.DataProcess.Core");
+            IoCContainer.RegisterNew("Yuebon.DataProcess.Core", "Yuebon.DataProcess");
             List<Assembly> myAssembly = new List<Assembly>();
             myAssembly.Add(Assembly.Load("Yuebon.Security.Core"));
             myAssembly.Add(Assembly.Load("Yuebon.Tenants.Core"));
+            myAssembly.Add(Assembly.Load("Yuebon.DataProcess.Core"));
             services.AddAutoMapper(myAssembly);
             services.AddScoped<IMapper, Mapper>();
 

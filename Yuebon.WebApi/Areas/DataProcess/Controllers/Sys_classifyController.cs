@@ -1,19 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Yuebon.AspNetCore.Controllers;
-using Yuebon.AspNetCore.Models;
 using Yuebon.Commons.Helpers;
-using Yuebon.Commons.Log;
-using Yuebon.Commons.Mapping;
-using Yuebon.Commons.Models;
-using Yuebon.Commons.Pages;
-using HtSoft.DataProcess.Dtos;
-using HtSoft.DataProcess.Models;
-using HtSoft.DataProcess.IServices;
+using Yuebon.DataProcess.Dtos;
+using Yuebon.DataProcess.Models;
+using Yuebon.DataProcess.IServices;
 
-namespace HtSoft.DataProcessApi.Areas.DataProcess.Controllers
+namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
     /// <summary>
     /// 数据处理-系统接口
