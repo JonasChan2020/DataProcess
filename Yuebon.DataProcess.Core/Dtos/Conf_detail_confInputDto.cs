@@ -13,20 +13,17 @@ namespace Yuebon.DataProcess.Dtos
     public class Conf_detail_confInputDto: IInputDto<string>
     {
         /// <summary>
-        /// 设置或获取唯一键值
-        /// </summary>
-        public string Id { get; set; }
-
-        /// <summary>
         /// 设置或获取配置详情ID
         /// </summary>
         public string Conf_detail_id { get; set; }
-
-        /// <summary>
+        /// <summary>
         /// 设置或获取配置json串
         /// </summary>
         public string Confstr { get; set; }
-
-
+        /// <summary>
+        /// 设置或获取唯一键值
+        /// </summary>
+        public string Id { get; set; }
+
     }
 }

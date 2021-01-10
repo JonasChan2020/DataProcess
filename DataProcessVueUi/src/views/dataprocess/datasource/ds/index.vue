@@ -83,22 +83,22 @@
         @sort-change="handleSortChange"
       >
         <el-table-column type="selection" width="30" />
-                <el-table-column prop="Dscode" label="数据源编码" sortable="custom" width="120" />
-        <el-table-column prop="Dsname" label="数据源名称" sortable="custom" width="120" />
+                <el-table-column prop="Classify_id" label="数据源分类" sortable="custom" width="120" />
         <el-table-column prop="Connectionstr" label="连接信息" sortable="custom" width="120" />
-        <el-table-column prop="Classify_id" label="数据源分类" sortable="custom" width="120" />
-        <el-table-column prop="Dstype" label="数据源类型" sortable="custom" width="120" />
-        <el-table-column prop="State" label="状态" sortable="custom" width="120" />
-        <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="120" />
-        <el-table-column prop="DeleteMark" label="删除标记" sortable="custom" width="120" />
-        <el-table-column prop="EnabledMark" label="启用标记" sortable="custom" width="120" />
-        <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
         <el-table-column prop="CreatorTime" label="创建时间" sortable="custom" width="120" />
         <el-table-column prop="CreatorUserId" label="创建人" sortable="custom" width="120" />
-        <el-table-column prop="LastModifyTime" label="最后修改时间" sortable="custom" width="120" />
-        <el-table-column prop="LastModifyUserId" label="最后修改人" sortable="custom" width="120" />
+        <el-table-column prop="DeleteMark" label="删除标记" sortable="custom" width="120" />
         <el-table-column prop="DeleteTime" label="删除时间" sortable="custom" width="120" />
         <el-table-column prop="DeleteUserId" label="删除人" sortable="custom" width="120" />
+        <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
+        <el-table-column prop="Dscode" label="数据源编码" sortable="custom" width="120" />
+        <el-table-column prop="Dsname" label="数据源名称" sortable="custom" width="120" />
+        <el-table-column prop="Dstype" label="数据源类型" sortable="custom" width="120" />
+        <el-table-column prop="EnabledMark" label="启用标记" sortable="custom" width="120" />
+        <el-table-column prop="LastModifyTime" label="最后修改时间" sortable="custom" width="120" />
+        <el-table-column prop="LastModifyUserId" label="最后修改人" sortable="custom" width="120" />
+        <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="120" />
+        <el-table-column prop="State" label="状态" sortable="custom" width="120" />
 
       </el-table>
       <div class="pagination-container">
@@ -121,35 +121,11 @@
       width="640px"
     >
       <el-form ref="editFrom" :model="editFrom" :rules="rules">
-                <el-form-item label="数据源编码" :label-width="formLabelWidth" prop="Dscode">
-          <el-input v-model="editFrom.Dscode" placeholder="请输入数据源编码" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="数据源名称" :label-width="formLabelWidth" prop="Dsname">
-          <el-input v-model="editFrom.Dsname" placeholder="请输入数据源名称" autocomplete="off" clearable />
+                <el-form-item label="数据源分类" :label-width="formLabelWidth" prop="Classify_id">
+          <el-input v-model="editFrom.Classify_id" placeholder="请输入数据源分类" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="连接信息" :label-width="formLabelWidth" prop="Connectionstr">
           <el-input v-model="editFrom.Connectionstr" placeholder="请输入连接信息" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="数据源分类" :label-width="formLabelWidth" prop="Classify_id">
-          <el-input v-model="editFrom.Classify_id" placeholder="请输入数据源分类" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="数据源类型" :label-width="formLabelWidth" prop="Dstype">
-          <el-input v-model="editFrom.Dstype" placeholder="请输入数据源类型" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="状态" :label-width="formLabelWidth" prop="State">
-          <el-input v-model="editFrom.State" placeholder="请输入状态" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="排序字段" :label-width="formLabelWidth" prop="SortCode">
-          <el-input v-model="editFrom.SortCode" placeholder="请输入排序字段" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="删除标记" :label-width="formLabelWidth" prop="DeleteMark">
-          <el-input v-model="editFrom.DeleteMark" placeholder="请输入删除标记" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="启用标记" :label-width="formLabelWidth" prop="EnabledMark">
-          <el-input v-model="editFrom.EnabledMark" placeholder="请输入启用标记" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
-          <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="创建时间" :label-width="formLabelWidth" prop="CreatorTime">
           <el-input v-model="editFrom.CreatorTime" placeholder="请输入创建时间" autocomplete="off" clearable />
@@ -157,17 +133,41 @@
         <el-form-item label="创建人" :label-width="formLabelWidth" prop="CreatorUserId">
           <el-input v-model="editFrom.CreatorUserId" placeholder="请输入创建人" autocomplete="off" clearable />
         </el-form-item>
-        <el-form-item label="最后修改时间" :label-width="formLabelWidth" prop="LastModifyTime">
-          <el-input v-model="editFrom.LastModifyTime" placeholder="请输入最后修改时间" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="最后修改人" :label-width="formLabelWidth" prop="LastModifyUserId">
-          <el-input v-model="editFrom.LastModifyUserId" placeholder="请输入最后修改人" autocomplete="off" clearable />
+        <el-form-item label="删除标记" :label-width="formLabelWidth" prop="DeleteMark">
+          <el-input v-model="editFrom.DeleteMark" placeholder="请输入删除标记" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="删除时间" :label-width="formLabelWidth" prop="DeleteTime">
           <el-input v-model="editFrom.DeleteTime" placeholder="请输入删除时间" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="删除人" :label-width="formLabelWidth" prop="DeleteUserId">
           <el-input v-model="editFrom.DeleteUserId" placeholder="请输入删除人" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
+          <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="数据源编码" :label-width="formLabelWidth" prop="Dscode">
+          <el-input v-model="editFrom.Dscode" placeholder="请输入数据源编码" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="数据源名称" :label-width="formLabelWidth" prop="Dsname">
+          <el-input v-model="editFrom.Dsname" placeholder="请输入数据源名称" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="数据源类型" :label-width="formLabelWidth" prop="Dstype">
+          <el-input v-model="editFrom.Dstype" placeholder="请输入数据源类型" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="启用标记" :label-width="formLabelWidth" prop="EnabledMark">
+          <el-input v-model="editFrom.EnabledMark" placeholder="请输入启用标记" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="最后修改时间" :label-width="formLabelWidth" prop="LastModifyTime">
+          <el-input v-model="editFrom.LastModifyTime" placeholder="请输入最后修改时间" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="最后修改人" :label-width="formLabelWidth" prop="LastModifyUserId">
+          <el-input v-model="editFrom.LastModifyUserId" placeholder="请输入最后修改人" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="排序字段" :label-width="formLabelWidth" prop="SortCode">
+          <el-input v-model="editFrom.SortCode" placeholder="请输入排序字段" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="状态" :label-width="formLabelWidth" prop="State">
+          <el-input v-model="editFrom.State" placeholder="请输入状态" autocomplete="off" clearable />
         </el-form-item>
 
       </el-form>
@@ -207,22 +207,22 @@ export default {
       dialogEditFormVisible: false,
       editFormTitle: '',
       editFrom: {
-                Dscode: '',
-        Dsname: '',
+                Classify_id: '',
         Connectionstr: '',
-        Classify_id: '',
-        Dstype: '',
-        State: '',
-        SortCode: '',
-        DeleteMark: '',
-        EnabledMark: '',
-        Description: '',
         CreatorTime: '',
         CreatorUserId: '',
-        LastModifyTime: '',
-        LastModifyUserId: '',
+        DeleteMark: '',
         DeleteTime: '',
         DeleteUserId: '',
+        Description: '',
+        Dscode: '',
+        Dsname: '',
+        Dstype: '',
+        EnabledMark: '',
+        LastModifyTime: '',
+        LastModifyUserId: '',
+        SortCode: '',
+        State: '',
 
       },
       rules: {
@@ -292,22 +292,22 @@ export default {
     },
     bindEditInfo: function() {
       getDs_dsDetail(this.currentId).then(res => {
-               this.editFrom.Dscode = res.ResData.Dscode
-        this.editFrom.Dsname = res.ResData.Dsname
+               this.editFrom.Classify_id = res.ResData.Classify_id
         this.editFrom.Connectionstr = res.ResData.Connectionstr
-        this.editFrom.Classify_id = res.ResData.Classify_id
-        this.editFrom.Dstype = res.ResData.Dstype
-        this.editFrom.State = res.ResData.State
-        this.editFrom.SortCode = res.ResData.SortCode
-        this.editFrom.DeleteMark = res.ResData.DeleteMark
-        this.editFrom.EnabledMark = res.ResData.EnabledMark
-        this.editFrom.Description = res.ResData.Description
         this.editFrom.CreatorTime = res.ResData.CreatorTime
         this.editFrom.CreatorUserId = res.ResData.CreatorUserId
-        this.editFrom.LastModifyTime = res.ResData.LastModifyTime
-        this.editFrom.LastModifyUserId = res.ResData.LastModifyUserId
+        this.editFrom.DeleteMark = res.ResData.DeleteMark
         this.editFrom.DeleteTime = res.ResData.DeleteTime
         this.editFrom.DeleteUserId = res.ResData.DeleteUserId
+        this.editFrom.Description = res.ResData.Description
+        this.editFrom.Dscode = res.ResData.Dscode
+        this.editFrom.Dsname = res.ResData.Dsname
+        this.editFrom.Dstype = res.ResData.Dstype
+        this.editFrom.EnabledMark = res.ResData.EnabledMark
+        this.editFrom.LastModifyTime = res.ResData.LastModifyTime
+        this.editFrom.LastModifyUserId = res.ResData.LastModifyUserId
+        this.editFrom.SortCode = res.ResData.SortCode
+        this.editFrom.State = res.ResData.State
 
       })
     },
@@ -318,22 +318,22 @@ export default {
       this.$refs['editFrom'].validate((valid) => {
         if (valid) {
           const data = {
-                   'Dscode':this.editFrom.Dscode,
-        'Dsname':this.editFrom.Dsname,
+                   'Classify_id':this.editFrom.Classify_id,
         'Connectionstr':this.editFrom.Connectionstr,
-        'Classify_id':this.editFrom.Classify_id,
-        'Dstype':this.editFrom.Dstype,
-        'State':this.editFrom.State,
-        'SortCode':this.editFrom.SortCode,
-        'DeleteMark':this.editFrom.DeleteMark,
-        'EnabledMark':this.editFrom.EnabledMark,
-        'Description':this.editFrom.Description,
         'CreatorTime':this.editFrom.CreatorTime,
         'CreatorUserId':this.editFrom.CreatorUserId,
-        'LastModifyTime':this.editFrom.LastModifyTime,
-        'LastModifyUserId':this.editFrom.LastModifyUserId,
+        'DeleteMark':this.editFrom.DeleteMark,
         'DeleteTime':this.editFrom.DeleteTime,
         'DeleteUserId':this.editFrom.DeleteUserId,
+        'Description':this.editFrom.Description,
+        'Dscode':this.editFrom.Dscode,
+        'Dsname':this.editFrom.Dsname,
+        'Dstype':this.editFrom.Dstype,
+        'EnabledMark':this.editFrom.EnabledMark,
+        'LastModifyTime':this.editFrom.LastModifyTime,
+        'LastModifyUserId':this.editFrom.LastModifyUserId,
+        'SortCode':this.editFrom.SortCode,
+        'State':this.editFrom.State,
 
             'Id': this.currentId
           }

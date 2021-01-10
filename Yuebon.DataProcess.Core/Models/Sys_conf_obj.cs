@@ -15,15 +15,13 @@ namespace Yuebon.DataProcess.Models
     public class Sys_conf_obj:BaseEntity<string>
     {
         /// <summary>
-        /// 设置或获取系统配置详情ID
-        /// </summary>
-        public string Sys_conf_detail_id { get; set; }
-
-        /// <summary>
         /// 设置或获取配置json串
         /// </summary>
         public string Configjson { get; set; }
-
-
+        /// <summary>
+        /// 设置或获取系统配置详情ID
+        /// </summary>
+        public string Sys_conf_detail_id { get; set; }
+
     }
 }

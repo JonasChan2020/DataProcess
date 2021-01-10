@@ -18,12 +18,10 @@ namespace Yuebon.DataProcess.Models
         /// 设置或获取配置详情ID
         /// </summary>
         public string Conf_detail_id { get; set; }
-
-        /// <summary>
+        /// <summary>
         /// 设置或获取配置json串
         /// </summary>
         public string Confstr { get; set; }
-
-
+
     }
 }
