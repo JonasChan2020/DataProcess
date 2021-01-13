@@ -10,6 +10,7 @@ using Yuebon.DataProcess.IRepositories;
 using Yuebon.DataProcess.IServices;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
+using System.Linq;
 
 namespace Yuebon.DataProcess.Services
 {
@@ -25,6 +26,48 @@ namespace Yuebon.DataProcess.Services
 			_repository=repository;
 			_logService=logService;
             //_repository.OnOperationLog += _logService.OnOperationLog;
+        }
+
+        /// <summary>
+        /// 获取分类适用于Vue 树形列表
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<Sd_classifyOutputDto>> GetAllClassifyTreeTable()
+        {
+            List<Sd_classifyOutputDto> reslist = new List<Sd_classifyOutputDto>();
+            IEnumerable<Sd_classify> elist = await _repository.GetAllAsync();
+            List<Sd_classify> list = elist.OrderBy(t => t.SortCode).ToList();
+            List<Sd_classify> oneMenuList = list.FindAll(t => t.Parentid == "");
+            foreach (Sd_classify item in oneMenuList)
+            {
+                Sd_classifyOutputDto menuTreeTableOutputDto = new Sd_classifyOutputDto();
+                menuTreeTableOutputDto = item.MapTo<Sd_classifyOutputDto>();
+                menuTreeTableOutputDto.Children = GetSubClasses(list, item.Id).ToList();
+                reslist.Add(menuTreeTableOutputDto);
+            }
+
+            return reslist;
+        }
+
+
+        /// <summary>
+        /// 获取子菜单，递归调用
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="parentId">父级Id</param>
+        /// <returns></returns>
+        private List<Sd_classifyOutputDto> GetSubClasses(List<Sd_classify> data, string parentId)
+        {
+            List<Sd_classifyOutputDto> list = new List<Sd_classifyOutputDto>();
+            Sd_classifyOutputDto OrganizeOutputDto = new Sd_classifyOutputDto();
+            var ChilList = data.FindAll(t => t.Parentid == parentId);
+            foreach (Sd_classify entity in ChilList)
+            {
+                OrganizeOutputDto = entity.MapTo<Sd_classifyOutputDto>();
+                OrganizeOutputDto.Children = GetSubClasses(data, entity.Id).OrderBy(t => t.SortCode).MapTo<Sd_classifyOutputDto>();
+                list.Add(OrganizeOutputDto);
+            }
+            return list;
         }
     }
 }

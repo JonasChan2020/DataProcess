@@ -10,6 +10,7 @@ using Yuebon.DataProcess.IRepositories;
 using Yuebon.DataProcess.IServices;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
+using System.Linq;
 
 namespace Yuebon.DataProcess.Services
 {
@@ -25,6 +26,48 @@ namespace Yuebon.DataProcess.Services
 			_repository=repository;
 			_logService=logService;
             //_repository.OnOperationLog += _logService.OnOperationLog;
+        }
+
+        /// <summary>
+        /// 获取分类适用于Vue 树形列表
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<Conf_classifyOutputDto>> GetAllClassifyTreeTable()
+        {
+            List<Conf_classifyOutputDto> reslist = new List<Conf_classifyOutputDto>();
+            IEnumerable<Conf_classify> elist = await _repository.GetAllAsync();
+            List<Conf_classify> list = elist.OrderBy(t => t.SortCode).ToList();
+            List<Conf_classify> oneMenuList = list.FindAll(t => t.Parentid == "");
+            foreach (Conf_classify item in oneMenuList)
+            {
+                Conf_classifyOutputDto menuTreeTableOutputDto = new Conf_classifyOutputDto();
+                menuTreeTableOutputDto = item.MapTo<Conf_classifyOutputDto>();
+                menuTreeTableOutputDto.Children = GetSubClasses(list, item.Id).ToList();
+                reslist.Add(menuTreeTableOutputDto);
+            }
+
+            return reslist;
+        }
+
+
+        /// <summary>
+        /// 获取子菜单，递归调用
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="parentId">父级Id</param>
+        /// <returns></returns>
+        private List<Conf_classifyOutputDto> GetSubClasses(List<Conf_classify> data, string parentId)
+        {
+            List<Conf_classifyOutputDto> list = new List<Conf_classifyOutputDto>();
+            Conf_classifyOutputDto OrganizeOutputDto = new Conf_classifyOutputDto();
+            var ChilList = data.FindAll(t => t.Parentid == parentId);
+            foreach (Conf_classify entity in ChilList)
+            {
+                OrganizeOutputDto = entity.MapTo<Conf_classifyOutputDto>();
+                OrganizeOutputDto.Children = GetSubClasses(data, entity.Id).OrderBy(t => t.SortCode).MapTo<Conf_classifyOutputDto>();
+                list.Add(OrganizeOutputDto);
+            }
+            return list;
         }
     }
 }

@@ -90,6 +90,11 @@ namespace Yuebon.DataProcess.Dtos
         /// </summary>
         [MaxLength(0)]
         public string Stname { get; set; }
+
+        /// <summary>
+        /// 子集
+        /// </summary>
+        public List<Sys_classifyOutputDto> Children { get; set; }
 
     }
 }

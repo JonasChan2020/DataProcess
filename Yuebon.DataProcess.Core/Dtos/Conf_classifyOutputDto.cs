@@ -95,6 +95,11 @@ namespace Yuebon.DataProcess.Dtos
         /// </summary>
         [MaxLength(0)]
         public string Sysid { get; set; }
+
+        /// <summary>
+        /// 子集
+        /// </summary>
+        public List<Conf_classifyOutputDto> Children { get; set; }
 
     }
 }

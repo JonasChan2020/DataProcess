@@ -8,7 +8,7 @@ import defaultSettings from '@/settings'
 export function getSys_sysListWithPager (data) {
   return http.request({
     url: 'Sys_sys/FindWithPagerAsync',
-    method: 'get',
+    method: 'post',
     data: data,
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })

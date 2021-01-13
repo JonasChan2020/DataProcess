@@ -85,6 +85,11 @@ namespace Yuebon.DataProcess.Dtos
         /// </summary>
         [MaxLength(0)]
         public string State { get; set; }
+
+        /// <summary>
+        /// 子集
+        /// </summary>
+        public List<Ds_classifyOutputDto> Children { get; set; }
 
     }
 }
