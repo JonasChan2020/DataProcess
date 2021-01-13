@@ -121,55 +121,21 @@
       width="640px"
     >
       <el-form ref="editFrom" :model="editFrom" :rules="rules">
-        <el-form-item label="创建时间" :label-width="formLabelWidth" prop="CreatorTime">
-          <el-input v-model="editFrom.CreatorTime" placeholder="请输入创建时间" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="创建人" :label-width="formLabelWidth" prop="CreatorUserId">
-          <el-input v-model="editFrom.CreatorUserId" placeholder="请输入创建人" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="删除标记" :label-width="formLabelWidth" prop="DeleteMark">
-          <el-input v-model="editFrom.DeleteMark" placeholder="请输入删除标记" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="删除时间" :label-width="formLabelWidth" prop="DeleteTime">
-          <el-input v-model="editFrom.DeleteTime" placeholder="请输入删除时间" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="删除人" :label-width="formLabelWidth" prop="DeleteUserId">
-          <el-input v-model="editFrom.DeleteUserId" placeholder="请输入删除人" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
-          <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="启用标记" :label-width="formLabelWidth" prop="EnabledMark">
-          <el-input v-model="editFrom.EnabledMark" placeholder="请输入启用标记" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="最后修改时间" :label-width="formLabelWidth" prop="LastModifyTime">
-          <el-input v-model="editFrom.LastModifyTime" placeholder="请输入最后修改时间" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="最后修改人" :label-width="formLabelWidth" prop="LastModifyUserId">
-          <el-input v-model="editFrom.LastModifyUserId" placeholder="请输入最后修改人" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="层级路径" :label-width="formLabelWidth" prop="Levelpath">
-          <el-input v-model="editFrom.Levelpath" placeholder="请输入层级路径" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="父ID" :label-width="formLabelWidth" prop="Parentid">
-          <el-input v-model="editFrom.Parentid" placeholder="请输入父ID" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="排序字段" :label-width="formLabelWidth" prop="SortCode">
-          <el-input v-model="editFrom.SortCode" placeholder="请输入排序字段" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="状态" :label-width="formLabelWidth" prop="State">
-          <el-input v-model="editFrom.State" placeholder="请输入状态" autocomplete="off" clearable />
-        </el-form-item>
         <el-form-item label="类型编码" :label-width="formLabelWidth" prop="Stcode">
           <el-input v-model="editFrom.Stcode" placeholder="请输入类型编码" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="类型描述" :label-width="formLabelWidth" prop="Stdesc">
-          <el-input v-model="editFrom.Stdesc" placeholder="请输入类型描述" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="类型名称" :label-width="formLabelWidth" prop="Stname">
           <el-input v-model="editFrom.Stname" placeholder="请输入类型名称" autocomplete="off" clearable />
         </el-form-item>
-
+        <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
+          <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="上级分类" :label-width="formLabelWidth" prop="Parentid">
+          <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'Stname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
+        </el-form-item>
+        <el-form-item label="排序字段" :label-width="formLabelWidth" prop="SortCode">
+          <el-input v-model="editFrom.SortCode" placeholder="请输入排序字段" autocomplete="off" clearable />
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogEditFormVisible = false">取 消</el-button>
@@ -183,7 +149,7 @@
 
 import { getSys_classifyListWithPager, getSys_classifyDetail,
   saveSys_classify, setSys_classifyEnable, deleteSoftSys_classify,
-  deleteSys_classify
+  deleteSys_classify, getAllClassifyTreeTable
 } from '@/api/dataprocess/sys_classify'
 
 export default {
@@ -204,6 +170,8 @@ export default {
         order: 'desc',
         sort: 'CreatorTime'
       },
+      selectedclass: '',
+      selectclasses: [],
       dialogEditFormVisible: false,
       editFormTitle: '',
       editFrom: {
@@ -244,6 +212,9 @@ export default {
      * 初始化数据
      */
     InitDictItem () {
+      getAllClassifyTreeTable().then(res => {
+        this.selectclasses = res.ResData
+      })
     },
     /**
      * 加载页面table数据
@@ -287,6 +258,7 @@ export default {
       } else {
         this.editFormTitle = '新增'
         this.currentId = ''
+        this.selectedclass = ''
         this.dialogEditFormVisible = true
       }
     },
@@ -308,6 +280,7 @@ export default {
         this.editFrom.Stcode = res.ResData.Stcode
         this.editFrom.Stdesc = res.ResData.Stdesc
         this.editFrom.Stname = res.ResData.Stname
+        this.selectedclass = res.Parentid
       })
     },
     /**
@@ -336,7 +309,11 @@ export default {
 
             'Id': this.currentId
           }
-          saveSys_classify(data).then(res => {
+          var url = 'Conf_classify/Insert'
+          if (this.currentId !== '') {
+            url = 'Conf_classify/Update?id=' + this.currentId
+          }
+          saveSys_classify(data, url).then(res => {
             if (res.Success) {
               this.$message({
                 message: '恭喜你，操作成功',
@@ -344,6 +321,7 @@ export default {
               })
               this.dialogEditFormVisible = false
               this.currentSelected = ''
+              this.selectedclass = ''
               this.$refs['editFrom'].resetFields()
               this.loadTableData()
               this.InitDictItem()
@@ -459,6 +437,12 @@ export default {
         this.sortableData.order = 'desc'
       }
       this.loadTableData()
+    },
+    /**
+  *选择上级分类
+  */
+    handleSelectClassChange: function () {
+      this.editFrom.Parentid = this.selectedclass
     },
     /**
      * 当用户手动勾选checkbox数据行事件

@@ -12,6 +12,7 @@ using Yuebon.Commons.Pages;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 using Yuebon.DataProcess.IServices;
+using Yuebon.AspNetCore.Mvc;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -74,6 +75,31 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             info.DeleteMark = true;
             info.DeleteTime = DateTime.Now;
             info.DeleteUserId = CurrentUser.UserId;
+        }
+
+        /// <summary>
+        /// 获取功能菜单适用于Vue 树形列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetAllClassifyTreeTable")]
+        [YuebonAuthorize("List")]
+        public async Task<IActionResult> GetAllClassifyTreeTable()
+        {
+            CommonResult result = new CommonResult();
+            try
+            {
+                List<Plug_typeOutputDto> list = await iService.GetAllClassifyTreeTable();
+                result.Success = true;
+                result.ErrCode = ErrCode.successCode;
+                result.ResData = list;
+            }
+            catch (Exception ex)
+            {
+                Log4NetHelper.Error("获取组织结构异常", ex);
+                result.ErrMsg = ErrCode.err40110;
+                result.ErrCode = "40110";
+            }
+            return ToJsonContent(result);
         }
     }
 }

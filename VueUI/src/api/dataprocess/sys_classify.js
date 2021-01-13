@@ -22,6 +22,17 @@ export function getAllSys_classifyList () {
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
 }
+
+/**
+ * 获取树形分类
+*/
+export function getAllClassifyTreeTable () {
+  return http.request({
+    url: 'Sys_classify/GetAllClassifyTreeTable',
+    method: 'get',
+    baseURL: defaultSettings.apiSecurityUrl // 直接通过覆盖的方式
+  })
+}
 /**
    * 新增或修改保存
    * @param data
