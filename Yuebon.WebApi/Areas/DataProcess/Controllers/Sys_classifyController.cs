@@ -11,6 +11,7 @@ using Yuebon.Commons.Models;
 using Yuebon.AspNetCore.Models;
 using Yuebon.Commons.Log;
 using System.Collections.Generic;
+using Yuebon.Commons.Mapping;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -74,6 +75,84 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             info.DeleteTime = DateTime.Now;
             info.DeleteUserId = CurrentUser.UserId;
         }
+
+        /// <summary>
+        /// 异步新增数据
+        /// </summary>
+        /// <param name="tinfo"></param>
+        /// <returns></returns>
+        [HttpPost("Insert")]
+        [YuebonAuthorize("Add")]
+        public override async Task<IActionResult> InsertAsync(Sys_classifyInputDto tinfo)
+        {
+            CommonResult result = new CommonResult();
+
+            #region 验证非空及重复
+            if (!string.IsNullOrEmpty(tinfo.Stcode))
+            {
+                string where = string.Format("stcode='{0}'", tinfo.Stcode);
+                Sys_classify model = iService.GetWhere(where);
+                if (model != null)
+                {
+                    result.ErrMsg = "编码不能重复";
+                    return ToJsonContent(result);
+                }
+            }
+            else
+            {
+                result.ErrMsg = "编码不能为空";
+                return ToJsonContent(result);
+            }
+            #endregion
+
+            #region 补充层级路径
+            if (!string.IsNullOrEmpty(tinfo.Parentid))
+            { 
+                12
+            }
+            #endregion
+
+            Sys_classify info = tinfo.MapTo<Sys_classify>();
+            OnBeforeInsert(info);
+            result.Success = await iService.InsertAsync(info) > 0;
+            if (result.Success)
+            {
+                result.ErrCode = ErrCode.successCode;
+                result.ErrMsg = ErrCode.err0;
+            }
+            else
+            {
+                result.ErrMsg = ErrCode.err43001;
+                result.ErrCode = "43001";
+            }
+            return ToJsonContent(result);
+        }
+        /// <summary>
+        /// 异步更新数据
+        /// </summary>
+        /// <param name="tinfo"></param>
+        /// <param name="id">主键Id</param>
+        /// <returns></returns>
+        [HttpPost("Update")]
+        [YuebonAuthorize("Edit")]
+        public override async Task<IActionResult> UpdateAsync(Sys_classifyInputDto tinfo, string id)
+        {
+            CommonResult result = new CommonResult();
+0
+            bool bl = await iService.UpdateAsync(info, id).ConfigureAwait(false);
+            if (bl)
+            {
+                result.ErrCode = ErrCode.successCode;
+                result.ErrMsg = ErrCode.err0;
+            }
+            else
+            {
+                result.ErrMsg = ErrCode.err43002;
+                result.ErrCode = "43002";
+            }
+            return ToJsonContent(result);
+        }
+
 
         /// <summary>
         /// 获取功能菜单适用于Vue 树形列表

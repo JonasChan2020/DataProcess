@@ -264,22 +264,12 @@ export default {
     },
     bindEditInfo: function () {
       getSys_classifyDetail(this.currentId).then(res => {
-        this.editFrom.CreatorTime = res.ResData.CreatorTime
-        this.editFrom.CreatorUserId = res.ResData.CreatorUserId
-        this.editFrom.DeleteMark = res.ResData.DeleteMark
-        this.editFrom.DeleteTime = res.ResData.DeleteTime
-        this.editFrom.DeleteUserId = res.ResData.DeleteUserId
+        this.editFrom.Stcode = res.ResData.Stcode
+        this.editFrom.Stname = res.ResData.Stname
         this.editFrom.Description = res.ResData.Description
         this.editFrom.EnabledMark = res.ResData.EnabledMark
-        this.editFrom.LastModifyTime = res.ResData.LastModifyTime
-        this.editFrom.LastModifyUserId = res.ResData.LastModifyUserId
-        this.editFrom.Levelpath = res.ResData.Levelpath
         this.editFrom.Parentid = res.ResData.Parentid
         this.editFrom.SortCode = res.ResData.SortCode
-        this.editFrom.State = res.ResData.State
-        this.editFrom.Stcode = res.ResData.Stcode
-        this.editFrom.Stdesc = res.ResData.Stdesc
-        this.editFrom.Stname = res.ResData.Stname
         this.selectedclass = res.Parentid
       })
     },
@@ -290,29 +280,21 @@ export default {
       this.$refs['editFrom'].validate((valid) => {
         if (valid) {
           const data = {
-            'CreatorTime': this.editFrom.CreatorTime,
-            'CreatorUserId': this.editFrom.CreatorUserId,
-            'DeleteMark': this.editFrom.DeleteMark,
-            'DeleteTime': this.editFrom.DeleteTime,
-            'DeleteUserId': this.editFrom.DeleteUserId,
             'Description': this.editFrom.Description,
             'EnabledMark': this.editFrom.EnabledMark,
-            'LastModifyTime': this.editFrom.LastModifyTime,
-            'LastModifyUserId': this.editFrom.LastModifyUserId,
-            'Levelpath': this.editFrom.Levelpath,
             'Parentid': this.editFrom.Parentid,
             'SortCode': this.editFrom.SortCode,
             'State': this.editFrom.State,
             'Stcode': this.editFrom.Stcode,
             'Stdesc': this.editFrom.Stdesc,
             'Stname': this.editFrom.Stname,
-
             'Id': this.currentId
           }
-          var url = 'Conf_classify/Insert'
+          var url = 'sys_classify/Insert'
           if (this.currentId !== '') {
-            url = 'Conf_classify/Update?id=' + this.currentId
+            url = 'sys_classify/Update?id=' + this.currentId
           }
+          alert(this.currentId)
           saveSys_classify(data, url).then(res => {
             if (res.Success) {
               this.$message({
@@ -333,6 +315,7 @@ export default {
             }
           })
         } else {
+          alert(2)
           return false
         }
       })
