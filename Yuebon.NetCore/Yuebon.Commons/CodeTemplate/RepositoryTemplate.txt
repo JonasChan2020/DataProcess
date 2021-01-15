@@ -1,5 +1,6 @@
-﻿using Yuebon.Commons.Repositories;
+﻿using System;
 using Yuebon.Commons.IDbContext;
+using Yuebon.Commons.Repositories;
 using {IRepositoriesNamespace};
 using {ModelsNamespace};
 

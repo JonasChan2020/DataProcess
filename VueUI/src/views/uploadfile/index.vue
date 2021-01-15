@@ -22,6 +22,7 @@
       <div class="list-btn-container">
         <el-button-group>
           <slot v-for="itemf in loadBtnFunc">
+            <el-button v-if="itemf.FullName === '新增'" type="primary" icon="el-icon-plus" size="small" @click="ShowEditOrViewDialog()">新增</el-button>
             <el-button
               v-if="itemf.FullName==='删除'"
               type="danger"
@@ -110,6 +111,7 @@ import { getUploadFileListWithPager, deleteUploadFile } from '@/api/security/upl
 
 import defaultSettings from '@/settings'
 export default {
+  name: 'UploadFile',
   data () {
     return {
       searchform: {
@@ -179,13 +181,20 @@ export default {
         this.currentSelected.forEach(element => {
           currentIds.push(element.Id)
         })
-        const data = {
-          Ids: currentIds
-        }
-        deleteUploadFile(data).then(res => {
+
+        this.$confirm('是否确认删除所选的数据项?', '警告', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(function () {
+          const data = {
+            Ids: currentIds
+          }
+          return deleteUploadFile(data)
+        }).then(res => {
           if (res.Success) {
             this.$message({
-              message: '恭喜你，操作成功',
+              message: '恭喜你，删除成功',
               type: 'success'
             })
             this.currentSelected = ''

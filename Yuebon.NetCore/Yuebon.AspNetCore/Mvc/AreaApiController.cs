@@ -11,6 +11,7 @@ using Yuebon.AspNetCore.Mvc;
 using Yuebon.AspNetCore.Mvc.Filter;
 using Yuebon.AspNetCore.ViewModel;
 using Yuebon.Commons.Cache;
+using Yuebon.Commons.Core.Dtos;
 using Yuebon.Commons.Dtos;
 using Yuebon.Commons.Extensions;
 using Yuebon.Commons.IServices;
@@ -128,8 +129,7 @@ namespace Yuebon.AspNetCore.Controllers
 
 
         /// <summary>
-        /// 异步更新数据，需要在业务模块控制器重写该方法
-        /// 否则更新无效
+        /// 异步更新数据，需要在业务模块控制器重写该方法,否则更新无效
         /// </summary>
         /// <param name="tinfo"></param>
         /// <param name="id">主键Id</param>
@@ -193,7 +193,7 @@ namespace Yuebon.AspNetCore.Controllers
         /// <param name="info"></param>
         [HttpDelete("DeleteBatchAsync")]
         [YuebonAuthorize("Delete")]
-        public virtual async Task<IActionResult> DeleteBatchAsync(UpdateEnableViewModel info)
+        public virtual async Task<IActionResult> DeleteBatchAsync(DeletesInputDto info)
         {
             CommonResult result = new CommonResult();
             string where = string.Empty;

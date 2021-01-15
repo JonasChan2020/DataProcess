@@ -281,6 +281,7 @@ namespace Yuebon.Commons.Services
         /// 异步查询单个实体。
         /// </summary>
         /// <param name="id">主键</param>
+        /// <param name="trans">事务对象</param>
         /// <returns></returns>
         public virtual async Task<T> GetAsync(TKey id)
         {
@@ -290,6 +291,7 @@ namespace Yuebon.Commons.Services
         /// 异步查询单个实体。
         /// </summary>
         /// <param name="id">主键</param>
+        /// <param name="trans">事务对象</param>
         /// <returns></returns>
         public virtual async Task<TODto> GetOutDtoAsync(TKey id)
         {

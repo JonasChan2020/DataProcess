@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Yuebon.AspNetCore.Controllers;
 using Yuebon.AspNetCore.Models;
 using Yuebon.AspNetCore.Mvc;
+using Yuebon.Commons.Core.Dtos;
 using Yuebon.Commons.Helpers;
 using Yuebon.Commons.Log;
 using Yuebon.Commons.Models;
@@ -143,7 +144,7 @@ namespace Yuebon.WebApi.Areas.Security.Controllers
             return ToJsonContent(result);
         }
         /// <summary>
-        /// 获取功能菜单适用于Vue 树形列表
+        /// 获取组织机构适用于Vue 树形列表
         /// </summary>
         /// <returns></returns>
         [HttpGet("GetAllOrganizeTreeTable")]
@@ -169,7 +170,7 @@ namespace Yuebon.WebApi.Areas.Security.Controllers
 
 
         /// <summary>
-        /// 获取功能菜单适用于Vue Tree树形
+        /// 获取组织机构适用于Vue Tree树形
         /// </summary>
         /// <returns></returns>
         [HttpGet("GetAllOrganizeTree")]
@@ -186,9 +187,36 @@ namespace Yuebon.WebApi.Areas.Security.Controllers
             }
             catch (Exception ex)
             {
-                Log4NetHelper.Error("获取菜单异常", ex);
+                Log4NetHelper.Error("获取组织结构异常", ex);
                 result.ErrMsg = ErrCode.err40110;
                 result.ErrCode = "40110";
+            }
+            return ToJsonContent(result);
+        }
+
+
+        /// <summary>
+        /// 异步批量物理删除
+        /// </summary>
+        /// <param name="info"></param>
+        [HttpDelete("DeleteBatchAsync")]
+        [YuebonAuthorize("Delete")]
+        public override async Task<IActionResult> DeleteBatchAsync(DeletesInputDto info)
+        {
+            CommonResult result = new CommonResult();
+
+            if (info.Ids.Length > 0)
+            {
+                result = await iService.DeleteBatchWhereAsync(info).ConfigureAwait(false);
+                if (result.Success)
+                {
+                    result.ErrCode = ErrCode.successCode;
+                    result.ErrMsg = ErrCode.err0;
+                }
+                else
+                {
+                    result.ErrCode = "43003";
+                }
             }
             return ToJsonContent(result);
         }
