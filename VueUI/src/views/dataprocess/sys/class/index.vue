@@ -52,13 +52,6 @@
               @click="setEnable('1')"
             >启用</el-button>
             <el-button
-              v-if="itemf.FullName==='软删除'"
-              type="warning"
-              icon="el-icon-delete"
-              size="small"
-              @click="deleteSoft('0')"
-            >软删除</el-button>
-            <el-button
               v-if="itemf.FullName==='删除'"
               type="danger"
               icon="el-icon-delete"
@@ -69,50 +62,20 @@
           <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableData()">刷新</el-button>
         </el-button-group>
       </div>
-      <el-table
-        ref="gridtable"
-        v-loading="tableloading"
-        :data="tableData"
-        border
-        stripe
-        highlight-current-row
-        style="width: 100%"
-        :default-sort="{prop: 'SortCode', order: 'ascending'}"
-        @select="handleSelectChange"
-        @select-all="handleSelectAllChange"
-        @sort-change="handleSortChange"
-      >
-        <el-table-column type="selection" width="30" />
-        <el-table-column prop="CreatorTime" label="创建时间" sortable="custom" width="120" />
-        <el-table-column prop="CreatorUserId" label="创建人" sortable="custom" width="120" />
-        <el-table-column prop="DeleteMark" label="删除标记" sortable="custom" width="120" />
-        <el-table-column prop="DeleteTime" label="删除时间" sortable="custom" width="120" />
-        <el-table-column prop="DeleteUserId" label="删除人" sortable="custom" width="120" />
-        <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
-        <el-table-column prop="EnabledMark" label="启用标记" sortable="custom" width="120" />
-        <el-table-column prop="LastModifyTime" label="最后修改时间" sortable="custom" width="120" />
-        <el-table-column prop="LastModifyUserId" label="最后修改人" sortable="custom" width="120" />
-        <el-table-column prop="Levelpath" label="层级路径" sortable="custom" width="120" />
-        <el-table-column prop="Parentid" label="父ID" sortable="custom" width="120" />
-        <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="120" />
-        <el-table-column prop="State" label="状态" sortable="custom" width="120" />
-        <el-table-column prop="Stcode" label="类型编码" sortable="custom" width="120" />
-        <el-table-column prop="Stdesc" label="类型描述" sortable="custom" width="120" />
-        <el-table-column prop="Stname" label="类型名称" sortable="custom" width="120" />
 
+      <el-table ref="gridtable" v-loading="tableloading" :data="tableData" row-key="Id" border stripe highlight-current-row style="width: 100%" default-expand-all :tree-props="{ children: 'Children' }" @select="handleSelectChange" @select-all="handleSelectAllChange" @sort-change="handleSortChange">
+        <el-table-column type="selection" width="30" />
+        <el-table-column prop="Stcode" label="类型编码" sortable="custom" width="380" />
+        <el-table-column prop="Stname" label="类型名称" sortable="custom" width="180" />
+        <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="90" align="center" />
+        <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="CreatorTime" label="创建时间" sortable />
+        <el-table-column prop="LastModifyTime" label="更新时间" sortable />
       </el-table>
-      <div class="pagination-container">
-        <el-pagination
-          background
-          :current-page="pagination.currentPage"
-          :page-sizes="[5,10,20,50,100, 200, 300, 400]"
-          :page-size="pagination.pagesize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="pagination.pageTotal"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
     </el-card>
     <el-dialog
       ref="dialogEditForm"
@@ -133,8 +96,11 @@
         <el-form-item label="上级分类" :label-width="formLabelWidth" prop="Parentid">
           <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'Stname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
         </el-form-item>
-        <el-form-item label="排序字段" :label-width="formLabelWidth" prop="SortCode">
-          <el-input v-model="editFrom.SortCode" placeholder="请输入排序字段" autocomplete="off" clearable />
+        <el-form-item label="排序" :label-width="formLabelWidth" prop="SortCode">
+          <el-input v-model.number="editFrom.SortCode" placeholder="请输入排序,默认为99" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="选项" :label-width="formLabelWidth" prop="">
+          <el-checkbox v-model="editFrom.EnabledMark">启用</el-checkbox>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -147,7 +113,7 @@
 
 <script>
 
-import { getSys_classifyListWithPager, getSys_classifyDetail,
+import { getSys_classifyDetail,
   saveSys_classify, setSys_classifyEnable, deleteSoftSys_classify,
   deleteSys_classify, getAllClassifyTreeTable
 } from '@/api/dataprocess/sys_classify'
@@ -161,11 +127,6 @@ export default {
       loadBtnFunc: [],
       tableData: [],
       tableloading: true,
-      pagination: {
-        currentPage: 1,
-        pagesize: 20,
-        pageTotal: 0
-      },
       sortableData: {
         order: 'desc',
         sort: 'CreatorTime'
@@ -175,21 +136,11 @@ export default {
       dialogEditFormVisible: false,
       editFormTitle: '',
       editFrom: {
-        CreatorTime: '',
-        CreatorUserId: '',
-        DeleteMark: '',
-        DeleteTime: '',
-        DeleteUserId: '',
         Description: '',
         EnabledMark: '',
-        LastModifyTime: '',
-        LastModifyUserId: '',
-        Levelpath: '',
         Parentid: '',
         SortCode: '',
-        State: '',
         Stcode: '',
-        Stdesc: '',
         Stname: ''
 
       },
@@ -202,7 +153,6 @@ export default {
     }
   },
   created () {
-    this.pagination.currentPage = 1
     this.InitDictItem()
     this.loadTableData()
     this.loadBtnFunc = JSON.parse(localStorage.getItem('yueboncurrentfuns'))
@@ -212,25 +162,16 @@ export default {
      * 初始化数据
      */
     InitDictItem () {
-      getAllClassifyTreeTable().then(res => {
-        this.selectclasses = res.ResData
-      })
+
     },
     /**
      * 加载页面table数据
      */
     loadTableData: function () {
       this.tableloading = true
-      var seachdata = {
-        CurrenetPageIndex: this.pagination.currentPage,
-        PageSize: this.pagination.pagesize,
-        Keywords: this.searchform.keywords,
-        Order: this.sortableData.order,
-        Sort: this.sortableData.sort
-      }
-      getSys_classifyListWithPager(seachdata).then(res => {
-        this.tableData = res.ResData.Items
-        this.pagination.pageTotal = res.ResData.TotalItems
+      getAllClassifyTreeTable().then(res => {
+        this.tableData = res.ResData
+        this.selectclasses = res.ResData
         this.tableloading = false
       })
     },
@@ -270,7 +211,7 @@ export default {
         this.editFrom.EnabledMark = res.ResData.EnabledMark
         this.editFrom.Parentid = res.ResData.Parentid
         this.editFrom.SortCode = res.ResData.SortCode
-        this.selectedclass = res.Parentid
+        this.selectedclass = res.ResData.Parentid
       })
     },
     /**
@@ -281,20 +222,17 @@ export default {
         if (valid) {
           const data = {
             'Description': this.editFrom.Description,
-            'EnabledMark': this.editFrom.EnabledMark,
             'Parentid': this.editFrom.Parentid,
             'SortCode': this.editFrom.SortCode,
-            'State': this.editFrom.State,
             'Stcode': this.editFrom.Stcode,
-            'Stdesc': this.editFrom.Stdesc,
             'Stname': this.editFrom.Stname,
+            'EnabledMark': this.editFrom.EnabledMark,
             'Id': this.currentId
           }
           var url = 'sys_classify/Insert'
           if (this.currentId !== '') {
             url = 'sys_classify/Update?id=' + this.currentId
           }
-          alert(this.currentId)
           saveSys_classify(data, url).then(res => {
             if (res.Success) {
               this.$message({
@@ -315,7 +253,6 @@ export default {
             }
           })
         } else {
-          alert(2)
           return false
         }
       })
