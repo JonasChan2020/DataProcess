@@ -22,151 +22,84 @@
       <div class="list-btn-container">
         <el-button-group>
           <slot v-for="itemf in loadBtnFunc">
-            <el-button
-              v-if="itemf.FullName==='新增'"
-              type="primary"
-              icon="el-icon-plus"
-              size="small"
-              @click="ShowEditOrViewDialog()"
-            >新增</el-button>
-            <el-button
-              v-if="itemf.FullName==='修改'"
-              type="primary"
-              icon="el-icon-edit"
-              class="el-button-modify"
-              size="small"
-              @click="ShowEditOrViewDialog('edit')"
-            >修改</el-button>
-            <el-button
-              v-if="itemf.FullName=='禁用'"
-              type="info"
-              icon="el-icon-video-pause"
-              size="small"
-              @click="setEnable('0')"
-            >禁用</el-button>
-            <el-button
-              v-if="itemf.FullName=='启用'"
-              type="success"
-              icon="el-icon-video-play"
-              size="small"
-              @click="setEnable('1')"
-            >启用</el-button>
-            <el-button
-              v-if="itemf.FullName==='软删除'"
-              type="warning"
-              icon="el-icon-delete"
-              size="small"
-              @click="deleteSoft('0')"
-            >软删除</el-button>
-            <el-button
-              v-if="itemf.FullName==='删除'"
-              type="danger"
-              icon="el-icon-delete"
-              size="small"
-              @click="deletePhysics()"
-            >删除</el-button>
+            <el-button v-if="itemf.FullName==='新增'"
+                       type="primary"
+                       icon="el-icon-plus"
+                       size="small"
+                       @click="ShowEditOrViewDialog()">新增</el-button>
+            <el-button v-if="itemf.FullName==='修改'"
+                       type="primary"
+                       icon="el-icon-edit"
+                       class="el-button-modify"
+                       size="small"
+                       @click="ShowEditOrViewDialog('edit')">修改</el-button>
+            <el-button v-if="itemf.FullName=='禁用'"
+                       type="info"
+                       icon="el-icon-video-pause"
+                       size="small"
+                       @click="setEnable('0')">禁用</el-button>
+            <el-button v-if="itemf.FullName=='启用'"
+                       type="success"
+                       icon="el-icon-video-play"
+                       size="small"
+                       @click="setEnable('1')">启用</el-button>
+            <el-button v-if="itemf.FullName==='软删除'"
+                       type="warning"
+                       icon="el-icon-delete"
+                       size="small"
+                       @click="deleteSoft('0')">软删除</el-button>
+            <el-button v-if="itemf.FullName==='删除'"
+                       type="danger"
+                       icon="el-icon-delete"
+                       size="small"
+                       @click="deletePhysics()">删除</el-button>
           </slot>
           <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableData()">刷新</el-button>
         </el-button-group>
       </div>
-      <el-table
-        ref="gridtable"
-        v-loading="tableloading"
-        :data="tableData"
-        border
-        stripe
-        highlight-current-row
-        style="width: 100%"
-        :default-sort="{prop: 'SortCode', order: 'ascending'}"
-        @select="handleSelectChange"
-        @select-all="handleSelectAllChange"
-        @sort-change="handleSortChange"
-      >
-        <el-table-column type="selection" width="30" />
-        <el-table-column prop="CreatorTime" label="创建时间" sortable="custom" width="120" />
-        <el-table-column prop="CreatorUserId" label="创建人" sortable="custom" width="120" />
-        <el-table-column prop="DeleteMark" label="删除标记" sortable="custom" width="120" />
-        <el-table-column prop="DeleteTime" label="删除时间" sortable="custom" width="120" />
-        <el-table-column prop="DeleteUserId" label="删除人" sortable="custom" width="120" />
-        <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
-        <el-table-column prop="Dtcode" label="类型编码" sortable="custom" width="120" />
-        <el-table-column prop="Dtname" label="类型名称" sortable="custom" width="120" />
-        <el-table-column prop="EnabledMark" label="启用标记" sortable="custom" width="120" />
-        <el-table-column prop="LastModifyTime" label="最后修改时间" sortable="custom" width="120" />
-        <el-table-column prop="LastModifyUserId" label="最后修改人" sortable="custom" width="120" />
-        <el-table-column prop="Levelpath" label="层级路径" sortable="custom" width="120" />
-        <el-table-column prop="Parentid" label="父ID" sortable="custom" width="120" />
-        <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="120" />
-        <el-table-column prop="State" label="状态" sortable="custom" width="120" />
 
+      <el-table ref="gridtable" v-loading="tableloading" :data="tableData" row-key="Id" border stripe highlight-current-row style="width: 100%" default-expand-all :tree-props="{ children: 'Children' }" @select="handleSelectChange" @select-all="handleSelectAllChange" @sort-change="handleSortChange">
+        <el-table-column type="selection" width="30" />
+        <el-table-column prop="Dtcode" label="类型编码" sortable="custom" width="380" />
+        <el-table-column prop="Dtname" label="类型名称" sortable="custom" width="180" />
+        <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="90" align="center" />
+        <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="CreatorTime" label="创建时间" sortable />
+        <el-table-column prop="LastModifyTime" label="更新时间" sortable />
       </el-table>
-      <div class="pagination-container">
-        <el-pagination
-          background
-          :current-page="pagination.currentPage"
-          :page-sizes="[5,10,20,50,100, 200, 300, 400]"
-          :page-size="pagination.pagesize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="pagination.pageTotal"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
+
+      
     </el-card>
-    <el-dialog
-      ref="dialogEditForm"
-      :title="editFormTitle+'{TableNameDesc}'"
-      :visible.sync="dialogEditFormVisible"
-      width="640px"
-    >
+    <el-dialog ref="dialogEditForm"
+               :title="editFormTitle+'{TableNameDesc}'"
+               :visible.sync="dialogEditFormVisible"
+               width="640px">
+
       <el-form ref="editFrom" :model="editFrom" :rules="rules">
-        <el-form-item label="创建时间" :label-width="formLabelWidth" prop="CreatorTime">
-          <el-input v-model="editFrom.CreatorTime" placeholder="请输入创建时间" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="创建人" :label-width="formLabelWidth" prop="CreatorUserId">
-          <el-input v-model="editFrom.CreatorUserId" placeholder="请输入创建人" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="删除标记" :label-width="formLabelWidth" prop="DeleteMark">
-          <el-input v-model="editFrom.DeleteMark" placeholder="请输入删除标记" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="删除时间" :label-width="formLabelWidth" prop="DeleteTime">
-          <el-input v-model="editFrom.DeleteTime" placeholder="请输入删除时间" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="删除人" :label-width="formLabelWidth" prop="DeleteUserId">
-          <el-input v-model="editFrom.DeleteUserId" placeholder="请输入删除人" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
-          <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
-        </el-form-item>
         <el-form-item label="类型编码" :label-width="formLabelWidth" prop="Dtcode">
           <el-input v-model="editFrom.Dtcode" placeholder="请输入类型编码" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="类型名称" :label-width="formLabelWidth" prop="Dtname">
           <el-input v-model="editFrom.Dtname" placeholder="请输入类型名称" autocomplete="off" clearable />
         </el-form-item>
-        <el-form-item label="启用标记" :label-width="formLabelWidth" prop="EnabledMark">
-          <el-input v-model="editFrom.EnabledMark" placeholder="请输入启用标记" autocomplete="off" clearable />
+        <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
+          <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
         </el-form-item>
-        <el-form-item label="最后修改时间" :label-width="formLabelWidth" prop="LastModifyTime">
-          <el-input v-model="editFrom.LastModifyTime" placeholder="请输入最后修改时间" autocomplete="off" clearable />
+        <el-form-item label="上级分类" :label-width="formLabelWidth" prop="Parentid">
+          <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'Dtname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
         </el-form-item>
-        <el-form-item label="最后修改人" :label-width="formLabelWidth" prop="LastModifyUserId">
-          <el-input v-model="editFrom.LastModifyUserId" placeholder="请输入最后修改人" autocomplete="off" clearable />
+        <el-form-item label="排序" :label-width="formLabelWidth" prop="SortCode">
+          <el-input v-model.number="editFrom.SortCode" placeholder="请输入排序,默认为99" autocomplete="off" clearable />
         </el-form-item>
-        <el-form-item label="层级路径" :label-width="formLabelWidth" prop="Levelpath">
-          <el-input v-model="editFrom.Levelpath" placeholder="请输入层级路径" autocomplete="off" clearable />
+        <el-form-item label="选项" :label-width="formLabelWidth" prop="">
+          <el-checkbox v-model="editFrom.EnabledMark">启用</el-checkbox>
         </el-form-item>
-        <el-form-item label="父ID" :label-width="formLabelWidth" prop="Parentid">
-          <el-input v-model="editFrom.Parentid" placeholder="请输入父ID" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="排序字段" :label-width="formLabelWidth" prop="SortCode">
-          <el-input v-model="editFrom.SortCode" placeholder="请输入排序字段" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="状态" :label-width="formLabelWidth" prop="State">
-          <el-input v-model="editFrom.State" placeholder="请输入状态" autocomplete="off" clearable />
-        </el-form-item>
-
       </el-form>
+
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogEditFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="saveEditForm()">确 定</el-button>
@@ -179,7 +112,7 @@
 
 import { getDs_classifyListWithPager, getDs_classifyDetail,
   saveDs_classify, setDs_classifyEnable, deleteSoftDs_classify,
-  deleteDs_classify
+    deleteDs_classify, getAllClassifyTreeTable
 } from '@/api/dataprocess/ds_classify'
 
 export default {
@@ -200,25 +133,17 @@ export default {
         order: 'desc',
         sort: 'CreatorTime'
       },
+      selectedclass: '',
+      selectclasses: [],
       dialogEditFormVisible: false,
       editFormTitle: '',
       editFrom: {
-        CreatorTime: '',
-        CreatorUserId: '',
-        DeleteMark: '',
-        DeleteTime: '',
-        DeleteUserId: '',
         Description: '',
-        Dtcode: '',
-        Dtname: '',
         EnabledMark: '',
-        LastModifyTime: '',
-        LastModifyUserId: '',
-        Levelpath: '',
         Parentid: '',
         SortCode: '',
-        State: ''
-
+        Dtcode: '',
+        Dtname: ''
       },
       rules: {
 
@@ -229,7 +154,6 @@ export default {
     }
   },
   created () {
-    this.pagination.currentPage = 1
     this.InitDictItem()
     this.loadTableData()
     this.loadBtnFunc = JSON.parse(localStorage.getItem('yueboncurrentfuns'))
@@ -245,16 +169,11 @@ export default {
      */
     loadTableData: function () {
       this.tableloading = true
-      var seachdata = {
-        CurrenetPageIndex: this.pagination.currentPage,
-        PageSize: this.pagination.pagesize,
-        Keywords: this.searchform.keywords,
-        Order: this.sortableData.order,
-        Sort: this.sortableData.sort
-      }
-      getDs_classifyListWithPager(seachdata).then(res => {
-        this.tableData = res.ResData.Items
-        this.pagination.pageTotal = res.ResData.TotalItems
+ 
+      getAllClassifyTreeTable().then(res => {
+        
+        this.tableData = res.ResData
+        this.selectclasses = res.ResData
         this.tableloading = false
       })
     },
@@ -282,26 +201,19 @@ export default {
       } else {
         this.editFormTitle = '新增'
         this.currentId = ''
+        this.selectedclass = ''
         this.dialogEditFormVisible = true
       }
     },
     bindEditInfo: function () {
       getDs_classifyDetail(this.currentId).then(res => {
-        this.editFrom.CreatorTime = res.ResData.CreatorTime
-        this.editFrom.CreatorUserId = res.ResData.CreatorUserId
-        this.editFrom.DeleteMark = res.ResData.DeleteMark
-        this.editFrom.DeleteTime = res.ResData.DeleteTime
-        this.editFrom.DeleteUserId = res.ResData.DeleteUserId
-        this.editFrom.Description = res.ResData.Description
         this.editFrom.Dtcode = res.ResData.Dtcode
         this.editFrom.Dtname = res.ResData.Dtname
+        this.editFrom.Description = res.ResData.Description
         this.editFrom.EnabledMark = res.ResData.EnabledMark
-        this.editFrom.LastModifyTime = res.ResData.LastModifyTime
-        this.editFrom.LastModifyUserId = res.ResData.LastModifyUserId
-        this.editFrom.Levelpath = res.ResData.Levelpath
         this.editFrom.Parentid = res.ResData.Parentid
         this.editFrom.SortCode = res.ResData.SortCode
-        this.editFrom.State = res.ResData.State
+        this.selectedclass = res.ResData.Parentid
       })
     },
     /**
@@ -311,25 +223,19 @@ export default {
       this.$refs['editFrom'].validate((valid) => {
         if (valid) {
           const data = {
-            'CreatorTime': this.editFrom.CreatorTime,
-            'CreatorUserId': this.editFrom.CreatorUserId,
-            'DeleteMark': this.editFrom.DeleteMark,
-            'DeleteTime': this.editFrom.DeleteTime,
-            'DeleteUserId': this.editFrom.DeleteUserId,
             'Description': this.editFrom.Description,
+            'Parentid': this.editFrom.Parentid,
+            'SortCode': this.editFrom.SortCode,
             'Dtcode': this.editFrom.Dtcode,
             'Dtname': this.editFrom.Dtname,
             'EnabledMark': this.editFrom.EnabledMark,
-            'LastModifyTime': this.editFrom.LastModifyTime,
-            'LastModifyUserId': this.editFrom.LastModifyUserId,
-            'Levelpath': this.editFrom.Levelpath,
-            'Parentid': this.editFrom.Parentid,
-            'SortCode': this.editFrom.SortCode,
-            'State': this.editFrom.State,
-
             'Id': this.currentId
           }
-          saveDs_classify(data).then(res => {
+          var url = 'Ds_classify/Insert'
+          if (this.currentId !== '') {
+            url = 'Ds_classify/Update?id=' + this.currentId
+          }
+          saveDs_classify(data, url).then(res => {
             if (res.Success) {
               this.$message({
                 message: '恭喜你，操作成功',
@@ -337,6 +243,7 @@ export default {
               })
               this.dialogEditFormVisible = false
               this.currentSelected = ''
+              this.selectedclass = ''
               this.$refs['editFrom'].resetFields()
               this.loadTableData()
               this.InitDictItem()
@@ -452,6 +359,12 @@ export default {
         this.sortableData.order = 'desc'
       }
       this.loadTableData()
+    },
+    /**
+  *选择上级分类
+  */
+    handleSelectClassChange: function () {
+      this.editFrom.Parentid = this.selectedclass
     },
     /**
      * 当用户手动勾选checkbox数据行事件

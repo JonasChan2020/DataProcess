@@ -30,7 +30,7 @@ export function getAllClassifyTreeTable () {
   return http.request({
     url: 'Plug_type/GetAllClassifyTreeTable',
     method: 'get',
-    baseURL: defaultSettings.apiSecurityUrl // 直接通过覆盖的方式
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
 }
 /**
