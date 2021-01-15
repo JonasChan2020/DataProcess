@@ -113,10 +113,11 @@
 
 <script>
 
-import { getSys_classifyDetail,
-  saveSys_classify, setSys_classifyEnable, deleteSoftSys_classify,
-  deleteSys_classify, getAllClassifyTreeTable
-} from '@/api/dataprocess/sys_classify'
+  import {
+    getSys_classifyDetail,
+    saveSys_classify, setSys_classifyEnable, deleteSoftSys_classify,
+    deleteSys_classify, getAllClassifyTreeTable
+  } from '@/api/dataprocess/sys_classify'
 
 export default {
   data () {

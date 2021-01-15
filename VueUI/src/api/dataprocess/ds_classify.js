@@ -5,8 +5,8 @@ import defaultSettings from '@/settings'
    * 分页查询
    * @param {查询条件} data
    */
-export function getDs_classifyListWithPager(data) {
-  alert(2);
+export function getDs_classifyListWithPager (data) {
+  alert(2)
   return http.request({
     url: 'Ds_classify/FindWithPagerAsync',
     method: 'post',
@@ -16,8 +16,8 @@ export function getDs_classifyListWithPager(data) {
 }/**
    * 获取所有可用的
    */
-export function getAllDs_classifyList() {
-  alert(1);
+export function getAllDs_classifyList () {
+  alert(1)
   return http.request({
     url: 'Ds_classify/GetAllEnable',
     method: 'get',
@@ -28,7 +28,7 @@ export function getAllDs_classifyList() {
 /**
  * 获取树形分类
 */
-export function getAllClassifyTreeTable() {
+export function getAllClassifyTreeTable () {
   return http.request({
     url: 'Ds_classify/GetAllClassifyTreeTable',
     method: 'get',

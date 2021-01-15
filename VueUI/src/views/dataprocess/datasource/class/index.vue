@@ -22,37 +22,49 @@
       <div class="list-btn-container">
         <el-button-group>
           <slot v-for="itemf in loadBtnFunc">
-            <el-button v-if="itemf.FullName==='新增'"
-                       type="primary"
-                       icon="el-icon-plus"
-                       size="small"
-                       @click="ShowEditOrViewDialog()">新增</el-button>
-            <el-button v-if="itemf.FullName==='修改'"
-                       type="primary"
-                       icon="el-icon-edit"
-                       class="el-button-modify"
-                       size="small"
-                       @click="ShowEditOrViewDialog('edit')">修改</el-button>
-            <el-button v-if="itemf.FullName=='禁用'"
-                       type="info"
-                       icon="el-icon-video-pause"
-                       size="small"
-                       @click="setEnable('0')">禁用</el-button>
-            <el-button v-if="itemf.FullName=='启用'"
-                       type="success"
-                       icon="el-icon-video-play"
-                       size="small"
-                       @click="setEnable('1')">启用</el-button>
-            <el-button v-if="itemf.FullName==='软删除'"
-                       type="warning"
-                       icon="el-icon-delete"
-                       size="small"
-                       @click="deleteSoft('0')">软删除</el-button>
-            <el-button v-if="itemf.FullName==='删除'"
-                       type="danger"
-                       icon="el-icon-delete"
-                       size="small"
-                       @click="deletePhysics()">删除</el-button>
+            <el-button
+              v-if="itemf.FullName==='新增'"
+              type="primary"
+              icon="el-icon-plus"
+              size="small"
+              @click="ShowEditOrViewDialog()"
+            >新增</el-button>
+            <el-button
+              v-if="itemf.FullName==='修改'"
+              type="primary"
+              icon="el-icon-edit"
+              class="el-button-modify"
+              size="small"
+              @click="ShowEditOrViewDialog('edit')"
+            >修改</el-button>
+            <el-button
+              v-if="itemf.FullName=='禁用'"
+              type="info"
+              icon="el-icon-video-pause"
+              size="small"
+              @click="setEnable('0')"
+            >禁用</el-button>
+            <el-button
+              v-if="itemf.FullName=='启用'"
+              type="success"
+              icon="el-icon-video-play"
+              size="small"
+              @click="setEnable('1')"
+            >启用</el-button>
+            <el-button
+              v-if="itemf.FullName==='软删除'"
+              type="warning"
+              icon="el-icon-delete"
+              size="small"
+              @click="deleteSoft('0')"
+            >软删除</el-button>
+            <el-button
+              v-if="itemf.FullName==='删除'"
+              type="danger"
+              icon="el-icon-delete"
+              size="small"
+              @click="deletePhysics()"
+            >删除</el-button>
           </slot>
           <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableData()">刷新</el-button>
         </el-button-group>
@@ -72,12 +84,13 @@
         <el-table-column prop="LastModifyTime" label="更新时间" sortable />
       </el-table>
 
-      
     </el-card>
-    <el-dialog ref="dialogEditForm"
-               :title="editFormTitle+'{TableNameDesc}'"
-               :visible.sync="dialogEditFormVisible"
-               width="640px">
+    <el-dialog
+      ref="dialogEditForm"
+      :title="editFormTitle+'{TableNameDesc}'"
+      :visible.sync="dialogEditFormVisible"
+      width="640px"
+    >
 
       <el-form ref="editFrom" :model="editFrom" :rules="rules">
         <el-form-item label="类型编码" :label-width="formLabelWidth" prop="Dtcode">
@@ -110,10 +123,11 @@
 
 <script>
 
-import { getDs_classifyListWithPager, getDs_classifyDetail,
-  saveDs_classify, setDs_classifyEnable, deleteSoftDs_classify,
+  import {
+    getDs_classifyDetail,
+    saveDs_classify, setDs_classifyEnable, deleteSoftDs_classify,
     deleteDs_classify, getAllClassifyTreeTable
-} from '@/api/dataprocess/ds_classify'
+  } from '@/api/dataprocess/ds_classify'
 
 export default {
   data () {
@@ -169,9 +183,8 @@ export default {
      */
     loadTableData: function () {
       this.tableloading = true
- 
+
       getAllClassifyTreeTable().then(res => {
-        
         this.tableData = res.ResData
         this.selectclasses = res.ResData
         this.tableloading = false

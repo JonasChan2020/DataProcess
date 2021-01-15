@@ -22,37 +22,49 @@
       <div class="list-btn-container">
         <el-button-group>
           <slot v-for="itemf in loadBtnFunc">
-            <el-button v-if="itemf.FullName==='新增'"
-                       type="primary"
-                       icon="el-icon-plus"
-                       size="small"
-                       @click="ShowEditOrViewDialog()">新增</el-button>
-            <el-button v-if="itemf.FullName==='修改'"
-                       type="primary"
-                       icon="el-icon-edit"
-                       class="el-button-modify"
-                       size="small"
-                       @click="ShowEditOrViewDialog('edit')">修改</el-button>
-            <el-button v-if="itemf.FullName=='禁用'"
-                       type="info"
-                       icon="el-icon-video-pause"
-                       size="small"
-                       @click="setEnable('0')">禁用</el-button>
-            <el-button v-if="itemf.FullName=='启用'"
-                       type="success"
-                       icon="el-icon-video-play"
-                       size="small"
-                       @click="setEnable('1')">启用</el-button>
-            <el-button v-if="itemf.FullName==='软删除'"
-                       type="warning"
-                       icon="el-icon-delete"
-                       size="small"
-                       @click="deleteSoft('0')">软删除</el-button>
-            <el-button v-if="itemf.FullName==='删除'"
-                       type="danger"
-                       icon="el-icon-delete"
-                       size="small"
-                       @click="deletePhysics()">删除</el-button>
+            <el-button
+              v-if="itemf.FullName==='新增'"
+              type="primary"
+              icon="el-icon-plus"
+              size="small"
+              @click="ShowEditOrViewDialog()"
+            >新增</el-button>
+            <el-button
+              v-if="itemf.FullName==='修改'"
+              type="primary"
+              icon="el-icon-edit"
+              class="el-button-modify"
+              size="small"
+              @click="ShowEditOrViewDialog('edit')"
+            >修改</el-button>
+            <el-button
+              v-if="itemf.FullName=='禁用'"
+              type="info"
+              icon="el-icon-video-pause"
+              size="small"
+              @click="setEnable('0')"
+            >禁用</el-button>
+            <el-button
+              v-if="itemf.FullName=='启用'"
+              type="success"
+              icon="el-icon-video-play"
+              size="small"
+              @click="setEnable('1')"
+            >启用</el-button>
+            <el-button
+              v-if="itemf.FullName==='软删除'"
+              type="warning"
+              icon="el-icon-delete"
+              size="small"
+              @click="deleteSoft('0')"
+            >软删除</el-button>
+            <el-button
+              v-if="itemf.FullName==='删除'"
+              type="danger"
+              icon="el-icon-delete"
+              size="small"
+              @click="deletePhysics()"
+            >删除</el-button>
           </slot>
           <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableData()">刷新</el-button>
         </el-button-group>
@@ -72,12 +84,13 @@
         <el-table-column prop="LastModifyTime" label="更新时间" sortable />
       </el-table>
 
-      
     </el-card>
-    <el-dialog ref="dialogEditForm"
-               :title="editFormTitle+'{TableNameDesc}'"
-               :visible.sync="dialogEditFormVisible"
-               width="640px">
+    <el-dialog
+      ref="dialogEditForm"
+      :title="editFormTitle+'{TableNameDesc}'"
+      :visible.sync="dialogEditFormVisible"
+      width="640px"
+    >
 
       <el-form ref="editFrom" :model="editFrom" :rules="rules">
         <el-form-item label="类型编码" :label-width="formLabelWidth" prop="Stcode">
@@ -109,10 +122,11 @@
 
 <script>
 
-import { getSys_conf_classifyListWithPager, getSys_conf_classifyDetail,
-  saveSys_conf_classify, setSys_conf_classifyEnable, deleteSoftSys_conf_classify,
+  import {
+    getSys_conf_classifyDetail,
+    saveSys_conf_classify, setSys_conf_classifyEnable, deleteSoftSys_conf_classify,
     deleteSys_conf_classify, getAllClassifyTreeTable
-} from '@/api/dataprocess/sys_conf_classify'
+  } from '@/api/dataprocess/sys_conf_classify'
 
 export default {
   data () {
@@ -211,7 +225,6 @@ export default {
         this.editFrom.Parentid = res.ResData.Parentid
         this.editFrom.SortCode = res.ResData.SortCode
         this.selectedclass = res.ResData.Parentid
-
         this.editFrom.Sysid = res.ResData.Sysid
       })
     },
@@ -228,10 +241,7 @@ export default {
             'Stcode': this.editFrom.Stcode,
             'Stname': this.editFrom.Stname,
             'EnabledMark': this.editFrom.EnabledMark,
-            'Id': this.currentId,
-
             'Sysid': this.editFrom.Sysid,
-
             'Id': this.currentId
           }
           var url = 'Sys_conf_classify/Insert'

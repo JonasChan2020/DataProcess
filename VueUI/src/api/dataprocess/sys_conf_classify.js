@@ -26,7 +26,7 @@ export function getAllSys_conf_classifyList () {
 /**
  * 获取树形分类
 */
-export function getAllClassifyTreeTable() {
+export function getAllClassifyTreeTable () {
   return http.request({
     url: 'Sys_conf_classify/GetAllClassifyTreeTable',
     method: 'get',
