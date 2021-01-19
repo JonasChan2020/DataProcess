@@ -83,25 +83,28 @@
         @sort-change="handleSortChange"
       >
         <el-table-column type="selection" width="30" />
-        <el-table-column prop="CreatorTime" label="创建时间" sortable="custom" width="120" />
-        <el-table-column prop="CreatorUserId" label="创建人" sortable="custom" width="120" />
-        <el-table-column prop="DeleteMark" label="删除标记" sortable="custom" width="120" />
-        <el-table-column prop="DeleteTime" label="删除时间" sortable="custom" width="120" />
-        <el-table-column prop="DeleteUserId" label="删除人" sortable="custom" width="120" />
-        <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
-        <el-table-column prop="EnabledMark" label="启用标记" sortable="custom" width="120" />
-        <el-table-column prop="Is_public" label="是否为公共插件 0否，1是" sortable="custom" width="120" />
-        <el-table-column prop="LastModifyTime" label="最后修改时间" sortable="custom" width="120" />
-        <el-table-column prop="LastModifyUserId" label="最后修改人" sortable="custom" width="120" />
         <el-table-column prop="Pcode" label="插件编码" sortable="custom" width="120" />
-        <el-table-column prop="Pdesc" label="插件描述" sortable="custom" width="120" />
         <el-table-column prop="Pname" label="插件名称" sortable="custom" width="120" />
-        <el-table-column prop="Ppath" label="插件路径" sortable="custom" width="120" />
         <el-table-column prop="Ptag" label="标签" sortable="custom" width="120" />
-        <el-table-column prop="Ptype" label="插件类型" sortable="custom" width="120" />
-        <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="120" />
-        <el-table-column prop="State" label="状态" sortable="custom" width="120" />
-
+        <el-table-column label="是否为公共" sortable="custom" width="120" prop="Is_public" align="center">
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.Is_public === true ? 'success' : 'info'" disable-transitions>{{ scope.row.Is_public === true ? "是" : "否" }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="Ptype" label="插件类型" sortable="custom" width="260" align="center">
+          <template slot-scope="scope">
+            {{ scope.row.Classify_Name }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
+        <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="90" align="center" />
+        <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="CreatorTime" label="创建时间" sortable />
+        <el-table-column prop="LastModifyTime" label="更新时间" sortable />
       </el-table>
       <div class="pagination-container">
         <el-pagination
@@ -123,61 +126,31 @@
       width="640px"
     >
       <el-form ref="editFrom" :model="editFrom" :rules="rules">
-        <el-form-item label="创建时间" :label-width="formLabelWidth" prop="CreatorTime">
-          <el-input v-model="editFrom.CreatorTime" placeholder="请输入创建时间" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="创建人" :label-width="formLabelWidth" prop="CreatorUserId">
-          <el-input v-model="editFrom.CreatorUserId" placeholder="请输入创建人" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="删除标记" :label-width="formLabelWidth" prop="DeleteMark">
-          <el-input v-model="editFrom.DeleteMark" placeholder="请输入删除标记" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="删除时间" :label-width="formLabelWidth" prop="DeleteTime">
-          <el-input v-model="editFrom.DeleteTime" placeholder="请输入删除时间" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="删除人" :label-width="formLabelWidth" prop="DeleteUserId">
-          <el-input v-model="editFrom.DeleteUserId" placeholder="请输入删除人" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
-          <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="启用标记" :label-width="formLabelWidth" prop="EnabledMark">
-          <el-input v-model="editFrom.EnabledMark" placeholder="请输入启用标记" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="是否为公共插件 0否，1是" :label-width="formLabelWidth" prop="Is_public">
-          <el-input v-model="editFrom.Is_public" placeholder="请输入是否为公共插件 0否，1是" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="最后修改时间" :label-width="formLabelWidth" prop="LastModifyTime">
-          <el-input v-model="editFrom.LastModifyTime" placeholder="请输入最后修改时间" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="最后修改人" :label-width="formLabelWidth" prop="LastModifyUserId">
-          <el-input v-model="editFrom.LastModifyUserId" placeholder="请输入最后修改人" autocomplete="off" clearable />
-        </el-form-item>
         <el-form-item label="插件编码" :label-width="formLabelWidth" prop="Pcode">
           <el-input v-model="editFrom.Pcode" placeholder="请输入插件编码" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="插件描述" :label-width="formLabelWidth" prop="Pdesc">
-          <el-input v-model="editFrom.Pdesc" placeholder="请输入插件描述" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="插件名称" :label-width="formLabelWidth" prop="Pname">
           <el-input v-model="editFrom.Pname" placeholder="请输入插件名称" autocomplete="off" clearable />
         </el-form-item>
-        <el-form-item label="插件路径" :label-width="formLabelWidth" prop="Ppath">
-          <el-input v-model="editFrom.Ppath" placeholder="请输入插件路径" autocomplete="off" clearable />
-        </el-form-item>
         <el-form-item label="标签" :label-width="formLabelWidth" prop="Ptag">
           <el-input v-model="editFrom.Ptag" placeholder="请输入标签" autocomplete="off" clearable />
         </el-form-item>
+        <el-form-item label="插件路径" :label-width="formLabelWidth" prop="Ppath">
+          <el-input v-model="editFrom.Ppath" placeholder="请输入插件路径" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
+          <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
+        </el-form-item>
         <el-form-item label="插件类型" :label-width="formLabelWidth" prop="Ptype">
-          <el-input v-model="editFrom.Ptype" placeholder="请输入插件类型" autocomplete="off" clearable />
+          <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'Ptname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
         </el-form-item>
-        <el-form-item label="排序字段" :label-width="formLabelWidth" prop="SortCode">
-          <el-input v-model="editFrom.SortCode" placeholder="请输入排序字段" autocomplete="off" clearable />
+        <el-form-item label="排序" :label-width="formLabelWidth" prop="SortCode">
+          <el-input v-model.number="editFrom.SortCode" placeholder="请输入排序,默认为99" autocomplete="off" clearable />
         </el-form-item>
-        <el-form-item label="状态" :label-width="formLabelWidth" prop="State">
-          <el-input v-model="editFrom.State" placeholder="请输入状态" autocomplete="off" clearable />
+        <el-form-item label="选项" :label-width="formLabelWidth" prop="">
+          <el-checkbox v-model="editFrom.Is_public">是否为公共插件</el-checkbox>
+          <el-checkbox v-model="editFrom.EnabledMark">启用</el-checkbox>
         </el-form-item>
-
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogEditFormVisible = false">取 消</el-button>
@@ -192,7 +165,10 @@
 import { getPlug_plugListWithPager, getPlug_plugDetail,
   savePlug_plug, setPlug_plugEnable, deleteSoftPlug_plug,
   deletePlug_plug
-} from '@/api/dataprocess/plug_plug'
+  } from '@/api/dataprocess/plug_plug'
+  import {
+    getAllClassifyTreeTable
+  } from '@/api/dataprocess/plug_type'
 
 export default {
   data () {
@@ -212,27 +188,21 @@ export default {
         order: 'desc',
         sort: 'CreatorTime'
       },
+      selectedclass: '',
+      selectclasses: [],
       dialogEditFormVisible: false,
       editFormTitle: '',
       editFrom: {
-        CreatorTime: '',
-        CreatorUserId: '',
-        DeleteMark: '',
-        DeleteTime: '',
-        DeleteUserId: '',
         Description: '',
         EnabledMark: '',
         Is_public: '',
-        LastModifyTime: '',
-        LastModifyUserId: '',
         Pcode: '',
         Pdesc: '',
         Pname: '',
         Ppath: '',
         Ptag: '',
         Ptype: '',
-        SortCode: '',
-        State: ''
+        SortCode: ''
 
       },
       rules: {
@@ -272,6 +242,11 @@ export default {
         this.pagination.pageTotal = res.ResData.TotalItems
         this.tableloading = false
       })
+      getAllClassifyTreeTable().then(res => {
+        this.tableData = res.ResData
+        this.selectclasses = res.ResData
+        this.tableloading = false
+      })
     },
     /**
      * 点击查询
@@ -297,21 +272,15 @@ export default {
       } else {
         this.editFormTitle = '新增'
         this.currentId = ''
+        this.selectedclass = ''
         this.dialogEditFormVisible = true
       }
     },
     bindEditInfo: function () {
       getPlug_plugDetail(this.currentId).then(res => {
-        this.editFrom.CreatorTime = res.ResData.CreatorTime
-        this.editFrom.CreatorUserId = res.ResData.CreatorUserId
-        this.editFrom.DeleteMark = res.ResData.DeleteMark
-        this.editFrom.DeleteTime = res.ResData.DeleteTime
-        this.editFrom.DeleteUserId = res.ResData.DeleteUserId
         this.editFrom.Description = res.ResData.Description
         this.editFrom.EnabledMark = res.ResData.EnabledMark
         this.editFrom.Is_public = res.ResData.Is_public
-        this.editFrom.LastModifyTime = res.ResData.LastModifyTime
-        this.editFrom.LastModifyUserId = res.ResData.LastModifyUserId
         this.editFrom.Pcode = res.ResData.Pcode
         this.editFrom.Pdesc = res.ResData.Pdesc
         this.editFrom.Pname = res.ResData.Pname
@@ -319,7 +288,7 @@ export default {
         this.editFrom.Ptag = res.ResData.Ptag
         this.editFrom.Ptype = res.ResData.Ptype
         this.editFrom.SortCode = res.ResData.SortCode
-        this.editFrom.State = res.ResData.State
+        this.selectedclass = res.ResData.Ptype
       })
     },
     /**
@@ -329,16 +298,9 @@ export default {
       this.$refs['editFrom'].validate((valid) => {
         if (valid) {
           const data = {
-            'CreatorTime': this.editFrom.CreatorTime,
-            'CreatorUserId': this.editFrom.CreatorUserId,
-            'DeleteMark': this.editFrom.DeleteMark,
-            'DeleteTime': this.editFrom.DeleteTime,
-            'DeleteUserId': this.editFrom.DeleteUserId,
             'Description': this.editFrom.Description,
             'EnabledMark': this.editFrom.EnabledMark,
             'Is_public': this.editFrom.Is_public,
-            'LastModifyTime': this.editFrom.LastModifyTime,
-            'LastModifyUserId': this.editFrom.LastModifyUserId,
             'Pcode': this.editFrom.Pcode,
             'Pdesc': this.editFrom.Pdesc,
             'Pname': this.editFrom.Pname,
@@ -346,11 +308,13 @@ export default {
             'Ptag': this.editFrom.Ptag,
             'Ptype': this.editFrom.Ptype,
             'SortCode': this.editFrom.SortCode,
-            'State': this.editFrom.State,
-
             'Id': this.currentId
           }
-          savePlug_plug(data).then(res => {
+          var url = 'Plug_plug/Insert'
+          if (this.currentId !== '') {
+            url = 'Plug_plug/Update?id=' + this.currentId
+          }
+          savePlug_plug(data, url).then(res => {
             if (res.Success) {
               this.$message({
                 message: '恭喜你，操作成功',
@@ -358,6 +322,7 @@ export default {
               })
               this.dialogEditFormVisible = false
               this.currentSelected = ''
+              this.selectedclass = ''
               this.$refs['editFrom'].resetFields()
               this.loadTableData()
               this.InitDictItem()
@@ -473,6 +438,12 @@ export default {
         this.sortableData.order = 'desc'
       }
       this.loadTableData()
+    },
+    /**
+*选择分类
+*/
+    handleSelectClassChange: function () {
+      this.editFrom.Ptype = this.selectedclass
     },
     /**
      * 当用户手动勾选checkbox数据行事件

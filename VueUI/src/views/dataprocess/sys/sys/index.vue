@@ -83,21 +83,22 @@
         @sort-change="handleSortChange"
       >
         <el-table-column type="selection" width="30" />
-        <el-table-column prop="Classify_id" label="系统分类" sortable="custom" width="120" />
-        <el-table-column prop="CreatorTime" label="创建时间" sortable="custom" width="120" />
-        <el-table-column prop="CreatorUserId" label="创建人" sortable="custom" width="120" />
-        <el-table-column prop="DeleteMark" label="删除标记" sortable="custom" width="120" />
-        <el-table-column prop="DeleteTime" label="删除时间" sortable="custom" width="120" />
-        <el-table-column prop="DeleteUserId" label="删除人" sortable="custom" width="120" />
-        <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
-        <el-table-column prop="EnabledMark" label="启用标记" sortable="custom" width="120" />
-        <el-table-column prop="LastModifyTime" label="最后修改时间" sortable="custom" width="120" />
-        <el-table-column prop="LastModifyUserId" label="最后修改人" sortable="custom" width="120" />
-        <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="120" />
-        <el-table-column prop="State" label="状态" sortable="custom" width="120" />
         <el-table-column prop="Syscode" label="系统编码" sortable="custom" width="120" />
         <el-table-column prop="Sysname" label="系统名称" sortable="custom" width="120" />
-
+        <el-table-column prop="Classify_id" label="系统分类" sortable="custom" width="260" align="center">
+          <template slot-scope="scope">
+            {{ scope.row.Classify_Name }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
+        <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="90" align="center" />
+        <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="CreatorTime" label="创建时间" sortable />
+        <el-table-column prop="LastModifyTime" label="更新时间" sortable />
       </el-table>
       <div class="pagination-container">
         <el-pagination
@@ -119,49 +120,24 @@
       width="640px"
     >
       <el-form ref="editFrom" :model="editFrom" :rules="rules">
-        <el-form-item label="系统分类" :label-width="formLabelWidth" prop="Classify_id">
-          <el-input v-model="editFrom.Classify_id" placeholder="请输入系统分类" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="创建时间" :label-width="formLabelWidth" prop="CreatorTime">
-          <el-input v-model="editFrom.CreatorTime" placeholder="请输入创建时间" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="创建人" :label-width="formLabelWidth" prop="CreatorUserId">
-          <el-input v-model="editFrom.CreatorUserId" placeholder="请输入创建人" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="删除标记" :label-width="formLabelWidth" prop="DeleteMark">
-          <el-input v-model="editFrom.DeleteMark" placeholder="请输入删除标记" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="删除时间" :label-width="formLabelWidth" prop="DeleteTime">
-          <el-input v-model="editFrom.DeleteTime" placeholder="请输入删除时间" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="删除人" :label-width="formLabelWidth" prop="DeleteUserId">
-          <el-input v-model="editFrom.DeleteUserId" placeholder="请输入删除人" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
-          <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="启用标记" :label-width="formLabelWidth" prop="EnabledMark">
-          <el-input v-model="editFrom.EnabledMark" placeholder="请输入启用标记" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="最后修改时间" :label-width="formLabelWidth" prop="LastModifyTime">
-          <el-input v-model="editFrom.LastModifyTime" placeholder="请输入最后修改时间" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="最后修改人" :label-width="formLabelWidth" prop="LastModifyUserId">
-          <el-input v-model="editFrom.LastModifyUserId" placeholder="请输入最后修改人" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="排序字段" :label-width="formLabelWidth" prop="SortCode">
-          <el-input v-model="editFrom.SortCode" placeholder="请输入排序字段" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="状态" :label-width="formLabelWidth" prop="State">
-          <el-input v-model="editFrom.State" placeholder="请输入状态" autocomplete="off" clearable />
-        </el-form-item>
         <el-form-item label="系统编码" :label-width="formLabelWidth" prop="Syscode">
           <el-input v-model="editFrom.Syscode" placeholder="请输入系统编码" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="系统名称" :label-width="formLabelWidth" prop="Sysname">
           <el-input v-model="editFrom.Sysname" placeholder="请输入系统名称" autocomplete="off" clearable />
         </el-form-item>
-
+        <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
+          <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="系统分类" :label-width="formLabelWidth" prop="Classify_id">
+          <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'Stname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
+        </el-form-item>
+        <el-form-item label="排序" :label-width="formLabelWidth" prop="SortCode">
+          <el-input v-model.number="editFrom.SortCode" placeholder="请输入排序,默认为99" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="选项" :label-width="formLabelWidth" prop="">
+          <el-checkbox v-model="editFrom.EnabledMark">启用</el-checkbox>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogEditFormVisible = false">取 消</el-button>
@@ -176,7 +152,9 @@
 import { getSys_sysListWithPager, getSys_sysDetail,
   saveSys_sys, setSys_sysEnable, deleteSoftSys_sys,
   deleteSys_sys
-} from '@/api/dataprocess/sys_sys'
+  } from '@/api/dataprocess/sys_sys'
+  import { getAllClassifyTreeTable
+  } from '@/api/dataprocess/sys_classify'
 
 export default {
   data () {
@@ -196,21 +174,15 @@ export default {
         order: 'desc',
         sort: 'CreatorTime'
       },
+      selectedclass: '',
+      selectclasses: [],
       dialogEditFormVisible: false,
       editFormTitle: '',
       editFrom: {
         Classify_id: '',
-        CreatorTime: '',
-        CreatorUserId: '',
-        DeleteMark: '',
-        DeleteTime: '',
-        DeleteUserId: '',
         Description: '',
         EnabledMark: '',
-        LastModifyTime: '',
-        LastModifyUserId: '',
         SortCode: '',
-        State: '',
         Syscode: '',
         Sysname: ''
 
@@ -252,6 +224,11 @@ export default {
         this.pagination.pageTotal = res.ResData.TotalItems
         this.tableloading = false
       })
+      getAllClassifyTreeTable().then(res => {
+        this.tableData = res.ResData
+        this.selectclasses = res.ResData
+        this.tableloading = false
+      })
     },
     /**
      * 点击查询
@@ -276,6 +253,7 @@ export default {
         }
       } else {
         this.editFormTitle = '新增'
+        this.selectedclass = ''
         this.currentId = ''
         this.dialogEditFormVisible = true
       }
@@ -283,19 +261,12 @@ export default {
     bindEditInfo: function () {
       getSys_sysDetail(this.currentId).then(res => {
         this.editFrom.Classify_id = res.ResData.Classify_id
-        this.editFrom.CreatorTime = res.ResData.CreatorTime
-        this.editFrom.CreatorUserId = res.ResData.CreatorUserId
-        this.editFrom.DeleteMark = res.ResData.DeleteMark
-        this.editFrom.DeleteTime = res.ResData.DeleteTime
-        this.editFrom.DeleteUserId = res.ResData.DeleteUserId
         this.editFrom.Description = res.ResData.Description
         this.editFrom.EnabledMark = res.ResData.EnabledMark
-        this.editFrom.LastModifyTime = res.ResData.LastModifyTime
-        this.editFrom.LastModifyUserId = res.ResData.LastModifyUserId
         this.editFrom.SortCode = res.ResData.SortCode
-        this.editFrom.State = res.ResData.State
         this.editFrom.Syscode = res.ResData.Syscode
         this.editFrom.Sysname = res.ResData.Sysname
+        this.selectedclass = res.ResData.Classify_id
       })
     },
     /**
@@ -306,23 +277,19 @@ export default {
         if (valid) {
           const data = {
             'Classify_id': this.editFrom.Classify_id,
-            'CreatorTime': this.editFrom.CreatorTime,
-            'CreatorUserId': this.editFrom.CreatorUserId,
-            'DeleteMark': this.editFrom.DeleteMark,
-            'DeleteTime': this.editFrom.DeleteTime,
-            'DeleteUserId': this.editFrom.DeleteUserId,
             'Description': this.editFrom.Description,
             'EnabledMark': this.editFrom.EnabledMark,
-            'LastModifyTime': this.editFrom.LastModifyTime,
-            'LastModifyUserId': this.editFrom.LastModifyUserId,
             'SortCode': this.editFrom.SortCode,
-            'State': this.editFrom.State,
             'Syscode': this.editFrom.Syscode,
             'Sysname': this.editFrom.Sysname,
 
             'Id': this.currentId
           }
-          saveSys_sys(data).then(res => {
+          var url = 'Sys_sys/Insert'
+          if (this.currentId !== '') {
+            url = 'Sys_sys/Update?id=' + this.currentId
+          }
+          saveSys_sys(data, url).then(res => {
             if (res.Success) {
               this.$message({
                 message: '恭喜你，操作成功',
@@ -330,6 +297,7 @@ export default {
               })
               this.dialogEditFormVisible = false
               this.currentSelected = ''
+              this.selectedclass = ''
               this.$refs['editFrom'].resetFields()
               this.loadTableData()
               this.InitDictItem()
@@ -445,6 +413,12 @@ export default {
         this.sortableData.order = 'desc'
       }
       this.loadTableData()
+    },
+    /**
+*选择分类
+*/
+    handleSelectClassChange: function () {
+      this.editFrom.Classify_id = this.selectedclass
     },
     /**
      * 当用户手动勾选checkbox数据行事件

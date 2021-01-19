@@ -90,6 +90,12 @@ namespace Yuebon.DataProcess.Dtos
         /// </summary>
         [MaxLength(0)]
         public string Ptype { get; set; }
+
+        /// <summary>
+        /// 设置或获取分类名称
+        /// </summary>
+        [MaxLength(0)]
+        public string Classify_Name { get; set; }
         /// <summary>
         /// 设置或获取排序字段
         /// </summary>

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Yuebon.AspNetCore.Common;
@@ -139,7 +140,41 @@ namespace Yuebon.AspNetCore.Controllers
         public virtual async Task<IActionResult> UpdateAsync(TIDto tinfo, TKey id)
         {
             CommonResult result = new CommonResult();
+            T newInfo = tinfo.MapTo<T>();
+            OnBeforeUpdate(newInfo);
+            T info = iService.Get(id);
+            bool ln = await iService.UpdateAsync(SwapValue(info, newInfo), id).ConfigureAwait(false);
+            if (ln)
+            {
+                result.ErrCode = ErrCode.successCode;
+                result.ErrMsg = ErrCode.err0;
+            }
+            else
+            {
+                result.ErrMsg = ErrCode.err43002;
+                result.ErrCode = "43002";
+            }
             return ToJsonContent(result);
+        }
+
+        /// <summary>
+        /// 将新实体类中的非空值复制给原实体类
+        /// </summary>
+        /// <param name="info">原实体类</param>
+        /// <param name="newInfo">新实体类</param>
+        /// <returns></returns>
+        private T SwapValue(T info, T newInfo)
+        {
+            PropertyInfo[] propertys = newInfo.GetType().GetProperties();
+            foreach (PropertyInfo property in propertys)
+            {
+                object val = newInfo.GetType().GetProperty(property.Name).GetValue(newInfo, null);
+                if (val != null)
+                {
+                    info.GetType().GetProperty(property.Name).SetValue(info, val, null);
+                }
+            }
+            return info;
         }
 
         /// <summary>
