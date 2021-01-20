@@ -86,7 +86,7 @@
         <el-table-column prop="Confcode" label="配置编码" sortable="custom" width="120" />
         <el-table-column prop="Confname" label="配置名称" sortable="custom" width="120" />
         <el-table-column prop="Dsid" label="数据源ID" sortable="custom" width="120" />
-        <el-table-column prop="Sysid" label="系统ID" sortable="custom" width="120" />
+        <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
         <el-table-column prop="Classify_id" label="配置分类" sortable="custom" width="260" align="center">
           <template slot-scope="scope">
             {{ scope.row.Classify_Name }}
@@ -131,9 +131,6 @@
         </el-form-item>
         <el-form-item label="数据源ID" :label-width="formLabelWidth" prop="Dsid">
           <el-input v-model="editFrom.Dsid" placeholder="请输入数据源ID" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="系统ID" :label-width="formLabelWidth" prop="Sysid">
-          <el-input v-model="editFrom.Sysid" placeholder="请输入系统ID" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
           <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
@@ -196,8 +193,7 @@ export default {
         Description: '',
         Dsid: '',
         EnabledMark: '',
-        SortCode: '',
-        Sysid: ''
+        SortCode: ''
 
       },
       rules: {
@@ -280,7 +276,6 @@ export default {
         this.editFrom.Dsid = res.ResData.Dsid
         this.editFrom.EnabledMark = res.ResData.EnabledMark
         this.editFrom.SortCode = res.ResData.SortCode
-        this.editFrom.Sysid = res.ResData.Sysid
         this.selectedclass = res.ResData.Classify_id
       })
     },
@@ -298,7 +293,6 @@ export default {
             'Dsid': this.editFrom.Dsid,
             'EnabledMark': this.editFrom.EnabledMark,
             'SortCode': this.editFrom.SortCode,
-            'Sysid': this.editFrom.Sysid,
             'Id': this.currentId
           }
           var url = 'Conf_conf/Insert'

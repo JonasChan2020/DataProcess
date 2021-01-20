@@ -12,6 +12,8 @@ using Yuebon.Commons.Pages;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 using Yuebon.DataProcess.IServices;
+using Yuebon.Commons.Dtos;
+using Yuebon.AspNetCore.Mvc;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -44,6 +46,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         protected override void OnBeforeInsert(Sd_sysdb info)
         {
             info.Id = GuidUtils.CreateNo();
+            info.Sys_id = CurrentUser.SysId;
             info.CreatorTime = DateTime.Now;
             info.CreatorUserId = CurrentUser.UserId;
             info.DeleteMark = false;
@@ -60,6 +63,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// <returns></returns>
         protected override void OnBeforeUpdate(Sd_sysdb info)
         {
+            info.Sys_id = CurrentUser.SysId;
             info.LastModifyUserId = CurrentUser.UserId;
             info.LastModifyTime = DateTime.Now;
         }
@@ -74,6 +78,31 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             info.DeleteMark = true;
             info.DeleteTime = DateTime.Now;
             info.DeleteUserId = CurrentUser.UserId;
+        }
+
+        /// <summary>
+        /// 根据条件查询数据库,并返回对象集合(用于分页数据显示)
+        /// 
+        /// </summary>
+        /// <param name="search"></param>
+        /// <returns></returns>
+        [HttpPost("FindWithPagerAsync")]
+        [YuebonAuthorize("List")]
+        public override async Task<CommonResult<PageResult<Sd_sysdbOutputDto>>> FindWithPagerAsync(SearchInputDto<Sd_sysdb> search)
+        {
+            CommonResult<PageResult<Sd_sysdbOutputDto>> result = new CommonResult<PageResult<Sd_sysdbOutputDto>>();
+            if (!string.IsNullOrEmpty(CurrentUser.SysId))
+            {
+                search.Filter = new Sd_sysdb();
+                search.Filter.Sys_id = CurrentUser.SysId;
+                result.ResData = await iService.FindWithPagerAsync(search);
+                result.ErrCode = ErrCode.successCode;
+            }
+            else
+            {
+                result.ErrCode = ErrCode.successCode;
+            }
+            return result;
         }
     }
 }

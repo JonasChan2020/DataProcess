@@ -16,6 +16,6 @@ namespace Yuebon.DataProcess.IServices
         /// 获取分类适用于Vue 树形列表
         /// </summary>
         /// <returns></returns>
-        Task<List<Sd_classifyOutputDto>> GetAllClassifyTreeTable();
+        Task<List<Sd_classifyOutputDto>> GetAllClassifyTreeTable(string SysId);
     }
 }

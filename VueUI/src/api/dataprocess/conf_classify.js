@@ -10,7 +10,7 @@ export function getConf_classifyListWithPager (data) {
     url: 'Conf_classify/FindWithPagerAsync',
     method: 'post',
     data: data,
-    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式1
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
 }/**
    * 获取所有可用的

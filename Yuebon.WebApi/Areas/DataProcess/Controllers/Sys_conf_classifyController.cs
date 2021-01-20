@@ -46,6 +46,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         {
             info.Id = GuidUtils.CreateNo();
             info.Parentid = string.IsNullOrEmpty(info.Parentid) ? "" : info.Parentid;
+            info.Sysid = CurrentUser.SysId;
             info.State = "0";
             info.CreatorTime = DateTime.Now;
             info.CreatorUserId = CurrentUser.UserId;
@@ -64,6 +65,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         protected override void OnBeforeUpdate(Sys_conf_classify info)
         {
             info.Parentid = string.IsNullOrEmpty(info.Parentid) ? "" : info.Parentid;
+            info.Sysid = CurrentUser.SysId;
             info.LastModifyUserId = CurrentUser.UserId;
             info.LastModifyTime = DateTime.Now;
         }
@@ -182,7 +184,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             info.Parentid = tinfo.Parentid;
             info.SortCode = tinfo.SortCode;
             info.EnabledMark = tinfo.EnabledMark;
-            info.Sysid = tinfo.Sysid;
 
 
 
@@ -231,10 +232,18 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             CommonResult result = new CommonResult();
             try
             {
-                List<Sys_conf_classifyOutputDto> list = await iService.GetAllClassifyTreeTable();
-                result.Success = true;
-                result.ErrCode = ErrCode.successCode;
-                result.ResData = list;
+                if (string.IsNullOrEmpty(CurrentUser.SysId))
+                {
+                    result.ErrMsg = ErrCode.err80001;
+                    result.ErrCode = "80001";
+                }
+                else
+                {
+                    List<Sys_conf_classifyOutputDto> list = await iService.GetAllClassifyTreeTable(CurrentUser.SysId);
+                    result.Success = true;
+                    result.ErrCode = ErrCode.successCode;
+                    result.ResData = list;
+                }
             }
             catch (Exception ex)
             {

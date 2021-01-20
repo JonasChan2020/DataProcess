@@ -20,11 +20,13 @@ namespace Yuebon.DataProcess.Services
     {
 		private readonly ISd_sysdbRepository _repository;
         private readonly ISd_classifyService _classservice;
+        private readonly ISys_sysRepository _sysrepository;
         private readonly ILogService _logService;
-        public Sd_sysdbService(ISd_sysdbRepository repository, ISd_classifyService classService, ILogService logService) : base(repository)
+        public Sd_sysdbService(ISd_sysdbRepository repository, ISys_sysRepository sysrepository, ISd_classifyService classService, ILogService logService) : base(repository)
         {
 			_repository=repository;
             _classservice = classService;
+            _sysrepository = sysrepository;
             _logService =logService;
             //_repository.OnOperationLog += _logService.OnOperationLog;
         }
@@ -48,6 +50,10 @@ namespace Yuebon.DataProcess.Services
                 CurrenetPageIndex = search.CurrenetPageIndex,
                 PageSize = search.PageSize
             };
+            if (!string.IsNullOrEmpty(search.Filter.Sys_id))
+            {
+                where += string.Format(" and sys_id = '{0}'", search.Filter.Sys_id);
+            }
             List<Sd_sysdb> list = await repository.FindWithPagerAsync(where, pagerInfo, search.Sort, order);
             List<Sd_sysdbOutputDto> resultList = list.MapTo<Sd_sysdbOutputDto>();
             List<Sd_sysdbOutputDto> listResult = new List<Sd_sysdbOutputDto>();
@@ -56,6 +62,10 @@ namespace Yuebon.DataProcess.Services
                 if (!string.IsNullOrEmpty(item.Classify_id))
                 {
                     item.Classify_Name = _classservice.Get(item.Classify_id).Dtname;
+                }
+                if (!string.IsNullOrEmpty(item.Sys_id))
+                {
+                    item.Sys_Name = _sysrepository.Get(item.Sys_id).Sysname;
                 }
                 listResult.Add(item);
             }

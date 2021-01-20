@@ -137,6 +137,11 @@ namespace Yuebon.Security.Dtos
         /// <summary>
         /// 当前所选系统（数据处理工具用）
         /// </summary>
-        public string SysInfo { get; set; }
+        public string SysId { get; set; }
+
+        /// <summary>
+        /// 当前所选系统（数据处理工具用）
+        /// </summary>
+        public string SysName { get; set; }
     }
 }

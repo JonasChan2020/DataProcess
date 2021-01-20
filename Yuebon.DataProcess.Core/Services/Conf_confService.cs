@@ -20,11 +20,13 @@ namespace Yuebon.DataProcess.Services
     {
 		private readonly IConf_confRepository _repository;
         private readonly IConf_classifyService _classservice;
+        private readonly ISys_sysRepository _sysrepository;
         private readonly ILogService _logService;
-        public Conf_confService(IConf_confRepository repository, IConf_classifyService classService, ILogService logService) : base(repository)
+        public Conf_confService(IConf_confRepository repository, ISys_sysRepository sysrepository, IConf_classifyService classService, ILogService logService) : base(repository)
         {
 			_repository=repository;
             _classservice = classService;
+            _sysrepository = sysrepository;
             _logService =logService;
             //_repository.OnOperationLog += _logService.OnOperationLog;
         }
@@ -48,6 +50,10 @@ namespace Yuebon.DataProcess.Services
                 CurrenetPageIndex = search.CurrenetPageIndex,
                 PageSize = search.PageSize
             };
+            if (!string.IsNullOrEmpty(search.Filter.Sysid))
+            {
+                where += string.Format(" and sysid = '{0}'", search.Filter.Sysid);
+            }
             List<Conf_conf> list = await repository.FindWithPagerAsync(where, pagerInfo, search.Sort, order);
             List<Conf_confOutputDto> resultList = list.MapTo<Conf_confOutputDto>();
             List<Conf_confOutputDto> listResult = new List<Conf_confOutputDto>();
@@ -56,6 +62,10 @@ namespace Yuebon.DataProcess.Services
                 if (!string.IsNullOrEmpty(item.Classify_id))
                 {
                     item.Classify_Name = _classservice.Get(item.Classify_id).Cname;
+                }
+                if (!string.IsNullOrEmpty(item.Sysid))
+                {
+                    item.Sys_Name = _sysrepository.Get(item.Sysid).Sysname;
                 }
                 listResult.Add(item);
             }

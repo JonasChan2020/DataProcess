@@ -11,6 +11,9 @@ using Yuebon.DataProcess.Models;
 using Yuebon.DataProcess.IServices;
 using Yuebon.AspNetCore.Mvc;
 using Yuebon.Commons.Json;
+using Yuebon.AspNetCore.Mvc.Filter;
+using Newtonsoft.Json;
+using Yuebon.Commons.Cache;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -79,17 +82,25 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// 获取文章分类适用于Vue 树形列表
         /// </summary>
         /// <returns></returns>
-        [HttpGet("ChoseSys")]
+        [HttpPost("ChoseSys")]
         [YuebonAuthorize("List")]
-        public async Task<IActionResult> ChoseSys(string sysId)
+        public async Task<IActionResult> ChoseSys([FromBody] dynamic formData)
         {
             CommonResult result = new CommonResult();
             try
             {
-                Sys_sys model = iService.Get(sysId);
-                CurrentUser.SysInfo = model.ToJson();
+                var aa = formData;
+                string dataStr = formData.ToString();
+                var paramsObj = new { sysId = "" };
+                paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
+                Sys_sys model = iService.Get(paramsObj.sysId);
+                CurrentUser.SysId = model.Id;
+                CurrentUser.SysName = model.Sysname;
+                YuebonCacheHelper yuebonCacheHelper = new YuebonCacheHelper();
+                yuebonCacheHelper.Replace("login_user_" + CurrentUser.UserId, CurrentUser);
                 result.Success = true;
                 result.ErrCode = ErrCode.successCode;
+
             }
             catch (Exception ex)
             {

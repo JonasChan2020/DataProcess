@@ -135,6 +135,7 @@
         <el-form-item label="连接字符串" :label-width="formLabelWidth" prop="Sdconnectionstr">
           <el-input v-model="editFrom.Sdconnectionstr" placeholder="请输入连接字符串" autocomplete="off" clearable />
         </el-form-item>
+        <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
         <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
           <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
         </el-form-item>
@@ -297,7 +298,6 @@ export default {
             'SdName': this.editFrom.SdName,
             'Sdtype': this.editFrom.Sdtype,
             'SortCode': this.editFrom.SortCode,
-
             'Id': this.currentId
           }
           var url = 'Sd_sysdb/Insert'

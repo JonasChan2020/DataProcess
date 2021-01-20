@@ -79,6 +79,8 @@ namespace Yuebon.AspNetCore.Models
         /// </summary>
         public static string err40110 = "程序异常";
 
+        
+
         /// <summary>
         /// 更新数据失败
         /// </summary>
@@ -113,5 +115,15 @@ namespace Yuebon.AspNetCore.Models
         /// 查询数据不存在
         /// </summary>
         public static string err60001 = "查询数据不存在";
+
+        /// <summary>
+        /// 未选择系统
+        /// </summary>
+        public static string err80001 = "未选择系统，请在系统管理页面选择系统";
+
+        /// <summary>
+        /// 未选择系统
+        /// </summary>
+        public static string err80002 = "未找到指定系统";
     }
 }

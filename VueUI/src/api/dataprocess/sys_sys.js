@@ -1,5 +1,6 @@
 import http from '@/utils/request'
 import defaultSettings from '@/settings'
+import { getAllSd_sysdbList } from './sd_sysdb'
 
 /**
    * 分页查询
@@ -25,7 +26,7 @@ export function getAllSys_sysList () {
 export function choseSys (sysId) {
   return http.request({
     url: 'Sys_sys/ChoseSys',
-    data: sysId,
+    data: { sysId: sysId },
     method: 'post',
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
@@ -35,6 +36,7 @@ export function choseSys (sysId) {
    * @param data
    */
 export function saveSys_sys (data, url) {
+  alert(data)
   return http.request({
     url: url,
     method: 'post',

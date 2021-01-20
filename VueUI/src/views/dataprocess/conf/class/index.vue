@@ -103,11 +103,6 @@
         <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
           <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
         </el-form-item>
-        <el-form-item label="所属系统" :label-width="formLabelWidth" prop="Sysid">
-          <el-select v-model="editFrom.Sysid" style="width:500px" clearable placeholder="请选择">
-            <el-option v-for="item in selectSys" :key="item.Id" :label="item.Sysname" :value="item.Id" />
-          </el-select>
-        </el-form-item>
         <el-form-item label="上级分类" :label-width="formLabelWidth" prop="Parentid">
           <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'Cname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
         </el-form-item>
@@ -134,9 +129,6 @@
     saveConf_classify, setConf_classifyEnable, deleteSoftConf_classify,
     deleteConf_classify, getAllClassifyTreeTable
   } from '@/api/dataprocess/conf_classify'
-  import {
-    getAllSys_sysList
-  } from '@/api/dataprocess/sys_sys'
 
 export default {
   data () {
@@ -144,7 +136,6 @@ export default {
       searchform: {
         keywords: ''
       },
-      selectSys: [],
       loadBtnFunc: [],
       tableData: [],
       tableloading: true,
@@ -167,8 +158,7 @@ export default {
         Parentid: '',
         SortCode: '',
         Ccode: '',
-        Cname: '',
-        Sysid: ''
+        Cname: ''
       },
       rules: {
 
@@ -188,9 +178,7 @@ export default {
      * 初始化数据
      */
     InitDictItem () {
-      getAllSys_sysList().then(res => {
-        this.selectSys = res.ResData
-      })
+
     },
     /**
      * 加载页面table数据
@@ -240,7 +228,6 @@ export default {
         this.editFrom.Parentid = res.ResData.Parentid
         this.editFrom.SortCode = res.ResData.SortCode
         this.selectedclass = res.ResData.Parentid
-        this.editFrom.Sysid = res.ResData.Sysid
       })
     },
     /**
@@ -256,8 +243,6 @@ export default {
             'Ccode': this.editFrom.Ccode,
             'Cname': this.editFrom.Cname,
             'EnabledMark': this.editFrom.EnabledMark,
-
-            'Sysid': this.editFrom.Sysid,
             'Id': this.currentId
           }
           var url = 'Conf_classify/Insert'
