@@ -1,17 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Yuebon.AspNetCore.Controllers;
 using Yuebon.AspNetCore.Models;
 using Yuebon.Commons.Helpers;
 using Yuebon.Commons.Log;
-using Yuebon.Commons.Mapping;
 using Yuebon.Commons.Models;
-using Yuebon.Commons.Pages;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 using Yuebon.DataProcess.IServices;
+using Yuebon.AspNetCore.Mvc;
+using Yuebon.Commons.Json;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -74,6 +73,31 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             info.DeleteMark = true;
             info.DeleteTime = DateTime.Now;
             info.DeleteUserId = CurrentUser.UserId;
+        }
+
+        /// <summary>
+        /// 获取文章分类适用于Vue 树形列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("ChoseSys")]
+        [YuebonAuthorize("List")]
+        public async Task<IActionResult> ChoseSys(string sysId)
+        {
+            CommonResult result = new CommonResult();
+            try
+            {
+                Sys_sys model = iService.Get(sysId);
+                CurrentUser.SysInfo = model.ToJson();
+                result.Success = true;
+                result.ErrCode = ErrCode.successCode;
+            }
+            catch (Exception ex)
+            {
+                Log4NetHelper.Error("获取组织结构异常", ex);
+                result.ErrMsg = ErrCode.err40110;
+                result.ErrCode = "40110";
+            }
+            return ToJsonContent(result);
         }
     }
 }

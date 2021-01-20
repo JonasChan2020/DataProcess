@@ -20,11 +20,13 @@ namespace Yuebon.DataProcess.Services
     public class Sys_conf_classifyService: BaseService<Sys_conf_classify,Sys_conf_classifyOutputDto, string>, ISys_conf_classifyService
     {
 		private readonly ISys_conf_classifyRepository _repository;
+        private readonly ISys_sysRepository _sysrepository;
         private readonly ILogService _logService;
-        public Sys_conf_classifyService(ISys_conf_classifyRepository repository,ILogService logService) : base(repository)
+        public Sys_conf_classifyService(ISys_conf_classifyRepository repository, ISys_sysRepository sysrepository,ILogService logService) : base(repository)
         {
 			_repository=repository;
-			_logService=logService;
+            _sysrepository = sysrepository;
+            _logService =logService;
             //_repository.OnOperationLog += _logService.OnOperationLog;
         }
 
@@ -42,6 +44,10 @@ namespace Yuebon.DataProcess.Services
             {
                 Sys_conf_classifyOutputDto menuTreeTableOutputDto = new Sys_conf_classifyOutputDto();
                 menuTreeTableOutputDto = item.MapTo<Sys_conf_classifyOutputDto>();
+                if (!string.IsNullOrEmpty(item.Sysid))
+                {
+                    menuTreeTableOutputDto.Sys_Name = _sysrepository.Get(item.Sysid).Sysname;
+                }
                 menuTreeTableOutputDto.Children = GetSubClasses(list, item.Id).ToList();
                 reslist.Add(menuTreeTableOutputDto);
             }
@@ -64,6 +70,10 @@ namespace Yuebon.DataProcess.Services
             foreach (Sys_conf_classify entity in ChilList)
             {
                 OrganizeOutputDto = entity.MapTo<Sys_conf_classifyOutputDto>();
+                if (!string.IsNullOrEmpty(entity.Sysid))
+                {
+                    OrganizeOutputDto.Sys_Name = _sysrepository.Get(entity.Sysid).Sysname;
+                }
                 OrganizeOutputDto.Children = GetSubClasses(data, entity.Id).OrderBy(t => t.SortCode).MapTo<Sys_conf_classifyOutputDto>();
                 list.Add(OrganizeOutputDto);
             }

@@ -99,6 +99,16 @@
         </el-table-column>
         <el-table-column prop="CreatorTime" label="创建时间" sortable />
         <el-table-column prop="LastModifyTime" label="更新时间" sortable />
+        <el-table-column label="选择" sortable="custom" width="120" align="center">
+          <template slot-scope="scope">
+            <el-button
+              type="primary"
+              icon="el-icon-plus"
+              size="small"
+              @click="ChoseSys(scope.row.Id)"
+            >选择</el-button>
+          </template>
+        </el-table-column>
       </el-table>
       <div class="pagination-container">
         <el-pagination
@@ -149,7 +159,8 @@
 
 <script>
 
-import { getSys_sysListWithPager, getSys_sysDetail,
+  import {
+    getSys_sysListWithPager, getSys_sysDetail, choseSys,
   saveSys_sys, setSys_sysEnable, deleteSoftSys_sys,
   deleteSys_sys
   } from '@/api/dataprocess/sys_sys'
@@ -401,6 +412,20 @@ export default {
           }
         })
       }
+    },
+    /**
+     * 选择指定系统
+     * @param sysId 系统ID
+     */
+    ChoseSys: function (sysId) {
+      choseSys(sysId).then(res => {
+        if (res.Success) {
+          this.$message({
+            message: '恭喜你，操作成功',
+            type: 'success'
+          })
+        }
+      })
     },
     /**
      * 当表格的排序条件发生变化的时候会触发该事件

@@ -182,7 +182,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             info.Parentid = tinfo.Parentid;
             info.SortCode = tinfo.SortCode;
             info.EnabledMark = tinfo.EnabledMark;
-
+            info.Sysid = tinfo.Sysid;
 
 
             OnBeforeUpdate(info);

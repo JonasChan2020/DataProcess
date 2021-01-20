@@ -198,7 +198,7 @@ export default {
       rules: {
 
       },
-      formLabelWidth: '80px',
+      formLabelWidth: '110px',
       currentId: '', // 当前操作对象的ID值，主要用于修改
       currentSelected: []
     }

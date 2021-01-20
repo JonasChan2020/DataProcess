@@ -101,6 +101,12 @@ namespace Yuebon.DataProcess.Dtos
         /// </summary>
         [MaxLength(0)]
         public string Sys_id { get; set; }
+
+        /// <summary>
+        /// 设置或获取所属系统名称
+        /// </summary>
+        [MaxLength(0)]
+        public string Sys_Name { get; set; }
 
     }
 }

@@ -133,5 +133,10 @@ namespace Yuebon.Security.Dtos
         /// 授权使用功能
         /// </summary>
         public List<MenuOutputDto> Modules { get; set; }
+
+        /// <summary>
+        /// 当前所选系统（数据处理工具用）
+        /// </summary>
+        public string SysInfo { get; set; }
     }
 }

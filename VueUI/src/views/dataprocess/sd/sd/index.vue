@@ -85,7 +85,7 @@
         <el-table-column type="selection" width="30" />
         <el-table-column prop="SdName" label="目标库名称" sortable="custom" width="120" />
         <el-table-column prop="Sdtype" label="目标库类型" sortable="custom" width="120" />
-        <el-table-column prop="Sys_id" label="所属系统ID" sortable="custom" width="120" />
+        <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
 
         <el-table-column prop="Classify_id" label="目标库分类" sortable="custom" width="260" align="center">
           <template slot-scope="scope">
@@ -134,9 +134,6 @@
         </el-form-item>
         <el-form-item label="连接字符串" :label-width="formLabelWidth" prop="Sdconnectionstr">
           <el-input v-model="editFrom.Sdconnectionstr" placeholder="请输入连接字符串" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="所属系统ID" :label-width="formLabelWidth" prop="Sys_id">
-          <el-input v-model="editFrom.Sys_id" placeholder="请输入所属系统ID" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
           <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
@@ -198,14 +195,13 @@ export default {
         Sddesc: '',
         SdName: '',
         Sdtype: '',
-        SortCode: '',
-        Sys_id: ''
+        SortCode: ''
 
       },
       rules: {
 
       },
-      formLabelWidth: '80px',
+      formLabelWidth: '110px',
       currentId: '', // 当前操作对象的ID值，主要用于修改
       currentSelected: []
     }
@@ -283,7 +279,6 @@ export default {
         this.editFrom.SdName = res.ResData.SdName
         this.editFrom.Sdtype = res.ResData.Sdtype
         this.editFrom.SortCode = res.ResData.SortCode
-        this.editFrom.Sys_id = res.ResData.Sys_id
         this.selectedclass = res.ResData.Classify_id
       })
     },
@@ -302,7 +297,6 @@ export default {
             'SdName': this.editFrom.SdName,
             'Sdtype': this.editFrom.Sdtype,
             'SortCode': this.editFrom.SortCode,
-            'Sys_id': this.editFrom.Sys_id,
 
             'Id': this.currentId
           }

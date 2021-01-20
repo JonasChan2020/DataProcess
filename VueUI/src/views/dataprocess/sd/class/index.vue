@@ -74,6 +74,7 @@
         <el-table-column type="selection" width="30" />
         <el-table-column prop="Dtcode" label="类型编码" sortable="custom" width="380" />
         <el-table-column prop="Dtname" label="类型名称" sortable="custom" width="180" />
+        <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
         <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="90" align="center" />
         <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
           <template slot-scope="scope">
@@ -101,6 +102,11 @@
         <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
           <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
         </el-form-item>
+        <el-form-item label="所属系统" :label-width="formLabelWidth" prop="Sysid">
+          <el-select v-model="editFrom.Sysid" style="width:500px" clearable placeholder="请选择">
+            <el-option v-for="item in selectSys" :key="item.Id" :label="item.Sysname" :value="item.Id" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="上级分类" :label-width="formLabelWidth" prop="Parentid">
           <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'Dtname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
         </el-form-item>
@@ -127,6 +133,9 @@
     saveSd_classify, setSd_classifyEnable, deleteSoftSd_classify,
     deleteSd_classify, getAllClassifyTreeTable
   } from '@/api/dataprocess/sd_classify'
+  import {
+    getAllSys_sysList
+  } from '@/api/dataprocess/sys_sys'
 
 export default {
   data () {
@@ -134,6 +143,7 @@ export default {
       searchform: {
         keywords: ''
       },
+      selectSys: [],
       loadBtnFunc: [],
       tableData: [],
       tableloading: true,
@@ -156,7 +166,8 @@ export default {
         Parentid: '',
         SortCode: '',
         Dtcode: '',
-        Dtname: ''
+        Dtname: '',
+        Sysid: ''
       },
       rules: {
 
@@ -176,6 +187,9 @@ export default {
      * 初始化数据
      */
     InitDictItem () {
+      getAllSys_sysList().then(res => {
+        this.selectSys = res.ResData
+      })
     },
     /**
      * 加载页面table数据

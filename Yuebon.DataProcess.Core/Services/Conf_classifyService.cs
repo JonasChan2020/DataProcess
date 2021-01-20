@@ -20,11 +20,13 @@ namespace Yuebon.DataProcess.Services
     public class Conf_classifyService: BaseService<Conf_classify,Conf_classifyOutputDto, string>, IConf_classifyService
     {
 		private readonly IConf_classifyRepository _repository;
+        private readonly ISys_sysRepository _sysrepository;
         private readonly ILogService _logService;
-        public Conf_classifyService(IConf_classifyRepository repository,ILogService logService) : base(repository)
+        public Conf_classifyService(IConf_classifyRepository repository, ISys_sysRepository sysrepository, ILogService logService) : base(repository)
         {
 			_repository=repository;
-			_logService=logService;
+            _sysrepository = sysrepository;
+            _logService =logService;
             //_repository.OnOperationLog += _logService.OnOperationLog;
         }
 
@@ -42,6 +44,10 @@ namespace Yuebon.DataProcess.Services
             {
                 Conf_classifyOutputDto menuTreeTableOutputDto = new Conf_classifyOutputDto();
                 menuTreeTableOutputDto = item.MapTo<Conf_classifyOutputDto>();
+                if (!string.IsNullOrEmpty(item.Sysid))
+                {
+                    menuTreeTableOutputDto.Sys_Name = _sysrepository.Get(item.Sysid).Sysname;
+                }
                 menuTreeTableOutputDto.Children = GetSubClasses(list, item.Id).ToList();
                 reslist.Add(menuTreeTableOutputDto);
             }
@@ -64,6 +70,10 @@ namespace Yuebon.DataProcess.Services
             foreach (Conf_classify entity in ChilList)
             {
                 OrganizeOutputDto = entity.MapTo<Conf_classifyOutputDto>();
+                if (!string.IsNullOrEmpty(entity.Sysid))
+                {
+                    OrganizeOutputDto.Sys_Name = _sysrepository.Get(entity.Sysid).Sysname;
+                }
                 OrganizeOutputDto.Children = GetSubClasses(data, entity.Id).OrderBy(t => t.SortCode).MapTo<Conf_classifyOutputDto>();
                 list.Add(OrganizeOutputDto);
             }

@@ -22,6 +22,14 @@ export function getAllSys_sysList () {
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
 }
+export function choseSys (sysId) {
+  return http.request({
+    url: 'Sys_sys/ChoseSys',
+    data: sysId,
+    method: 'post',
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
 /**
    * 新增或修改保存
    * @param data
