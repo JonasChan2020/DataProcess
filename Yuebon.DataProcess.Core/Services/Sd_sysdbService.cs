@@ -1,15 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Yuebon.Commons.Dtos;
-using Yuebon.Commons.Mapping;
-using Yuebon.Commons.Pages;
-using Yuebon.Commons.Services;
-using Yuebon.Security.IServices;
 using Yuebon.DataProcess.IRepositories;
 using Yuebon.DataProcess.IServices;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
+using System.Data;
+using Yuebon.DataProcess.Core.common.dbTools;
+using Yuebon.DataProcess.Core.common.Enity;
+using Yuebon.DataProcess.Core.common;
+using Yuebon.Commons.Services;
+using Yuebon.Security.IServices;
+using Yuebon.Commons.Helpers;
+using Yuebon.Commons.Pages;
+using Yuebon.Commons.Dtos;
+using Yuebon.Commons.Mapping;
 
 namespace Yuebon.DataProcess.Services
 {
@@ -19,16 +24,50 @@ namespace Yuebon.DataProcess.Services
     public class Sd_sysdbService: BaseService<Sd_sysdb,Sd_sysdbOutputDto, string>, ISd_sysdbService
     {
 		private readonly ISd_sysdbRepository _repository;
+        private readonly ISd_detailService _detailService;
         private readonly ISd_classifyService _classservice;
         private readonly ISys_sysRepository _sysrepository;
         private readonly ILogService _logService;
-        public Sd_sysdbService(ISd_sysdbRepository repository, ISys_sysRepository sysrepository, ISd_classifyService classService, ILogService logService) : base(repository)
+        public Sd_sysdbService(ISd_sysdbRepository repository, ISd_detailService detailService, ISys_sysRepository sysrepository, ISd_classifyService classService, ILogService logService) : base(repository)
         {
 			_repository=repository;
+            _detailService = detailService;
             _classservice = classService;
             _sysrepository = sysrepository;
             _logService =logService;
             //_repository.OnOperationLog += _logService.OnOperationLog;
+        }
+
+        /// <summary>
+        /// 异步步新增实体。
+        /// </summary>
+        /// <param name="entity">实体</param>
+        /// <param name="trans">事务对象</param>
+        /// <returns></returns>
+        public override async Task<long> InsertAsync(Sd_sysdb entity, IDbTransaction trans = null)
+        {
+            Sd_detail detailModel = new Sd_detail();
+            detailModel.Id = GuidUtils.CreateNo();
+            detailModel.Sd_id = entity.Id;
+            #region 获取所有表集合
+            DataTools bll = new DataTools(entity.Sdconnectionstr, entity.Sdtype);
+            List<DbTableInfo> tbList = bll.GetTbList(entity.dbName, "");
+            foreach (DbTableInfo item in tbList)
+            {
+                item.Fileds = bll.GetAllColumns(entity.dbName, item.TableName);
+            }
+            detailModel.Tbs = tbList.ToJson();
+            long addDetailResult = await  _detailService.InsertAsync(detailModel, trans);
+            #endregion
+            long addResult = await repository.InsertAsync(entity, trans);
+            if (addResult > 0 && addDetailResult > 0)
+            {
+                return addResult;
+            }
+            else
+            {
+                return -1;
+            }
         }
 
         /// <summary>
@@ -78,5 +117,7 @@ namespace Yuebon.DataProcess.Services
             };
             return pageResult;
         }
+
+
     }
 }

@@ -36,7 +36,9 @@ namespace Yuebon.DataProcess.Dtos
            CreateMap<Sd_classifyInputDto, Sd_classify>();
            CreateMap<Sd_sysdb, Sd_sysdbOutputDto>();
            CreateMap<Sd_sysdbInputDto, Sd_sysdb>();
-           CreateMap<Sys_classify, Sys_classifyOutputDto>();
+            CreateMap<Sd_detail, Sd_detailOutputDto>();
+            CreateMap<Sd_detailInputDto, Sd_detail>();
+            CreateMap<Sys_classify, Sys_classifyOutputDto>();
            CreateMap<Sys_classifyInputDto, Sys_classify>();
            CreateMap<Sys_conf, Sys_confOutputDto>();
            CreateMap<Sys_confInputDto, Sys_conf>();

@@ -44,6 +44,31 @@ namespace Yuebon.DataProcess.Dtos
         /// 设置或获取目标库类型
         /// </summary>
         public string Sdtype { get; set; }
+
+        /// <summary>
+        /// 设置或获取主机地址
+        /// </summary>
+        public string HostAddress { get; set; }
+
+        /// <summary>
+        /// 设置或获取端口
+        /// </summary>
+        public string Port { get; set; }
+
+        /// <summary>
+        /// 设置或获取数据库名
+        /// </summary>
+        public string dbName { get; set; }
+
+        /// <summary>
+        /// 设置或获取用户名
+        /// </summary>
+        public string UserId { get; set; }
+
+        /// <summary>
+        /// 设置或获取密码
+        /// </summary>
+        public string Password { get; set; }
         /// <summary>
         /// 设置或获取排序字段
         /// </summary>
@@ -56,6 +81,11 @@ namespace Yuebon.DataProcess.Dtos
         /// 设置或获取所属系统ID
         /// </summary>
         public string Sys_id { get; set; }
+
+        /// <summary>
+        /// 设置或获取是否为所属系统主库
+        /// </summary>
+        public string Is_maindb { get; set; }
 
     }
 }

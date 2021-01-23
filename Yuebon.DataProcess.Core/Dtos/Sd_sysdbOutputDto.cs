@@ -107,6 +107,42 @@ namespace Yuebon.DataProcess.Dtos
         /// </summary>
         [MaxLength(0)]
         public string Sys_Name { get; set; }
+
+        /// <summary>
+        /// 设置或获取是否为所属系统主库
+        /// </summary>
+        [MaxLength(100)]
+        public string Is_maindb { get; set; }
+
+        /// <summary>
+        /// 设置或获取主机地址
+        /// </summary>
+        [MaxLength(100)]
+        public string HostAddress { get; set; }
+
+        /// <summary>
+        /// 设置或获取端口
+        /// </summary>
+        [MaxLength(100)]
+        public string Port { get; set; }
+
+        /// <summary>
+        /// 设置或获取数据库名
+        /// </summary>
+        [MaxLength(300)]
+        public string dbName { get; set; }
+
+        /// <summary>
+        /// 设置或获取用户名
+        /// </summary>
+        [MaxLength(100)]
+        public string UserId { get; set; }
+
+        /// <summary>
+        /// 设置或获取密码
+        /// </summary>
+        [MaxLength(300)]
+        public string Password { get; set; }
 
     }
 }
