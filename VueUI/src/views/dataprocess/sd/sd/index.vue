@@ -2,13 +2,11 @@
   <div class="app-container">
     <div class="filter-container">
       <el-card>
-        <el-form
-          ref="searchform"
-          :inline="true"
-          :model="searchform"
-          class="demo-form-inline"
-          size="small"
-        >
+        <el-form ref="searchform"
+                 :inline="true"
+                 :model="searchform"
+                 class="demo-form-inline"
+                 size="small">
           <el-form-item label="名称：">
             <el-input v-model="searchform.keywords" clearable placeholder="名称" />
           </el-form-item>
@@ -22,66 +20,52 @@
       <div class="list-btn-container">
         <el-button-group>
           <slot v-for="itemf in loadBtnFunc">
-            <el-button
-              v-if="itemf.FullName==='新增'"
-              type="primary"
-              icon="el-icon-plus"
-              size="small"
-              @click="ShowEditOrViewDialog()"
-            >新增</el-button>
-            <el-button
-              v-if="itemf.FullName==='修改'"
-              type="primary"
-              icon="el-icon-edit"
-              class="el-button-modify"
-              size="small"
-              @click="ShowEditOrViewDialog('edit')"
-            >修改</el-button>
-            <el-button
-              v-if="itemf.FullName=='禁用'"
-              type="info"
-              icon="el-icon-video-pause"
-              size="small"
-              @click="setEnable('0')"
-            >禁用</el-button>
-            <el-button
-              v-if="itemf.FullName=='启用'"
-              type="success"
-              icon="el-icon-video-play"
-              size="small"
-              @click="setEnable('1')"
-            >启用</el-button>
-            <el-button
-              v-if="itemf.FullName==='软删除'"
-              type="warning"
-              icon="el-icon-delete"
-              size="small"
-              @click="deleteSoft('0')"
-            >软删除</el-button>
-            <el-button
-              v-if="itemf.FullName==='删除'"
-              type="danger"
-              icon="el-icon-delete"
-              size="small"
-              @click="deletePhysics()"
-            >删除</el-button>
+            <el-button v-if="itemf.FullName==='新增'"
+                       type="primary"
+                       icon="el-icon-plus"
+                       size="small"
+                       @click="ShowEditOrViewDialog()">新增</el-button>
+            <el-button v-if="itemf.FullName==='修改'"
+                       type="primary"
+                       icon="el-icon-edit"
+                       class="el-button-modify"
+                       size="small"
+                       @click="ShowEditOrViewDialog('edit')">修改</el-button>
+            <el-button v-if="itemf.FullName=='禁用'"
+                       type="info"
+                       icon="el-icon-video-pause"
+                       size="small"
+                       @click="setEnable('0')">禁用</el-button>
+            <el-button v-if="itemf.FullName=='启用'"
+                       type="success"
+                       icon="el-icon-video-play"
+                       size="small"
+                       @click="setEnable('1')">启用</el-button>
+            <el-button v-if="itemf.FullName==='软删除'"
+                       type="warning"
+                       icon="el-icon-delete"
+                       size="small"
+                       @click="deleteSoft('0')">软删除</el-button>
+            <el-button v-if="itemf.FullName==='删除'"
+                       type="danger"
+                       icon="el-icon-delete"
+                       size="small"
+                       @click="deletePhysics()">删除</el-button>
           </slot>
           <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableData()">刷新</el-button>
         </el-button-group>
       </div>
-      <el-table
-        ref="gridtable"
-        v-loading="tableloading"
-        :data="tableData"
-        border
-        stripe
-        highlight-current-row
-        style="width: 100%"
-        :default-sort="{prop: 'SortCode', order: 'ascending'}"
-        @select="handleSelectChange"
-        @select-all="handleSelectAllChange"
-        @sort-change="handleSortChange"
-      >
+      <el-table ref="gridtable"
+                v-loading="tableloading"
+                :data="tableData"
+                border
+                stripe
+                highlight-current-row
+                style="width: 100%"
+                :default-sort="{prop: 'SortCode', order: 'ascending'}"
+                @select="handleSelectChange"
+                @select-all="handleSelectAllChange"
+                @sort-change="handleSortChange">
         <el-table-column type="selection" width="30" />
         <el-table-column prop="SdName" label="目标库名称" sortable="custom" width="120" />
         <el-table-column prop="Sdtype" label="目标库类型" sortable="custom" width="120" />
@@ -100,59 +84,69 @@
             <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="CreatorTime" label="创建时间" sortable />
+        <el-table-column prop="CreatorTime" label="创建时间" sortable />dialogEditForm
         <el-table-column prop="LastModifyTime" label="更新时间" sortable />
       </el-table>
       <div class="pagination-container">
-        <el-pagination
-          background
-          :current-page="pagination.currentPage"
-          :page-sizes="[5,10,20,50,100, 200, 300, 400]"
-          :page-size="pagination.pagesize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="pagination.pageTotal"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
+        <el-pagination background
+                       :current-page="pagination.currentPage"
+                       :page-sizes="[5,10,20,50,100, 200, 300, 400]"
+                       :page-size="pagination.pagesize"
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :total="pagination.pageTotal"
+                       @size-change="handleSizeChange"
+                       @current-change="handleCurrentChange" />
       </div>
     </el-card>
-    <el-dialog
-      ref="dialogEditForm"
-      :title="editFormTitle+'{TableNameDesc}'"
-      :visible.sync="dialogEditFormVisible"
-      width="640px"
-    >
+    <el-dialog ref="dialogEditForm"
+               :title="editFormTitle+'连接'"
+               :visible.sync="dialogEditForm"
+               width="640px">
       <el-form ref="editFrom" :model="editFrom" :rules="rules">
-        <el-form-item label="目标库名称" :label-width="formLabelWidth" prop="SdName">
-          <el-input v-model="editFrom.SdName" placeholder="请输入目标库名称" autocomplete="off" clearable />
+        <el-form-item label="连接名称" :label-width="formLabelWidth" prop="SdName">
+          <el-input v-model="editFrom.SdName" placeholder="请输入连接名称" autocomplete="off" clearable />
         </el-form-item>
-        <el-form-item label="目标库类型" :label-width="formLabelWidth" prop="Sdtype">
-          <el-input v-model="editFrom.Sdtype" placeholder="请输入目标库类型" autocomplete="off" clearable />
+        <el-form-item label="数据库类型" :label-width="formLabelWidth" prop="Sdtype">
+          <el-input v-model="editFrom.Sdtype" placeholder="请输入数据库类型" autocomplete="off" clearable />
         </el-form-item>
-        <el-form-item label="目标库分类" :label-width="formLabelWidth" prop="Classify_id">
+        <el-form-item label="连接分类" :label-width="formLabelWidth" prop="Classify_id">
           <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'Dtname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
-        </el-form-item>
-        <el-form-item label="连接字符串" :label-width="formLabelWidth" prop="Sdconnectionstr">
-          <el-input v-model="editFrom.Sdconnectionstr" placeholder="请输入连接字符串" autocomplete="off" clearable />
         </el-form-item>
         <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
         <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
           <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
         </el-form-item>
-
+        <el-form-item label="主机地址" :label-width="formLabelWidth" prop="HostAddress">
+          <el-input v-model="editFrom.HostAddress" placeholder="请输入主机地址" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="端口" :label-width="formLabelWidth" prop="Port">
+          <el-input v-model="editFrom.Port" placeholder="请输入端口" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="数据库名" :label-width="formLabelWidth" prop="dbName">
+          <el-input v-model="editFrom.dbName" placeholder="请输入数据库名" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="用户名" :label-width="formLabelWidth" prop="UserId">
+          <el-input v-model="editFrom.UserId" placeholder="请输入用户名" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item label="密码" :label-width="formLabelWidth" prop="Password">
+          <el-input v-model="editFrom.Password" placeholder="请输入密码" autocomplete="off" clearable />
+        </el-form-item>
         <el-form-item label="排序" :label-width="formLabelWidth" prop="SortCode">
           <el-input v-model.number="editFrom.SortCode" placeholder="请输入排序,默认为99" autocomplete="off" clearable />
         </el-form-item>
+
         <el-form-item label="选项" :label-width="formLabelWidth" prop="">
+          <el-checkbox v-model="editFrom.Is_maindb">所属系统主库</el-checkbox>
           <el-checkbox v-model="editFrom.EnabledMark">启用</el-checkbox>
         </el-form-item>
 
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogEditFormVisible = false">取 消</el-button>
+        <el-button @click="dialogEditForm = false">取 消</el-button>
         <el-button type="primary" @click="saveEditForm()">确 定</el-button>
       </div>
     </el-dialog>
+
   </div>
 </template>
 
@@ -186,16 +180,21 @@ export default {
       },
       selectedclass: '',
       selectclasses: [],
-      dialogEditFormVisible: false,
+      dialogEditForm: false,
       editFormTitle: '',
       editFrom: {
         Classify_id: '',
         Description: '',
-        EnabledMark: '',
-        Sdconnectionstr: '',
+        EnabledMark: '1',
         Sddesc: '',
         SdName: '',
         Sdtype: '',
+        HostAddress: '',
+        Port: '',
+        dbName: '',
+        UserId: '',
+        Password: '',
+        Is_maindb: '',
         SortCode: ''
 
       },
@@ -260,14 +259,14 @@ export default {
         } else {
           this.currentId = this.currentSelected[0].Id
           this.editFormTitle = '编辑'
-          this.dialogEditFormVisible = true
+          this.dialogEditForm = true
           this.bindEditInfo()
         }
       } else {
         this.editFormTitle = '新增'
         this.currentId = ''
         this.selectedclass = ''
-        this.dialogEditFormVisible = true
+        this.dialogEditForm = true
       }
     },
     bindEditInfo: function () {
@@ -279,6 +278,12 @@ export default {
         this.editFrom.Sddesc = res.ResData.Sddesc
         this.editFrom.SdName = res.ResData.SdName
         this.editFrom.Sdtype = res.ResData.Sdtype
+        this.editFrom.HostAddress = res.ResData.HostAddress
+        this.editFrom.Port = res.ResData.Port
+        this.editFrom.dbName = res.ResData.dbName
+        this.editFrom.UserId = res.ResData.UserId
+        this.editFrom.Password = res.ResData.Password
+        this.editFrom.Is_maindb = res.ResData.Is_maindb
         this.editFrom.SortCode = res.ResData.SortCode
         this.selectedclass = res.ResData.Classify_id
       })
@@ -297,6 +302,12 @@ export default {
             'Sddesc': this.editFrom.Sddesc,
             'SdName': this.editFrom.SdName,
             'Sdtype': this.editFrom.Sdtype,
+            'HostAddress': this.editFrom.HostAddress,
+            'Port': this.editFrom.Port,
+            'dbName': this.editFrom.dbName,
+            'UserId': this.editFrom.UserId,
+            'Password': this.editFrom.Password,
+            'Is_maindb': this.editFrom.Is_maindb,
             'SortCode': this.editFrom.SortCode,
             'Id': this.currentId
           }
@@ -310,7 +321,7 @@ export default {
                 message: '恭喜你，操作成功',
                 type: 'success'
               })
-              this.dialogEditFormVisible = false
+              this.dialogEditForm = false
               this.currentSelected = ''
               this.selectedclass = ''
               this.$refs['editFrom'].resetFields()

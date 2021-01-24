@@ -15,6 +15,7 @@ using Yuebon.DataProcess.IServices;
 using Yuebon.Commons.Dtos;
 using Yuebon.AspNetCore.Mvc;
 using System.Reflection;
+using Yuebon.DataProcess.Core.common.dbTools.baseDb.Extension;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -114,6 +115,21 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             #endregion
 
             Sd_sysdb info = tinfo.MapTo<Sd_sysdb>();
+            #region 补充连接字符串
+            if (info.Sdtype == "Oracle")
+            {
+                info.Sdconnectionstr = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=" + info.HostAddress + ")(PORT=" + info.Port + "))(CONNECT_DATA=(SERVICE_NAME=" + info.dbName + ")));User Id=" + info.UserId + ";Password=" + info.Password + "";
+            }
+            else if (info.Sdtype == "MySql")
+            {
+                info.Sdconnectionstr = "Server=" + info.HostAddress + ";Database=" + info.dbName + ";port=" + info.Port + ";Uid=" + info.UserId + ";Pwd=" + info.Password + ";CharSet=utf8;Allow User Variables=True;SslMode=None;";
+            }
+            else if (info.Sdtype == "SqlServer")
+            {
+                info.Sdconnectionstr = "Server=" + info.HostAddress + ";Database=" + info.dbName + ";User id=" + info.UserId + "; password=" + info.Password + ";MultipleActiveResultSets=True;";
+            }
+            info.Sdconnectionstr = StringTools.EncodeBase64(info.Sdconnectionstr);
+            #endregion
             OnBeforeInsert(info);
 
             result.Success = await iService.InsertAsync(info) > 0;
@@ -158,9 +174,27 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                 return ToJsonContent(result);
             }
             #endregion
+
             Sd_sysdb newInfo = tinfo.MapTo<Sd_sysdb>();
             Sd_sysdb info = iService.Get(id);
             info = SwapValue(info, newInfo);
+
+            #region 补充连接字符串
+            if (info.Sdtype == "Oracle")
+            {
+                info.Sdconnectionstr = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=" + info.HostAddress + ")(PORT=" + info.Port + "))(CONNECT_DATA=(SERVICE_NAME=" + info.dbName + ")));User Id=" + info.UserId + ";Password=" + info.Password + "";
+            }
+            else if (info.Sdtype == "MySql")
+            {
+                info.Sdconnectionstr = "Server=" + info.HostAddress + ";Database=" + info.dbName + ";port=" + info.Port + ";Uid=" + info.UserId + ";Pwd=" + info.Password + ";CharSet=utf8;Allow User Variables=True;SslMode=None;";
+            }
+            else if (info.Sdtype == "SqlServer")
+            {
+                info.Sdconnectionstr = "Server=" + info.HostAddress + ";Database=" + info.dbName + ";User id=" + info.UserId + "; password=" + info.Password + ";MultipleActiveResultSets=True;";
+            }
+            info.Sdconnectionstr = StringTools.EncodeBase64(info.Sdconnectionstr);
+            #endregion
+
             OnBeforeUpdate(info);
 
             bool bl = await iService.UpdateAsync(info, id).ConfigureAwait(false);
