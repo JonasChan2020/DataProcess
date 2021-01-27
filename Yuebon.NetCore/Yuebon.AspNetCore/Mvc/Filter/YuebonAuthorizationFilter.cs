@@ -83,7 +83,7 @@ namespace Yuebon.AspNetCore.Mvc
                 //token验证失败
                 if (!result.Success)
                 {
-                    context.Result = new JsonResult(result);
+                    context.Result = new JsonResult(result,options);
                 }
                 else
                 {
@@ -101,7 +101,7 @@ namespace Yuebon.AspNetCore.Mvc
                         List<Claim> claimlist = result.ResData as List<Claim>;
                         string userId = claimlist[3].Value;
                         YuebonCacheHelper yuebonCacheHelper = new YuebonCacheHelper();
-                        var user = JsonSerializer.Deserialize<YuebonCurrentUser>(yuebonCacheHelper.Get("login_user_" + userId).ToJson(), options);
+                        var user = yuebonCacheHelper.Get<YuebonCurrentUser>("login_user_" + userId);
 
                         if (user == null)
                         {
@@ -113,8 +113,7 @@ namespace Yuebon.AspNetCore.Mvc
                         var claims = new[] {
                            new Claim(YuebonClaimTypes.UserId,userId),
                            new Claim(YuebonClaimTypes.UserName,claimlist[2].Value),
-                           new Claim(YuebonClaimTypes.Role,claimlist[4].Value),
-                           new Claim(YuebonClaimTypes.TenantId,user.TenantId)
+                           new Claim(YuebonClaimTypes.Role,claimlist[4].Value)
                         };
                         var identity = new ClaimsIdentity(claims);
                         var principal = new ClaimsPrincipal(identity);

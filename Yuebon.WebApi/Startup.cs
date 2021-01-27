@@ -1,5 +1,4 @@
-﻿using Autofac;
-using AutoMapper;
+﻿using AutoMapper;
 using log4net;
 using log4net.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -7,6 +6,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
@@ -31,8 +32,9 @@ using System.Text.Unicode;
 using Yuebon.AspNetCore.Common;
 using Yuebon.AspNetCore.Mvc;
 using Yuebon.AspNetCore.Mvc.Filter;
-using Yuebon.Commons.Attributes;
+using Yuebon.Commons;
 using Yuebon.Commons.Cache;
+using Yuebon.Commons.Core.App;
 using Yuebon.Commons.DbContextCore;
 using Yuebon.Commons.Extensions;
 using Yuebon.Commons.Helpers;
@@ -61,6 +63,7 @@ namespace Yuebon.WebApi
         /// 
         /// </summary>
         public IConfiguration Configuration { get; }
+        private IApiVersionDescriptionProvider apiVersionProvider;//api接口版本控制
         /// <summary>
         /// 
         /// </summary>
@@ -78,12 +81,11 @@ namespace Yuebon.WebApi
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
-
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddHttpContextAccessor();
-            services.AddSingleton(Configuration);
+            //services.AddSingleton(Configuration);
             //如果部署在linux系统上，需要加上下面的配置：
             //services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
             //如果部署在IIS上，需要加上下面的配置：
@@ -91,46 +93,76 @@ namespace Yuebon.WebApi
 
 
             #region Swagger Api文档
+
+            // Api多版本版本配置
+            services.AddApiVersioning(o =>
+            {
+                o.ReportApiVersions = true;//是否在请求头中返回受支持的版本信息。
+                o.ApiVersionReader = new HeaderApiVersionReader("api-version");////版本信息放到header ,不写在不配置路由的情况下，版本信息放到response url 中
+                o.AssumeDefaultVersionWhenUnspecified = true;//请求没有指明版本的情况下是否使用默认的版本。
+                o.DefaultApiVersion = new ApiVersion(1, 0);//默认的版本号。
+            }).AddVersionedApiExplorer(option =>
+            {    // 版本名的格式：v+版本号
+                option.GroupNameFormat = "'v'V";
+                option.AssumeDefaultVersionWhenUnspecified = true;
+            });
+            //获取webapi版本信息，用于swagger多版本支持 
+            apiVersionProvider = services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
             services.AddSwaggerGen(options =>
             {
                 string contactName = Configuration.GetSection("SwaggerDoc:ContactName").Value;
                 string contactNameEmail = Configuration.GetSection("SwaggerDoc:ContactEmail").Value;
                 string contactUrl = Configuration.GetSection("SwaggerDoc:ContactUrl").Value;
-                options.SwaggerDoc("v1", new OpenApiInfo
-                {
 
-                    Version = Configuration.GetSection("SwaggerDoc:Version").Value,
-                    Title = Configuration.GetSection("SwaggerDoc:Title").Value,
-                    Description = Configuration.GetSection("SwaggerDoc:Description").Value,
-                    Contact = new OpenApiContact { Name = contactName, Email = contactNameEmail, Url = new Uri(contactUrl) },
-                    License = new OpenApiLicense { Name = contactName, Url = new Uri(contactUrl) }
-                });
+                foreach (var description in apiVersionProvider.ApiVersionDescriptions)
+                {
+                    options.SwaggerDoc(description.GroupName,
+                         new OpenApiInfo()
+                         {
+                             Title = $"{Configuration.GetSection("SwaggerDoc:Title").Value}v{description.ApiVersion}",
+                             Version = description.ApiVersion.ToString(),
+                             Description = Configuration.GetSection("SwaggerDoc:Description").Value,
+                             Contact = new OpenApiContact { Name = contactName, Email = contactNameEmail, Url = new Uri(contactUrl) },
+                             License = new OpenApiLicense { Name = contactName, Url = new Uri(contactUrl) }
+                         }
+                    );
+                }
                 Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.xml").ToList().ForEach(file =>
                 {
                     options.IncludeXmlComments(file, true);
                 });
                 options.DocumentFilter<HiddenApiFilter>(); // 在接口类、方法标记属性 [HiddenApi]，可以阻止【Swagger文档】生成
-                options.OperationFilter<AddResponseHeadersFilter>();
-                options.OperationFilter<SecurityRequirementsOperationFilter>();
-                options.OperationFilter<SwaggerFileUploadFilter>();
                 //给api添加token令牌证书
-                options.AddSecurityDefinition("CoreApi", new OpenApiSecurityScheme
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = "JWT授权(数据将在请求头中进行传输) 直接在下框中输入Bearer {token}（注意两者之间是一个空格）\"",
                     Name = "Authorization",//jwt默认的参数名称
                     In = ParameterLocation.Header,//jwt默认存放Authorization信息的位置(请求头中)
-                    Type = SecuritySchemeType.ApiKey
+                    Type = SecuritySchemeType.ApiKey,
+                    BearerFormat="JWT",
+                    Scheme= "Bearer"
                 });
+                //添加安全请求
+                options.AddSecurityRequirement(
+                    new OpenApiSecurityRequirement {
+                        { 
+                            new OpenApiSecurityScheme
+                            {
+                                Reference=new OpenApiReference{
+                                    Type=ReferenceType.SecurityScheme,
+                                    Id= "Bearer"
+                                }
+                            }
+                            ,new string[] { }
+                        }
+                    });
+                //开启加权锁
+                options.OperationFilter<AddResponseHeadersFilter>();
+                options.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
+                options.OperationFilter<SecurityRequirementsOperationFilter>();
             });
 
 
-            // Api配置版本信息
-            services.AddApiVersioning(o =>
-            {
-                o.ReportApiVersions = true;
-                o.AssumeDefaultVersionWhenUnspecified = true;
-                o.DefaultApiVersion = new ApiVersion(1, 0);
-            });
             #endregion
 
             #region 全局设置跨域访问
@@ -176,7 +208,7 @@ namespace Yuebon.WebApi
                 .AddAuthorization().AddApiExplorer();
             #endregion
             services.AddSignalR();//使用 SignalR
-            return InitIoC(services);
+            InitIoC(services);
         }
 
         /// <summary>
@@ -198,6 +230,15 @@ namespace Yuebon.WebApi
                 if (env.IsDevelopment())
                 {
                     app.UseDeveloperExceptionPage();
+                    app.UseSwagger();
+                    app.UseSwaggerUI(options =>
+                    {
+                        foreach (var description in apiVersionProvider.ApiVersionDescriptions)
+                        {
+                            options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", $"{Configuration.GetSection("SwaggerDoc:Title").Value+description.GroupName.ToUpperInvariant()}");
+                            options.RoutePrefix = string.Empty;//这里主要是不需要再输入swagger这个默认前缀
+                        }
+                    });
                 }
                 else
                 {
@@ -218,12 +259,7 @@ namespace Yuebon.WebApi
                     endpoints.MapControllerRoute("default", "api/{controller=Home}/{action=Index}/{id?}");
                 });
                 app.UseStatusCodePages();
-                app.UseSwagger();
-                app.UseSwaggerUI(options =>
-                {
-                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Yuebon System API V1");
-                    options.RoutePrefix = string.Empty;//这里主要是不需要再输入swagger这个默认前缀
-                });
+
                 YuebonInitialization.Initial();
             }
         }
@@ -235,17 +271,30 @@ namespace Yuebon.WebApi
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        private IServiceProvider InitIoC(IServiceCollection services)
+        private void InitIoC(IServiceCollection services)
         {
             #region 缓存
-
-            services.AddMemoryCache();// 启用MemoryCache
             CacheProvider cacheProvider = new CacheProvider
             {
                 IsUseRedis = Configuration.GetSection("CacheProvider:UseRedis").Value.ToBool(false),
                 ConnectionString = Configuration.GetSection("CacheProvider:Redis_ConnectionString").Value,
                 InstanceName = Configuration.GetSection("CacheProvider:Redis_InstanceName").Value
             };
+
+            var options = new JsonSerializerOptions();
+            options.Encoder = JavaScriptEncoder.Create(UnicodeRanges.All);
+            options.WriteIndented = true;
+            options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.AllowTrailingCommas = true;
+            //设置时间格式
+            options.Converters.Add(new DateTimeJsonConverter());
+            options.Converters.Add(new DateTimeNullableConverter());
+            //设置bool获取格式
+            options.Converters.Add(new BooleanJsonConverter());
+            //设置数字
+            options.Converters.Add(new IntJsonConverter());
+            options.PropertyNamingPolicy = new UpperFirstCaseNamingPolicy();
+            options.PropertyNameCaseInsensitive = true;                     //忽略大小写
             //判断是否使用Redis，如果不使用 Redis就默认使用 MemoryCache
             if (cacheProvider.IsUseRedis)
             {
@@ -259,7 +308,7 @@ namespace Yuebon.WebApi
                 {
                     Configuration = cacheProvider.ConnectionString,
                     InstanceName = cacheProvider.InstanceName
-                }, 0));
+                }, options, 0));
                 services.Configure<DistributedCacheEntryOptions>(option => option.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5));//设置Redis缓存有效时间为5分钟。
             }
             else
@@ -274,6 +323,7 @@ namespace Yuebon.WebApi
                 services.Configure<MemoryCacheEntryOptions>(
                     options => options.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)); //设置MemoryCache缓存有效时间为5分钟
             }
+            services.AddMemoryCache();// 启用MemoryCache
             #endregion
 
 
@@ -308,41 +358,15 @@ namespace Yuebon.WebApi
                 };
             });
             #endregion
+
+            services.AddAutoScanInjection();//自动化注入仓储和服务
             services.AddTransient<IDbContextCore, MySqlDbContext>(); //注入EF上下文
-
-            IoCContainer.Register(cacheProvider);//注册缓存配置
-            IoCContainer.Register(Configuration);//注册配置
-            IoCContainer.Register(jwtOption);//注册配置
-            var codeGenerateOption = new CodeGenerateOption
-            {
-                ModelsNamespace = "",
-                IRepositoriesNamespace = "",
-                RepositoriesNamespace = "",
-                IServicsNamespace = "",
-                ServicesNamespace = ""
-            };
-            IoCContainer.Register(codeGenerateOption);//注册代码生成器相关配置信息
-            IoCContainer.Register("Yuebon.Commons");
-            IoCContainer.Register("Yuebon.AspNetCore");
-            IoCContainer.Register("Yuebon.Security.Core");
-            IoCContainer.RegisterNew("Yuebon.Security.Core", "Yuebon.Security");
-            IoCContainer.Register("Yuebon.Messages.Core");
-            IoCContainer.RegisterNew("Yuebon.Messages.Core", "Yuebon.Messages");
-            IoCContainer.Register("Yuebon.Tenants.Core");
-            IoCContainer.RegisterNew("Yuebon.Tenants.Core", "Yuebon.Tenants");
-            IoCContainer.Register("Yuebon.CMS.Core");
-            IoCContainer.RegisterNew("Yuebon.CMS.Core", "Yuebon.CMS");
-            IoCContainer.Register("Yuebon.DataProcess.Core");
-            IoCContainer.RegisterNew("Yuebon.DataProcess.Core", "Yuebon.DataProcess");
-
+            services.AddSingleton(cacheProvider)//注册缓存配置
+                .AddSingleton(jwtOption);//注册配置
             #region automapper
-            List<Assembly> myAssembly = new List<Assembly>();
-            myAssembly.Add(Assembly.Load("Yuebon.Security.Core"));
-            myAssembly.Add(Assembly.Load("Yuebon.Tenants.Core"));
-            myAssembly.Add(Assembly.Load("Yuebon.CMS.Core"));
-            myAssembly.Add(Assembly.Load("Yuebon.DataProcess.Core"));
+            List<Assembly> myAssembly =RuntimeHelper.GetAllYuebonAssemblies().ToList();
             services.AddAutoMapper(myAssembly);
-            services.AddScoped<IMapper, Mapper>();
+            services.AddTransient<IMapper, Mapper>();
             #endregion
 
             #region 定时任务
@@ -350,41 +374,10 @@ namespace Yuebon.WebApi
             services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
             //设置定时启动的任务
             services.AddHostedService<QuartzService>();
-            #endregion
-
-            return IoCContainer.Build(services);
-        }
-
-
-        public void ConfigureContainer(ContainerBuilder builder)
-        {
-            #region AutoFac IOC容器
-            try
-            {
-                #region SingleInstance
-                //无接口注入单例
-
-                //有接口注入单例
-                #endregion
-
-                #region Aop
-                var interceptorServiceTypes = new List<Type>();
-                builder.RegisterType<UnitOfWorkIInterceptor>();
-                interceptorServiceTypes.Add(typeof(UnitOfWorkIInterceptor));
-                #endregion
-
-                #region Repository
-                #endregion
-
-                #region Service
-                #endregion
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message + "\n" + ex.InnerException);
-            }
+            App.Services = services;
             #endregion
         }
+
         /// <summary>
         /// 加载模块应用
         /// </summary>

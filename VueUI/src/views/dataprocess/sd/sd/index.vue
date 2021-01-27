@@ -19,43 +19,54 @@
     <el-card>
       <div class="list-btn-container">
         <el-button-group>
-          <slot v-for="itemf in loadBtnFunc">
-            <el-button v-if="itemf.FullName==='新增'"
-                       type="primary"
-                       icon="el-icon-plus"
-                       size="small"
-                       @click="ShowEditOrViewDialog()">新增</el-button>
-            <el-button v-if="itemf.FullName==='修改'"
-                       type="primary"
-                       icon="el-icon-edit"
-                       class="el-button-modify"
-                       size="small"
-                       @click="ShowEditOrViewDialog('edit')">修改</el-button>
-            <el-button v-if="itemf.FullName=='禁用'"
-                       type="info"
-                       icon="el-icon-video-pause"
-                       size="small"
-                       @click="setEnable('0')">禁用</el-button>
-            <el-button v-if="itemf.FullName=='启用'"
-                       type="success"
-                       icon="el-icon-video-play"
-                       size="small"
-                       @click="setEnable('1')">启用</el-button>
-            <el-button v-if="itemf.FullName==='软删除'"
-                       type="warning"
-                       icon="el-icon-delete"
-                       size="small"
-                       @click="deleteSoft('0')">软删除</el-button>
-            <el-button v-if="itemf.FullName==='删除'"
-                       type="danger"
-                       icon="el-icon-delete"
-                       size="small"
-                       @click="deletePhysics()">删除</el-button>
-          </slot>
+          <el-button
+            v-hasPermi="['Sd_sysdb/Add']"
+            type="primary"
+            icon="el-icon-plus"
+            size="small"
+            @click="ShowEditOrViewDialog()"
+          >新增</el-button>
+          <el-button
+            v-hasPermi="['Sd_sysdb/Edit']"
+            type="primary"
+            icon="el-icon-edit"
+            class="el-button-modify"
+            size="small"
+            @click="ShowEditOrViewDialog('edit')"
+          >修改</el-button>
+          <el-button
+            v-hasPermi="['Sd_sysdb/Enable']"
+            type="info"
+            icon="el-icon-video-pause"
+            size="small"
+            @click="setEnable('0')"
+          >禁用</el-button>
+          <el-button
+            v-hasPermi="['Sd_sysdb/Enable']"
+            type="success"
+            icon="el-icon-video-play"
+            size="small"
+            @click="setEnable('1')"
+          >启用</el-button>
+          <el-button
+            v-hasPermi="['Sd_sysdb/DeleteSoft']"
+            type="warning"
+            icon="el-icon-delete"
+            size="small"
+            @click="deleteSoft('0')"
+          >软删除</el-button>
+          <el-button
+            v-hasPermi="['Sd_sysdb/Delete']"
+            type="danger"
+            icon="el-icon-delete"
+            size="small"
+            @click="deletePhysics()"
+          >删除</el-button>
           <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableData()">刷新</el-button>
         </el-button-group>
       </div>
-      <el-table ref="gridtable"
+      <el-table
+                ref="gridtable"
                 v-loading="tableloading"
                 :data="tableData"
                 border
@@ -103,9 +114,9 @@
     </el-card>
     <el-dialog ref="dialogEditForm"
                :title="editFormTitle+'连接'"
-               :visible.sync="dialogEditForm"
+               :visible.sync="dialogEditFormVisible"
                width="640px">
-      <el-form ref="editFrom" :model="editFrom" :rules="rules">
+      <el-form ref="editFrom" :model="editFrom" :rules="rules" class="demo-form-inline">
         <el-form-item label="连接名称" :label-width="formLabelWidth" prop="SdName">
           <el-input v-model="editFrom.SdName" placeholder="请输入连接名称" autocomplete="off" clearable />
         </el-form-item>
@@ -115,7 +126,6 @@
         <el-form-item label="连接分类" :label-width="formLabelWidth" prop="Classify_id">
           <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'Dtname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
         </el-form-item>
-        <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
         <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
           <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
         </el-form-item>
@@ -137,8 +147,9 @@
         <el-form-item label="排序" :label-width="formLabelWidth" prop="SortCode">
           <el-input v-model.number="editFrom.SortCode" placeholder="请输入排序,默认为99" autocomplete="off" clearable />
         </el-form-item>
-        <el-form-item label="主库" :label-width="formLabelWidth" prop="">
-          <el-checkbox v-model="editFrom.Is_maindb">所属系统主库</el-checkbox>
+
+        <el-form-item label="选项" :label-width="formLabelWidth" prop="">
+          <el-checkbox v-model="editFrom.Is_maindb">是否为主数据库</el-checkbox>
         </el-form-item>
 
         <el-form-item label="选项" :label-width="formLabelWidth" prop="">
@@ -147,7 +158,7 @@
 
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogEditForm = false">取 消</el-button>
+        <el-button @click="dialogEditFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="saveEditForm()">确 定</el-button>
       </div>
     </el-dialog>
@@ -185,7 +196,7 @@ export default {
       },
       selectedclass: '',
       selectclasses: [],
-      dialogEditForm: false,
+      dialogEditFormVisible: false,
       editFormTitle: '',
       editFrom: {
         Classify_id: '',
@@ -264,14 +275,14 @@ export default {
         } else {
           this.currentId = this.currentSelected[0].Id
           this.editFormTitle = '编辑'
-          this.dialogEditForm = true
+          this.dialogEditFormVisible = true
           this.bindEditInfo()
         }
       } else {
         this.editFormTitle = '新增'
         this.currentId = ''
         this.selectedclass = ''
-        this.dialogEditForm = true
+        this.dialogEditFormVisible = true
       }
     },
     bindEditInfo: function () {
@@ -279,7 +290,6 @@ export default {
         this.editFrom.Classify_id = res.ResData.Classify_id
         this.editFrom.Description = res.ResData.Description
         this.editFrom.EnabledMark = res.ResData.EnabledMark
-        this.editFrom.Sdconnectionstr = res.ResData.Sdconnectionstr
         this.editFrom.Sddesc = res.ResData.Sddesc
         this.editFrom.SdName = res.ResData.SdName
         this.editFrom.Sdtype = res.ResData.Sdtype
@@ -303,7 +313,6 @@ export default {
             'Classify_id': this.editFrom.Classify_id,
             'Description': this.editFrom.Description,
             'EnabledMark': this.editFrom.EnabledMark,
-            'Sdconnectionstr': this.editFrom.Sdconnectionstr,
             'Sddesc': this.editFrom.Sddesc,
             'SdName': this.editFrom.SdName,
             'Sdtype': this.editFrom.Sdtype,
@@ -326,7 +335,7 @@ export default {
                 message: '恭喜你，操作成功',
                 type: 'success'
               })
-              this.dialogEditForm = false
+              this.dialogEditFormVisible = false
               this.currentSelected = ''
               this.selectedclass = ''
               this.$refs['editFrom'].resetFields()

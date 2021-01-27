@@ -75,7 +75,7 @@ namespace Yuebon.DataProcess.Models
         /// <summary>
         /// 是否为所属系统主库
         /// </summary>
-        public string Is_maindb { get; set; }
+        public bool? Is_maindb { get; set; }
         /// <summary>
         /// 设置或获取创建时间
         /// </summary>

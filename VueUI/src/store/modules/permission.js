@@ -19,9 +19,9 @@ const permission = {
   },
   actions: {
     // 生成路由
-    GenerateRoutes ({ commit }) {
+    GenerateRoutes({ commit }, meuns) {
       return new Promise(resolve => {
-        var menuList = localStorage.getItem('nowmenus')
+        var menuList = JSON.stringify(meuns)
         const sdata = JSON.parse(menuList)
         const rdata = JSON.parse(menuList)
         const sidebarRoutes = filterAsyncRouter(sdata)
@@ -35,16 +35,15 @@ const permission = {
   }
 }
 // 遍历后台传来的路由字符串，转换为组件对象
-function filterAsyncRouter (asyncRouterMap, isRewrite = false) {
+function filterAsyncRouter(asyncRouterMap, isRewrite = false) {
   return asyncRouterMap.filter(route => {
     if (isRewrite && route.children) {
       route.children = filterChildren(route.children)
     }
     if (route.component) {
-      // Layout ParentView 组件特殊处理
       if (route.component === 'Layout') {
         route.component = Layout
-      } else if (route.component === 'ParentView') {
+      } else if (route.component === 'ParentView') { // Layout ParentView 组件特殊处理
         route.component = ParentView
       } else {
         route.component = loadView(route.component)
@@ -57,13 +56,12 @@ function filterAsyncRouter (asyncRouterMap, isRewrite = false) {
   })
 }
 
-function filterChildren (childrenMap) {
+function filterChildren(childrenMap) {
   var children = []
   childrenMap.forEach((el, index) => {
     if (el.children && el.children.length) {
       if (el.component === 'ParentView') {
         el.children.forEach(c => {
-          c.path = el.path + '/' + c.path
           if (c.children && c.children.length) {
             children = children.concat(filterChildren(c.children, c))
             return

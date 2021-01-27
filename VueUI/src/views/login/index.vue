@@ -14,11 +14,11 @@
       </div>
 
       <div class="logo-container">
-        <img :src="companyLogo">
+        <img :src="companyLogo" width="220" height="40">
       </div>
       <el-form-item prop="username">
         <span class="svg-container">
-          <i class="el-icon-user" />
+          <svg-icon icon-class="user" />
         </span>
         <el-input
           ref="username"
@@ -33,7 +33,7 @@
 
       <el-form-item prop="password">
         <span class="svg-container">
-          <i class="iconfont icon-auth" />
+          <svg-icon icon-class="auth" />
         </span>
         <el-input
           :key="passwordType"
@@ -55,7 +55,7 @@
 
       <el-form-item prop="vcode">
         <span class="svg-container">
-          <i class="iconfont icon-approve" />
+          <svg-icon icon-class="password" />
         </span>
         <el-input
           ref="vcode"
@@ -98,9 +98,10 @@
 import { setToken } from '@/utils/auth'
 import { getToken, getSysSetting, getVerifyCode } from '@/api/basebasic'
 import { Loading } from 'element-ui'
+import defaultSettings from '@/settings'
 export default {
   name: 'Login',
-  data () {
+  data() {
     const validateUsername = (rule, value, callback) => {
       if (value.length < 1) {
         callback(new Error('请输入登录账号！'))
@@ -120,7 +121,9 @@ export default {
         username: '',
         password: '',
         vcode: '',
-        verifyCodeKey: ''
+        verifyCodeKey: '',
+        appId: defaultSettings.appId,
+        systemCode: defaultSettings.activeSystemCode
       },
       loginRules: {
         username: [
@@ -139,7 +142,7 @@ export default {
       verifyCodeUrl: '',
       redirect: undefined,
       softName: '管理系统',
-      companyLogo: '/images/login-logo.png',
+      companyLogo: require('@/assets/images/login-logo.png'),
       companyName: '',
       copyRight: '',
       pageLoading: '',
@@ -149,7 +152,7 @@ export default {
   },
   watch: {
     $route: {
-      handler: function (route) {
+      handler: function(route) {
         const query = route.query
         if (query) {
           this.redirect = query.redirect
@@ -159,7 +162,7 @@ export default {
       immediate: true
     }
   },
-  created () {
+  created() {
     var loadop = {
       lock: true,
       text: '正在初始化...',
@@ -170,10 +173,10 @@ export default {
     this.loadToken()
     this.getLoginVerifyCode()
   },
-  mounted () {
+  mounted() {
   },
   methods: {
-    loadToken () {
+    loadToken() {
       getToken().then(response => {
         setToken(response.ResData.AccessToken)
         getSysSetting().then(res => {
@@ -187,7 +190,7 @@ export default {
         this.isShow = true
       })
     },
-    showPwd () {
+    showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
       } else {
@@ -197,7 +200,7 @@ export default {
         this.$refs.password.focus()
       })
     },
-    handleLogin () {
+    handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
@@ -216,7 +219,7 @@ export default {
       })
     },
     // 获取验证码
-    async getLoginVerifyCode () {
+    async getLoginVerifyCode() {
       this.loginForm.vcode = ''
       const res = await getVerifyCode()
       if (res.Success) {
@@ -224,7 +227,7 @@ export default {
         this.loginForm.verifyCodeKey = res.ResData.Key
       }
     },
-    getOtherQuery (query) {
+    getOtherQuery(query) {
       return Object.keys(query).reduce((acc, cur) => {
         if (cur !== 'redirect') {
           acc[cur] = query[cur]

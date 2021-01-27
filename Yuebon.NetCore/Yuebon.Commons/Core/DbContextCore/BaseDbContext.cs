@@ -155,7 +155,10 @@ namespace Yuebon.Commons.DbContextCore
             return list;
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="modelBuilder"></param>
         private void MappingEntityTypes(ModelBuilder modelBuilder)
         {
             var assemblies = GetCurrentPathAssembly();
@@ -387,6 +390,16 @@ namespace Yuebon.Commons.DbContextCore
         /// <param name="key"></param>
         /// <returns></returns>
         public virtual T Find<T>(object key) where T : class
+        {
+            return base.Find<T>(key);
+        }
+        /// <summary>
+        /// 根据主键查询实体
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public virtual T Find<T>(string key) where T : class
         {
             return base.Find<T>(key);
         }

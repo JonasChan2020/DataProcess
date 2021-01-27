@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Yuebon.Commons.Core.App;
 using Yuebon.Commons.Extend;
 using Yuebon.Commons.IoC;
 using Yuebon.Commons.Json;
@@ -22,9 +23,9 @@ namespace Yuebon.Security.Application
     /// </summary>
     public class MenuApp
     {
-        IMenuService service = IoCContainer.Resolve<IMenuService>();
-        ISystemTypeService systemservice = IoCContainer.Resolve<ISystemTypeService>();
-        IUserService serviceUser = IoCContainer.Resolve<IUserService>();
+        IMenuService service = App.GetService<IMenuService>();
+        ISystemTypeService systemservice = App.GetService<ISystemTypeService>();
+        IUserService serviceUser = App.GetService<IUserService>();
         /// <summary>
         /// 获取菜单树JsTree模式
         /// </summary>
@@ -161,7 +162,7 @@ namespace Yuebon.Security.Application
                 List<Menu> subChildNodeList = menus.FindAll(t => t.ParentId == menu.Id);
                 if (subChildNodeList.Count > 0)
                 {
-                    menuOutputDto.SubMenu = BuildTreeMenus(subChildNodeList, menu.Id);
+                    menuOutputDto.SubMenu = BuildTreeMenus(menus, menu.Id);
                 }
                 resultList.Add(menuOutputDto);
             }
@@ -207,7 +208,12 @@ namespace Yuebon.Security.Application
                 router.name = GetRouteName(menu);
                 router.path = GetRouterPath(menu);
                 router.component = GetComponent(menu);
-                router.meta = new Meta(menu.FullName, menu.Icon == null ? "" : menu.Icon, menu.IsCache);
+                Meta meta=  new Meta(menu.FullName, menu.Icon == null ? "" : menu.Icon, menu.IsCache);
+                if (!menu.IsShow && menu.MenuType.Contains("M"))
+                {
+                    meta.activeMenu = menu.ActiveMenu;
+                }
+                router.meta = meta;
                 List<MenuOutputDto> cMenus = menu.SubMenu;
                 if (cMenus!=null && menu.MenuType == "C")
                 {
@@ -215,16 +221,24 @@ namespace Yuebon.Security.Application
                     router.redirect="noRedirect";
                     router.children=BuildMenus(cMenus);
                 }
-                else if (IsMeunFrame(menu))
+                else if (IsMeunDoc(menu))
                 {
                     List<VueRouterModel> childrenList = new List<VueRouterModel>();
-                    VueRouterModel children = new VueRouterModel();
-                    children.path = menu.UrlAddress;
-                    children.component=menu.Component;
-                    children.name=menu.EnCode;
-                    children.meta = new Meta(menu.FullName, menu.Icon == null ? "" : menu.Icon, menu.IsCache);
-                    childrenList.Add(children);
+                    VueRouterModel childrenRouter = new VueRouterModel();
+                    childrenRouter.path = menu.UrlAddress;
+                    childrenRouter.component=menu.Component;
+                    childrenRouter.name=menu.EnCode;
+                    childrenRouter.meta = new Meta(menu.FullName, menu.Icon == null ? "" : menu.Icon, menu.IsCache);
+                    childrenRouter.meta = meta;
+                    childrenList.Add(childrenRouter);
                     router.children=childrenList;
+                }else if (IsMeunFrame(menu)&& cMenus != null)
+                {
+                    if (!menu.IsShow)
+                    {
+                        router.hidden = true;
+                    }
+                    router.children = BuildMenus(cMenus);
                 }
                 routers.Add(router);
             }
@@ -240,7 +254,7 @@ namespace Yuebon.Security.Application
         {
             String routerName = menu.EnCode;
             // 非外链并且是一级目录（类型为目录）
-            if (IsMeunFrame(menu))
+            if (IsMeunDoc(menu))
             {
                 routerName = "";
             }
@@ -260,7 +274,7 @@ namespace Yuebon.Security.Application
                 routerPath = menu.UrlAddress;// "/" + menu.EnCode;
             }
             // 非外链并且是一级目录（类型为菜单）
-            else if (IsMeunFrame(menu))
+            else if (IsMeunDoc(menu))
             {
                 routerPath = "/";
             }
@@ -274,7 +288,7 @@ namespace Yuebon.Security.Application
         public String GetComponent(MenuOutputDto menu)
         {
             String component = "Layout";
-            if (!string.IsNullOrEmpty(menu.Component) && !IsMeunFrame(menu))
+            if (!string.IsNullOrEmpty(menu.Component) && IsMeunFrame(menu)&&!IsMeunDoc(menu))
             {
                 component = menu.Component;
             }
@@ -285,13 +299,22 @@ namespace Yuebon.Security.Application
             return component;
         }
         /// <summary>
+        /// 是否为菜单内部跳转,并且是一级目录
+        /// </summary>
+        /// <param name="menu">菜单信息</param>
+        /// <returns></returns>
+        public bool IsMeunDoc(MenuOutputDto menu)
+        {
+            return menu.ParentId == "" && menu.MenuType == "M" && !menu.IsFrame;
+        }
+        /// <summary>
         /// 是否为菜单内部跳转
         /// </summary>
         /// <param name="menu">菜单信息</param>
         /// <returns></returns>
         public bool IsMeunFrame(MenuOutputDto menu)
         {
-            return menu.ParentId== "" && menu.MenuType=="M" && !menu.IsFrame;
+            return menu.MenuType == "M" && !menu.IsFrame;
         }
         /// <summary>
         /// 是否为parent_view组件

@@ -21,51 +21,49 @@
     <el-card>
       <div class="list-btn-container">
         <el-button-group>
-          <slot v-for="itemf in loadBtnFunc">
-            <el-button
-              v-if="itemf.FullName==='新增'"
-              type="primary"
-              icon="el-icon-plus"
-              size="small"
-              @click="ShowEditOrViewDialog()"
-            >新增</el-button>
-            <el-button
-              v-if="itemf.FullName==='修改'"
-              type="primary"
-              icon="el-icon-edit"
-              class="el-button-modify"
-              size="small"
-              @click="ShowEditOrViewDialog('edit')"
-            >修改</el-button>
-            <el-button
-              v-if="itemf.FullName=='禁用'"
-              type="info"
-              icon="el-icon-video-pause"
-              size="small"
-              @click="setEnable('0')"
-            >禁用</el-button>
-            <el-button
-              v-if="itemf.FullName=='启用'"
-              type="success"
-              icon="el-icon-video-play"
-              size="small"
-              @click="setEnable('1')"
-            >启用</el-button>
-            <el-button
-              v-if="itemf.FullName==='软删除'"
-              type="warning"
-              icon="el-icon-delete"
-              size="small"
-              @click="deleteSoft('0')"
-            >软删除</el-button>
-            <el-button
-              v-if="itemf.FullName==='删除'"
-              type="danger"
-              icon="el-icon-delete"
-              size="small"
-              @click="deletePhysics()"
-            >删除</el-button>
-          </slot>
+          <el-button
+            v-hasPermi="['Sys_sys/Add']"
+            type="primary"
+            icon="el-icon-plus"
+            size="small"
+            @click="ShowEditOrViewDialog()"
+          >新增</el-button>
+          <el-button
+            v-hasPermi="['Sys_sys/Edit']"
+            type="primary"
+            icon="el-icon-edit"
+            class="el-button-modify"
+            size="small"
+            @click="ShowEditOrViewDialog('edit')"
+          >修改</el-button>
+          <el-button
+            v-hasPermi="['Sys_sys/Enable']"
+            type="info"
+            icon="el-icon-video-pause"
+            size="small"
+            @click="setEnable('0')"
+          >禁用</el-button>
+          <el-button
+            v-hasPermi="['Sys_sys/Enable']"
+            type="success"
+            icon="el-icon-video-play"
+            size="small"
+            @click="setEnable('1')"
+          >启用</el-button>
+          <el-button
+            v-hasPermi="['Sys_sys/DeleteSoft']"
+            type="warning"
+            icon="el-icon-delete"
+            size="small"
+            @click="deleteSoft('0')"
+          >软删除</el-button>
+          <el-button
+            v-hasPermi="['Sys_sys/Delete']"
+            type="danger"
+            icon="el-icon-delete"
+            size="small"
+            @click="deletePhysics()"
+          >删除</el-button>
           <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableData()">刷新</el-button>
         </el-button-group>
       </div>
@@ -86,9 +84,7 @@
         <el-table-column prop="Syscode" label="系统编码" sortable="custom" width="120" />
         <el-table-column prop="Sysname" label="系统名称" sortable="custom" width="120" />
         <el-table-column prop="Classify_id" label="系统分类" sortable="custom" width="260" align="center">
-          <template slot-scope="scope">
-            {{ scope.row.Classify_Name }}
-          </template>
+          <template slot-scope="scope">{{ scope.row.Classify_Name }}</template>
         </el-table-column>
         <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
         <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="90" align="center" />

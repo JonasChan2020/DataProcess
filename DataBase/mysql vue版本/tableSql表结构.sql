@@ -11,7 +11,7 @@
  Target Server Version : 80017
  File Encoding         : 65001
 
- Date: 08/01/2021 20:57:38
+ Date: 24/01/2021 22:10:41
 */
 
 SET NAMES utf8mb4;
@@ -287,6 +287,7 @@ CREATE TABLE `sys_menu`  (
   `Component` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '组件路径',
   `Target` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '打开方式',
   `MenuType` char(1) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '类型（C目录 M菜单 F按钮）',
+  `ActiveMenu` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '设置当前选中菜单，用于新增、编辑、查看操作为单独的路由时指定选中菜单路由',
   `IsExpand` tinyint(1) NULL DEFAULT NULL COMMENT '是否展开',
   `IsFrame` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否外链',
   `IsShow` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否显示',
@@ -690,8 +691,8 @@ CREATE TABLE `sys_userlogon`  (
   `Question` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `AnswerQuestion` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `CheckIPAddress` tinyint(1) NULL DEFAULT NULL,
-  `Language` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `Theme` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `Language` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '软件语言',
+  `Theme` mediumtext CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '软件风格设置信息',
   PRIMARY KEY (`Id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用户登录信息' ROW_FORMAT = Dynamic;
 

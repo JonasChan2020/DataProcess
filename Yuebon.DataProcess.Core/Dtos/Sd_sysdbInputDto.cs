@@ -85,7 +85,7 @@ namespace Yuebon.DataProcess.Dtos
         /// <summary>
         /// 设置或获取是否为所属系统主库
         /// </summary>
-        public string Is_maindb { get; set; }
+        public bool? Is_maindb { get; set; }
 
     }
 }

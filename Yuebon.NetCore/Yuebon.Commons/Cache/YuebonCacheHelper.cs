@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Yuebon.Commons.Core.App;
 using Yuebon.Commons.IoC;
 using Yuebon.Commons.Json;
 
@@ -26,14 +27,14 @@ namespace Yuebon.Commons.Cache
         public YuebonCacheHelper()
         {
 
-            cacheProvider = IoCContainer.Resolve<CacheProvider>();
+            cacheProvider = App.GetService<CacheProvider>();
             if (cacheProvider == null)
             {
                 throw new ArgumentNullException(nameof(cacheProvider));
             }
             else
             {
-                cacheservice= IoCContainer.Resolve<ICacheService>();
+                cacheservice= App.GetService<ICacheService>();
             }
         }
 
@@ -133,7 +134,7 @@ namespace Yuebon.Commons.Cache
         /// <returns></returns>
         public T Get<T>(string key) where T : class
         {
-            return cacheservice.Get(key) as T;
+            return cacheservice.Get<T>(key);
         }
         /// <summary>
         /// 获取缓存

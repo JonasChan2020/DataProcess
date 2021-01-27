@@ -22,7 +22,7 @@ namespace Yuebon.Commons.Helpers
         {
             var list = new List<Assembly>();
             var deps = DependencyContext.Default;
-            //var libs = deps.CompileLibraries.Where(lib => !lib.Serviceable && lib.Type != "package" && lib.Type!= "referenceassembly");//排除所有的系统程序集、Nuget下载包
+            //排除所有的系统程序集、Nuget下载包
             var libs = deps.CompileLibraries.Where(lib => lib.Type == AssembleTypeConsts.Project);//只获取本项目用到的包
             foreach (var lib in libs)
             {
@@ -39,11 +39,39 @@ namespace Yuebon.Commons.Helpers
             return list;
         }
 
+        public static IList<Assembly> GetAllYuebonAssemblies()
+        {
+            var list = new List<Assembly>();
+            var deps = DependencyContext.Default;
+            //排除所有的系统程序集、Nuget下载包
+            var libs = deps.CompileLibraries.Where(lib => lib.Type == AssembleTypeConsts.Project&&lib.Name!= "Yuebon.Commons");//只获取本项目用到的包
+            foreach (var lib in libs)
+            {
+                try
+                {
+                    var assembly = AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(lib.Name));
+                    list.Add(assembly);
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            }
+            return list;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="assemblyName"></param>
+        /// <returns></returns>
         public static Assembly GetAssembly(string assemblyName)
         {
             return GetAllAssemblies().FirstOrDefault(assembly => assembly.FullName.Contains(assemblyName));
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public static IList<Type> GetAllTypes()
         {
             var list = new List<Type>();
@@ -57,7 +85,11 @@ namespace Yuebon.Commons.Helpers
             }
             return list;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="assemblyName"></param>
+        /// <returns></returns>
         public static IList<Type> GetTypesByAssembly(string assemblyName)
         {
             var list = new List<Type>();
@@ -69,7 +101,12 @@ namespace Yuebon.Commons.Helpers
             }
             return list;
         }
-
+        /// <summary>
+        /// 获取实现类
+        /// </summary>
+        /// <param name="typeName"></param>
+        /// <param name="baseInterfaceType"></param>
+        /// <returns></returns>
         public static Type GetImplementType(string typeName, Type baseInterfaceType)
         {
             return GetAllTypes().FirstOrDefault(t =>

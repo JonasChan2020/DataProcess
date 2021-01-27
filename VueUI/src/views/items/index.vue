@@ -1,22 +1,52 @@
 <template>
   <div class="app-container">
     <el-card>
-      <el-row :gutter="20">
-        <el-col :span="7">
+      <el-row :gutter="24">
+        <el-col :span="10">
           <div class="grid-content bg-purple">
             <div class="grid-content bg-purple">
               <div class="list-btn-container">
                 <el-form ref="searchmenuform" :inline="true" :model="searchform" class="demo-form-inline" size="small">
                   <el-form-item>
                     <el-button-group>
-                      <el-button type="default" icon="el-icon-refresh" size="mini" @click="loadTableData()">刷新</el-button>
-                      <slot v-for="itemf in loadItemsBtnFunc">
-                        <el-button v-if="itemf.FullName==='新增'" type="primary" icon="el-icon-plus" size="mini" @click="ShowItemsEditOrViewDialog()">新增</el-button>
-                        <el-button v-if="itemf.FullName==='修改'" type="primary" icon="el-icon-edit" class="el-button-modify" size="mini" @click="ShowItemsEditOrViewDialog('edit')">修改</el-button>
-                        <el-button v-if="itemf.FullName=='禁用'" type="info" icon="el-icon-video-pause" size="mini" @click="setItemsEnable('0')">禁用</el-button>
-                        <el-button v-if="itemf.FullName=='启用'" type="success" icon="el-icon-video-play" size="mini" @click="setItemsEnable('1')">启用</el-button>
-                        <el-button v-if="itemf.FullName==='删除'" type="danger" icon="el-icon-delete" size="mini" @click="deleteItemsPhysics()">删除</el-button>
-                      </slot>
+                      <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableData()">刷新</el-button>
+
+                      <el-button
+                        v-hasPermi="['Items/Add']"
+                        type="primary"
+                        icon="el-icon-plus"
+                        size="small"
+                        @click="ShowItemsEditOrViewDialog()"
+                      >新增</el-button>
+                      <el-button
+                        v-hasPermi="['Items/Edit']"
+                        type="primary"
+                        icon="el-icon-edit"
+                        class="el-button-modify"
+                        size="small"
+                        @click="ShowItemsEditOrViewDialog('edit')"
+                      >修改</el-button>
+                      <el-button
+                        v-hasPermi="['Items/Enable']"
+                        type="info"
+                        icon="el-icon-video-pause"
+                        size="small"
+                        @click="setItemsEnable('0')"
+                      >禁用</el-button>
+                      <el-button
+                        v-hasPermi="['Items/Enable']"
+                        type="success"
+                        icon="el-icon-video-play"
+                        size="small"
+                        @click="setItemsEnable('1')"
+                      >启用</el-button>
+                      <el-button
+                        v-hasPermi="['Items/Delete']"
+                        type="danger"
+                        icon="el-icon-delete"
+                        size="small"
+                        @click="deleteItemsPhysics()"
+                      >删除</el-button>
                     </el-button-group>
                   </el-form-item>
                 </el-form>
@@ -54,20 +84,43 @@
             </div>
           </div>
         </el-col>
-        <el-col :span="17">
+        <el-col :span="14">
           <div class="grid-content bg-purple">
             <div class="list-btn-container">
               <el-form ref="searchform" :inline="true" :model="searchform" class="demo-form-inline" size="small">
                 <el-form-item>
                   <el-button-group>
-                    <el-button type="default" icon="el-icon-refresh" size="mini" @click="loadItemsDetailTableData()">刷新</el-button>
-                    <slot v-for="itemf in loadItemsDetailBtnFunc">
-                      <el-button v-if="itemf.FullName==='新增'" type="primary" icon="el-icon-plus" size="mini" @click="ShowItemsDetailEditOrViewDialog()">新增</el-button>
-                      <el-button v-if="itemf.FullName==='修改'" type="primary" icon="el-icon-edit" class="el-button-modify" size="mini" @click="ShowItemsDetailEditOrViewDialog('edit')">修改</el-button>
-                      <el-button v-if="itemf.FullName=='禁用'" type="info" icon="el-icon-video-pause" size="mini" @click="setItemsDetailEnable('0')">禁用</el-button>
-                      <el-button v-if="itemf.FullName=='启用'" type="success" icon="el-icon-video-play" size="mini" @click="setItemsDetailEnable('1')">启用</el-button>
-                      <el-button v-if="itemf.FullName==='删除'" type="danger" icon="el-icon-delete" size="mini" @click="deleteItemsDetailPhysics()">删除</el-button>
-                    </slot>
+                    <el-button type="default" icon="el-icon-refresh" size="small" @click="loadItemsDetailTableData()">刷新</el-button>
+                    <el-button
+                      v-hasPermi="['ItemsDetail/Add']"
+                      type="primary"
+                      icon="el-icon-plus"
+                      size="small"
+                      @click="ShowItemsDetailEditOrViewDialog()"
+                    >新增</el-button>
+                    <el-button
+                      v-hasPermi="['ItemsDetail/Edit']"
+                      type="primary"
+                      icon="el-icon-edit"
+                      class="el-button-modify"
+                      size="small"
+                      @click="ShowItemsDetailEditOrViewDialog('edit')"
+                    >修改</el-button>
+                    <el-button
+                      v-hasPermi="['ItemsDetail/Enable']"
+                      type="info"
+                      icon="el-icon-video-pause"
+                      size="small"
+                      @click="setItemsDetailEnable('0')"
+                    >禁用</el-button>
+                    <el-button
+                      v-hasPermi="['ItemsDetail/Enable']"
+                      type="success"
+                      icon="el-icon-video-play"
+                      size="small"
+                      @click="setItemsDetailEnable('1')"
+                    >启用</el-button>
+                    <el-button v-hasPermi="['ItemsDetail/Delete']" type="danger" icon="el-icon-delete" size="small" @click="deleteItemsDetailPhysics()">删除</el-button>
                   </el-button-group>
                 </el-form-item>
               </el-form>
@@ -215,7 +268,7 @@ import { getAllItemsTreeTable, getItemsDetail, saveItems, setItemsEnable, delete
 import { getListMeunFuntionBymeunCode } from '@/api/basebasic'
 export default {
   name: 'Items',
-  data () {
+  data() {
     return {
       searchform: {
         keywords: '',
@@ -284,7 +337,7 @@ export default {
         ],
         ItemCode: [
           { required: true, message: '请输入值', trigger: 'blur' },
-          { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' }
+          { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
         ],
         ItemId: [
           { required: true, message: '请选择所属分类', trigger: 'blur' }
@@ -295,7 +348,7 @@ export default {
       tableDataItemss: []
     }
   },
-  created () {
+  created() {
     this.pagination.currentPage = 1
     this.InitDictItem()
     this.loadTableData()
@@ -305,7 +358,7 @@ export default {
     /**
      * 初始化数据
      */
-    InitDictItem () {
+    InitDictItem() {
       getListMeunFuntionBymeunCode('ItemsDetail').then(res => {
         this.loadItemsDetailBtnFunc = res.ResData
       })
@@ -313,7 +366,7 @@ export default {
     /**
      * 加载页面左侧菜单table数据
      */
-    loadTableData: function () {
+    loadTableData: function() {
       getAllItemsTreeTable().then(res => {
         this.selectItemss = this.tableDataItemss = res.ResData
       })
@@ -321,18 +374,18 @@ export default {
     /**
      * 点击查询菜单
      */
-    handleSearch: function () {
+    handleSearch: function() {
       this.loadTableData()
     },
     /**
      * 点击查询
      */
-    handleSearchItemsDetail: function () {
+    handleSearchItemsDetail: function() {
       this.pagination.currentPage = 1
       this.loadItemsDetailTableData()
     },
 
-    loadItemsDetailTree () {
+    loadItemsDetailTree() {
       var data = {
         itemId: this.selectItemsId
       }
@@ -343,8 +396,7 @@ export default {
     /**
      * 添加添加分类是选择父级分类
      */
-    handleItemsChange: function () {
-      console.log(this.selectedItemsOptions)
+    handleItemsChange: function() {
       if (this.currentItemsId === this.selectedItemsOptions) {
         this.$alert('不能选择自己作为父级', '提示')
         this.selectedItemsOptions = ''
@@ -355,8 +407,7 @@ export default {
     /**
      * 添加分类值是选择分类
      */
-    handleAddItemsDetailChange: function () {
-      console.log(this.selectedItemsOptions)
+    handleAddItemsDetailChange: function() {
       this.selectItemsId = this.selectedItemsOptions
       this.loadItemsDetailTree()
       this.editItemsDetailFrom.ItemId = this.selectedItemsOptions
@@ -364,20 +415,18 @@ export default {
     /**
      * 添加分类值时选择父级
      */
-    handleAddItemsDetailItemsChange: function () {
-      console.log(this.selectedItemsDetailOptions)
+    handleAddItemsDetailItemsChange: function() {
       if (this.currentId === this.selectedItemsDetailOptions) {
         this.$alert('不能选择自己作为父级', '提示')
         this.selectedItemsDetailOptions = ''
         return
       }
-      console.log('selectedItemsDetailOptions:' + this.selectedItemsDetailOptions)
       this.editItemsDetailFrom.ParentId = this.selectedItemsDetailOptions
     },
     /**
      * 新增、修改或查看明细信息（绑定显示数据）*
      */
-    ShowItemsEditOrViewDialog: function (view) {
+    ShowItemsEditOrViewDialog: function(view) {
       if (view !== undefined) {
         if (this.currentItemsId === '') {
           this.$alert('请选择一条数据进行编辑/修改', '提示')
@@ -392,7 +441,7 @@ export default {
         this.dialogItemsEditFormVisible = true
       }
     },
-    bindItemsEditInfo: function () {
+    bindItemsEditInfo: function() {
       getItemsDetail(this.currentItemsId).then(res => {
         this.editItemsFrom.FullName = res.ResData.FullName
         this.editItemsFrom.EnCode = res.ResData.EnCode
@@ -406,7 +455,7 @@ export default {
     /**
      * 新增/修改保存
      */
-    saveEditItemsForm () {
+    saveEditItemsForm() {
       this.$refs['editItemsFrom'].validate((valid) => {
         if (valid) {
           const data = {
@@ -430,7 +479,7 @@ export default {
               })
               this.dialogItemsEditFormVisible = false
               this.currentItemsId = ''
-              this.selectedItemsOptions = []
+              this.selectedItemsOptions = ''
               this.$refs['editItemsFrom'].resetFields()
               this.loadTableData()
               this.InitDictItem()
@@ -446,7 +495,7 @@ export default {
         }
       })
     },
-    setItemsEnable: function (val) {
+    setItemsEnable: function(val) {
       if (this.currentItemsId === '') {
         this.$alert('请先选择要操作的数据', '提示')
         return false
@@ -473,7 +522,7 @@ export default {
         })
       }
     },
-    deleteItemsSoft: function (val) {
+    deleteItemsSoft: function(val) {
       if (this.currentItemsId === '') {
         this.$alert('请先选择要操作的数据', '提示')
         return false
@@ -500,7 +549,7 @@ export default {
         })
       }
     },
-    deleteItemsPhysics: function () {
+    deleteItemsPhysics: function() {
       if (this.currentItemsId === '') {
         this.$alert('请先选择要操作的数据', '提示')
         return false
@@ -510,7 +559,7 @@ export default {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
-        }).then(function () {
+        }).then(function() {
           const data = {
             Ids: currentIds
           }
@@ -535,7 +584,7 @@ export default {
     /**
      * 新增、修改或查看明细信息（绑定显示数据）*
      */
-    ShowItemsDetailEditOrViewDialog: function (view) {
+    ShowItemsDetailEditOrViewDialog: function(view) {
       if (view !== undefined) {
         if (this.currentSelected.length === 0) {
           this.$alert('请选择一条数据进行编辑/修改', '提示')
@@ -551,7 +600,7 @@ export default {
         this.dialogItemsDetailEditFormVisible = true
       }
     },
-    bindItemsDetailEditInfo: function () {
+    bindItemsDetailEditInfo: function() {
       getItemsDetailDetail(this.currentId).then(res => {
         this.editItemsDetailFrom.ItemName = res.ResData.ItemName
         this.editItemsDetailFrom.ItemCode = res.ResData.ItemCode
@@ -569,7 +618,7 @@ export default {
     /**
      * 新增/修改保存
      */
-    saveEditItemsDetailForm () {
+    saveEditItemsDetailForm() {
       this.$refs['editItemsDetailFrom'].validate((valid) => {
         if (valid) {
           const data = {
@@ -595,6 +644,7 @@ export default {
               })
               this.dialogItemsDetailEditFormVisible = false
               this.currentSelected = ''
+              this.selectedItemsOptions = ''
               this.$refs['editItemsDetailFrom'].resetFields()
               this.loadItemsDetailTableData()
               this.InitDictItem()
@@ -610,7 +660,7 @@ export default {
         }
       })
     },
-    setItemsDetailEnable: function (val) {
+    setItemsDetailEnable: function(val) {
       if (this.currentSelected.length === 0) {
         this.$alert('请先选择要操作的数据', '提示')
         return false
@@ -640,7 +690,7 @@ export default {
         })
       }
     },
-    deleteItemsDetailSoft: function (val) {
+    deleteItemsDetailSoft: function(val) {
       if (this.currentSelected.length === 0) {
         this.$alert('请先选择要操作的数据', '提示')
         return false
@@ -670,7 +720,7 @@ export default {
         })
       }
     },
-    deleteItemsDetailPhysics: function () {
+    deleteItemsDetailPhysics: function() {
       if (this.currentSelected.length === 0) {
         this.$alert('请先选择要操作的数据', '提示')
         return false
@@ -683,7 +733,7 @@ export default {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
-        }).then(function () {
+        }).then(function() {
           const data = {
             Ids: currentIds
           }
@@ -708,7 +758,7 @@ export default {
     /**
      * 当表格的排序条件发生变化的时候会触发该事件
      */
-    handleSortChange: function (column) {
+    handleSortChange: function(column) {
       this.sortableData.sort = column.prop
       if (column.order === 'ascending') {
         this.sortableData.order = 'asc'
@@ -718,7 +768,7 @@ export default {
       this.loadItemsDetailTableData()
     },
     //
-    handleClickItemsChange: function (row, column, event) {
+    handleClickItemsChange: function(row, column, event) {
       this.searchform.code = row.EnCode
       this.currentItemsId = row.Id
       this.loadItemsDetailTableData()
@@ -726,20 +776,20 @@ export default {
     /**
      * 当用户手动勾选checkbox数据行事件
      */
-    handleSelectChange: function (selection, row) {
+    handleSelectChange: function(selection, row) {
       this.currentSelected = selection
     },
     /**
      * 当用户手动勾选全选checkbox事件
      */
-    handleSelectAllChange: function (selection) {
+    handleSelectAllChange: function(selection) {
       this.currentSelected = selection
     },
 
     /**
      * 加载页面table数据
      */
-    loadItemsDetailTableData: function () {
+    loadItemsDetailTableData: function() {
       this.tableloading = true
       var seachdata = {
         itemId: this.currentItemsId
