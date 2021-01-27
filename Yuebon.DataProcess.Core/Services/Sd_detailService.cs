@@ -1,16 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Yuebon.Commons.Dtos;
-using Yuebon.Commons.Mapping;
-using Yuebon.Commons.Pages;
 using Yuebon.Commons.Services;
 using Yuebon.DataProcess.IRepositories;
 using Yuebon.DataProcess.IServices;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 
-namespace HtSoft.DataProcess.Services
+namespace Yuebon.DataProcess.Services
 {
     /// <summary>
     /// 目标库详情服务接口实现

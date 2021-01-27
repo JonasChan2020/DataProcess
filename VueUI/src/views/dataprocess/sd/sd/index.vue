@@ -69,15 +69,18 @@
         <el-table-column type="selection" width="30" />
         <el-table-column prop="SdName" label="目标库名称" sortable="custom" width="120" />
         <el-table-column prop="Sdtype" label="目标库类型" sortable="custom" width="120" />
-        <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
-
         <el-table-column prop="Classify_id" label="目标库分类" sortable="custom" width="260" align="center">
           <template slot-scope="scope">
             {{ scope.row.Classify_Name }}
           </template>
         </el-table-column>
         <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
-        <el-table-column prop="Sdconnectionstr" label="连接字符串" sortable="custom" width="120" />
+        <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
+        <el-table-column label="是否主库" sortable="custom" width="120" prop="Is_maindb" align="center">
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.Is_maindb === true ? 'success' : 'info'" disable-transitions>{{ scope.row.Is_maindb === true ? "是" : "否" }}</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="90" align="center" />
         <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
           <template slot-scope="scope">
@@ -134,9 +137,11 @@
         <el-form-item label="排序" :label-width="formLabelWidth" prop="SortCode">
           <el-input v-model.number="editFrom.SortCode" placeholder="请输入排序,默认为99" autocomplete="off" clearable />
         </el-form-item>
+        <el-form-item label="主库" :label-width="formLabelWidth" prop="">
+          <el-checkbox v-model="editFrom.Is_maindb">所属系统主库</el-checkbox>
+        </el-form-item>
 
         <el-form-item label="选项" :label-width="formLabelWidth" prop="">
-          <el-checkbox v-model="editFrom.Is_maindb">所属系统主库</el-checkbox>
           <el-checkbox v-model="editFrom.EnabledMark">启用</el-checkbox>
         </el-form-item>
 

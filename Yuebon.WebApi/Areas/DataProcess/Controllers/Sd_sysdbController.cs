@@ -99,7 +99,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             #region 验证非空及重复
             if (!string.IsNullOrEmpty(tinfo.SdName))
             {
-                string where = string.Format("ccode='{0}' and Classify_id='{1}'", tinfo.SdName,tinfo.Classify_id);
+                string where = string.Format("SdName='{0}' and Classify_id='{1}'", tinfo.SdName,tinfo.Classify_id);
                 Sd_sysdb model = iService.GetWhere(where);
                 if (model != null)
                 {
@@ -160,9 +160,9 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             #region 验证非空及重复
             if (!string.IsNullOrEmpty(tinfo.SdName))
             {
-                string where = string.Format("ccode='{0}' and Classify_id='{1}'", tinfo.SdName, tinfo.Classify_id);
+                string where = string.Format("SdName='{0}' and Classify_id='{1}'", tinfo.SdName, tinfo.Classify_id);
                 Sd_sysdb model = iService.GetWhere(where);
-                if (model != null)
+                if (model != null && model.Id != id)
                 {
                     result.ErrMsg = "名称不能重复";
                     return ToJsonContent(result);
