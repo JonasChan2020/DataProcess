@@ -2,11 +2,13 @@
   <div class="app-container">
     <div class="filter-container">
       <el-card>
-        <el-form ref="searchform"
-                 :inline="true"
-                 :model="searchform"
-                 class="demo-form-inline"
-                 size="small">
+        <el-form
+          ref="searchform"
+          :inline="true"
+          :model="searchform"
+          class="demo-form-inline"
+          size="small"
+        >
           <el-form-item label="名称：">
             <el-input v-model="searchform.keywords" clearable placeholder="名称" />
           </el-form-item>
@@ -66,17 +68,18 @@
         </el-button-group>
       </div>
       <el-table
-                ref="gridtable"
-                v-loading="tableloading"
-                :data="tableData"
-                border
-                stripe
-                highlight-current-row
-                style="width: 100%"
-                :default-sort="{prop: 'SortCode', order: 'ascending'}"
-                @select="handleSelectChange"
-                @select-all="handleSelectAllChange"
-                @sort-change="handleSortChange">
+        ref="gridtable"
+        v-loading="tableloading"
+        :data="tableData"
+        border
+        stripe
+        highlight-current-row
+        style="width: 100%"
+        :default-sort="{prop: 'SortCode', order: 'ascending'}"
+        @select="handleSelectChange"
+        @select-all="handleSelectAllChange"
+        @sort-change="handleSortChange"
+      >
         <el-table-column type="selection" width="30" />
         <el-table-column prop="SdName" label="目标库名称" sortable="custom" width="120" />
         <el-table-column prop="Sdtype" label="目标库类型" sortable="custom" width="120" />
@@ -102,20 +105,24 @@
         <el-table-column prop="LastModifyTime" label="更新时间" sortable />
       </el-table>
       <div class="pagination-container">
-        <el-pagination background
-                       :current-page="pagination.currentPage"
-                       :page-sizes="[5,10,20,50,100, 200, 300, 400]"
-                       :page-size="pagination.pagesize"
-                       layout="total, sizes, prev, pager, next, jumper"
-                       :total="pagination.pageTotal"
-                       @size-change="handleSizeChange"
-                       @current-change="handleCurrentChange" />
+        <el-pagination
+          background
+          :current-page="pagination.currentPage"
+          :page-sizes="[5,10,20,50,100, 200, 300, 400]"
+          :page-size="pagination.pagesize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="pagination.pageTotal"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
       </div>
     </el-card>
-    <el-dialog ref="dialogEditForm"
-               :title="editFormTitle+'连接'"
-               :visible.sync="dialogEditFormVisible"
-               width="640px">
+    <el-dialog
+      ref="dialogEditForm"
+      :title="editFormTitle+'连接'"
+      :visible.sync="dialogEditFormVisible"
+      width="640px"
+    >
       <el-form ref="editFrom" :model="editFrom" :rules="rules" class="demo-form-inline">
         <el-form-item label="连接名称" :label-width="formLabelWidth" prop="SdName">
           <el-input v-model="editFrom.SdName" placeholder="请输入连接名称" autocomplete="off" clearable />
@@ -171,13 +178,13 @@
 import { getSd_sysdbListWithPager, getSd_sysdbDetail,
   saveSd_sysdb, setSd_sysdbEnable, deleteSoftSd_sysdb,
   deleteSd_sysdb
-  } from '@/api/dataprocess/sd_sysdb'
-  import {
-    getAllClassifyTreeTable
-  } from '@/api/dataprocess/sd_classify'
+} from '@/api/dataprocess/sd_sysdb'
+import {
+  getAllClassifyTreeTable
+} from '@/api/dataprocess/sd_classify'
 
 export default {
-  data () {
+  data() {
     return {
       searchform: {
         keywords: ''
@@ -222,7 +229,7 @@ export default {
       currentSelected: []
     }
   },
-  created () {
+  created() {
     this.pagination.currentPage = 1
     this.InitDictItem()
     this.loadTableData()
@@ -232,12 +239,12 @@ export default {
     /**
      * 初始化数据
      */
-    InitDictItem () {
+    InitDictItem() {
     },
     /**
      * 加载页面table数据
      */
-    loadTableData: function () {
+    loadTableData: function() {
       this.tableloading = true
       var seachdata = {
         CurrenetPageIndex: this.pagination.currentPage,
@@ -260,7 +267,7 @@ export default {
     /**
      * 点击查询
      */
-    handleSearch: function () {
+    handleSearch: function() {
       this.pagination.currentPage = 1
       this.loadTableData()
     },
@@ -268,7 +275,7 @@ export default {
     /**
      * 新增、修改或查看明细信息（绑定显示数据）     *
      */
-    ShowEditOrViewDialog: function (view) {
+    ShowEditOrViewDialog: function(view) {
       if (view !== undefined) {
         if (this.currentSelected.length > 1 || this.currentSelected.length === 0) {
           this.$alert('请选择一条数据进行编辑/修改', '提示')
@@ -285,7 +292,7 @@ export default {
         this.dialogEditFormVisible = true
       }
     },
-    bindEditInfo: function () {
+    bindEditInfo: function() {
       getSd_sysdbDetail(this.currentId).then(res => {
         this.editFrom.Classify_id = res.ResData.Classify_id
         this.editFrom.Description = res.ResData.Description
@@ -306,7 +313,7 @@ export default {
     /**
      * 新增/修改保存
      */
-    saveEditForm () {
+    saveEditForm() {
       this.$refs['editFrom'].validate((valid) => {
         if (valid) {
           const data = {
@@ -353,7 +360,7 @@ export default {
         }
       })
     },
-    setEnable: function (val) {
+    setEnable: function(val) {
       if (this.currentSelected.length === 0) {
         this.$alert('请先选择要操作的数据', '提示')
         return false
@@ -383,7 +390,7 @@ export default {
         })
       }
     },
-    deleteSoft: function (val) {
+    deleteSoft: function(val) {
       if (this.currentSelected.length === 0) {
         this.$alert('请先选择要操作的数据', '提示')
         return false
@@ -413,7 +420,7 @@ export default {
         })
       }
     },
-    deletePhysics: function () {
+    deletePhysics: function() {
       if (this.currentSelected.length === 0) {
         this.$alert('请先选择要操作的数据', '提示')
         return false
@@ -445,7 +452,7 @@ export default {
     /**
      * 当表格的排序条件发生变化的时候会触发该事件
      */
-    handleSortChange: function (column) {
+    handleSortChange: function(column) {
       this.sortableData.sort = column.prop
       if (column.order === 'ascending') {
         this.sortableData.order = 'asc'
@@ -457,25 +464,25 @@ export default {
     /**
 *选择分类
 */
-    handleSelectClassChange: function () {
+    handleSelectClassChange: function() {
       this.editFrom.Classify_id = this.selectedclass
     },
     /**
      * 当用户手动勾选checkbox数据行事件
      */
-    handleSelectChange: function (selection, row) {
+    handleSelectChange: function(selection, row) {
       this.currentSelected = selection
     },
     /**
      * 当用户手动勾选全选checkbox事件
      */
-    handleSelectAllChange: function (selection) {
+    handleSelectAllChange: function(selection) {
       this.currentSelected = selection
     },
     /**
      * 选择每页显示数量
      */
-    handleSizeChange (val) {
+    handleSizeChange(val) {
       this.pagination.pagesize = val
       this.pagination.currentPage = 1
       this.loadTableData()
@@ -483,7 +490,7 @@ export default {
     /**
      * 选择当页面
      */
-    handleCurrentChange (val) {
+    handleCurrentChange(val) {
       this.pagination.currentPage = val
       this.loadTableData()
     }

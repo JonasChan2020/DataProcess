@@ -68,7 +68,21 @@
         </el-button-group>
       </div>
 
-      <el-table ref="gridtable" v-loading="tableloading" :data="tableData" row-key="Id" border stripe highlight-current-row style="width: 100%" default-expand-all :tree-props="{ children: 'Children' }" @select="handleSelectChange" @select-all="handleSelectAllChange" @sort-change="handleSortChange">
+      <el-table
+        ref="gridtable"
+        v-loading="tableloading"
+        :data="tableData"
+        row-key="Id"
+        border
+        stripe
+        highlight-current-row
+        style="width: 100%"
+        default-expand-all
+:tree-props="{ children: 'Children' }"
+        @select="handleSelectChange"
+        @select-all="handleSelectAllChange"
+        @sort-change="handleSortChange"
+      >
         <el-table-column type="selection" width="30" />
         <el-table-column prop="Stcode" label="类型编码" sortable="custom" width="380" />
         <el-table-column prop="Stname" label="类型名称" sortable="custom" width="180" />
@@ -121,14 +135,14 @@
 
 <script>
 
-  import {
-    getSys_conf_classifyDetail,
-    saveSys_conf_classify, setSys_conf_classifyEnable, deleteSoftSys_conf_classify,
-    deleteSys_conf_classify, getAllClassifyTreeTable
-  } from '@/api/dataprocess/sys_conf_classify'
+import {
+  getSys_conf_classifyDetail,
+  saveSys_conf_classify, setSys_conf_classifyEnable, deleteSoftSys_conf_classify,
+  deleteSys_conf_classify, getAllClassifyTreeTable
+} from '@/api/dataprocess/sys_conf_classify'
 
 export default {
-  data () {
+  data() {
     return {
       searchform: {
         keywords: ''
@@ -165,7 +179,7 @@ export default {
       currentSelected: []
     }
   },
-  created () {
+  created() {
     this.InitDictItem()
     this.loadTableData()
     this.loadBtnFunc = JSON.parse(localStorage.getItem('yueboncurrentfuns'))
@@ -174,13 +188,13 @@ export default {
     /**
      * 初始化数据
      */
-    InitDictItem () {
+    InitDictItem() {
 
     },
     /**
      * 加载页面table数据
      */
-    loadTableData: function () {
+    loadTableData: function() {
       this.tableloading = true
       getAllClassifyTreeTable().then(res => {
         this.tableData = res.ResData
@@ -191,7 +205,7 @@ export default {
     /**
      * 点击查询
      */
-    handleSearch: function () {
+    handleSearch: function() {
       this.pagination.currentPage = 1
       this.loadTableData()
     },
@@ -199,7 +213,7 @@ export default {
     /**
      * 新增、修改或查看明细信息（绑定显示数据）     *
      */
-    ShowEditOrViewDialog: function (view) {
+    ShowEditOrViewDialog: function(view) {
       if (view !== undefined) {
         if (this.currentSelected.length > 1 || this.currentSelected.length === 0) {
           this.$alert('请选择一条数据进行编辑/修改', '提示')
@@ -216,7 +230,7 @@ export default {
         this.dialogEditFormVisible = true
       }
     },
-    bindEditInfo: function () {
+    bindEditInfo: function() {
       getSys_conf_classifyDetail(this.currentId).then(res => {
         this.editFrom.Stcode = res.ResData.Stcode
         this.editFrom.Stname = res.ResData.Stname
@@ -230,7 +244,7 @@ export default {
     /**
      * 新增/修改保存
      */
-    saveEditForm () {
+    saveEditForm() {
       this.$refs['editFrom'].validate((valid) => {
         if (valid) {
           const data = {
@@ -270,7 +284,7 @@ export default {
         }
       })
     },
-    setEnable: function (val) {
+    setEnable: function(val) {
       if (this.currentSelected.length === 0) {
         this.$alert('请先选择要操作的数据', '提示')
         return false
@@ -300,7 +314,7 @@ export default {
         })
       }
     },
-    deleteSoft: function (val) {
+    deleteSoft: function(val) {
       if (this.currentSelected.length === 0) {
         this.$alert('请先选择要操作的数据', '提示')
         return false
@@ -330,7 +344,7 @@ export default {
         })
       }
     },
-    deletePhysics: function () {
+    deletePhysics: function() {
       if (this.currentSelected.length === 0) {
         this.$alert('请先选择要操作的数据', '提示')
         return false
@@ -362,7 +376,7 @@ export default {
     /**
      * 当表格的排序条件发生变化的时候会触发该事件
      */
-    handleSortChange: function (column) {
+    handleSortChange: function(column) {
       this.sortableData.sort = column.prop
       if (column.order === 'ascending') {
         this.sortableData.order = 'asc'
@@ -374,25 +388,25 @@ export default {
     /**
   *选择上级分类
   */
-    handleSelectClassChange: function () {
+    handleSelectClassChange: function() {
       this.editFrom.Parentid = this.selectedclass
     },
     /**
      * 当用户手动勾选checkbox数据行事件
      */
-    handleSelectChange: function (selection, row) {
+    handleSelectChange: function(selection, row) {
       this.currentSelected = selection
     },
     /**
      * 当用户手动勾选全选checkbox事件
      */
-    handleSelectAllChange: function (selection) {
+    handleSelectAllChange: function(selection) {
       this.currentSelected = selection
     },
     /**
      * 选择每页显示数量
      */
-    handleSizeChange (val) {
+    handleSizeChange(val) {
       this.pagination.pagesize = val
       this.pagination.currentPage = 1
       this.loadTableData()
@@ -400,7 +414,7 @@ export default {
     /**
      * 选择当页面
      */
-    handleCurrentChange (val) {
+    handleCurrentChange(val) {
       this.pagination.currentPage = val
       this.loadTableData()
     }
