@@ -81,13 +81,14 @@
         @sort-change="handleSortChange"
       >
         <el-table-column type="selection" width="30" />
-        <el-table-column prop="SdName" label="目标库名称" sortable="custom" width="120" />
-        <el-table-column prop="Sdtype" label="目标库类型" sortable="custom" width="120" />
-        <el-table-column prop="Classify_id" label="目标库分类" sortable="custom" width="260" align="center">
+        <el-table-column prop="SdName" label="名称" sortable="custom" width="120" />
+        <el-table-column prop="Sdtype" label="类型" sortable="custom" width="120" />
+        <el-table-column prop="Classify_id" label="分类" sortable="custom" width="260" align="center">
           <template slot-scope="scope">
             {{ scope.row.Classify_Name }}
           </template>
         </el-table-column>
+        <el-table-column prop="dbName" label="库名称" sortable="custom" width="120" />
         <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
         <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
         <el-table-column label="是否主库" sortable="custom" width="120" prop="Is_maindb" align="center">
@@ -101,8 +102,16 @@
             <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="CreatorTime" label="创建时间" sortable />dialogEditForm
-        <el-table-column prop="LastModifyTime" label="更新时间" sortable />
+        <el-table-column label="操作" sortable="custom" width="120" align="center">
+          <template slot-scope="scope">
+            <el-button
+              type="primary"
+              icon="el-icon-plus"
+              size="small"
+              @click="UpdateDbContents(scope.row.Id)"
+            >更新结构信息</el-button>
+          </template>
+        </el-table-column>
       </el-table>
       <div class="pagination-container">
         <el-pagination
@@ -177,7 +186,7 @@
 
 import { getSd_sysdbListWithPager, getSd_sysdbDetail,
   saveSd_sysdb, setSd_sysdbEnable, deleteSoftSd_sysdb,
-  deleteSd_sysdb
+  deleteSd_sysdb, UpdateDbContents
 } from '@/api/dataprocess/sd_sysdb'
 import {
   getAllClassifyTreeTable
@@ -448,6 +457,20 @@ export default {
           }
         })
       }
+    },
+    /**
+     * 更新数据库结构信息
+     * @param dbid 数据库ID
+     */
+    UpdateDbContents: function(dbid) {
+      UpdateDbContents(dbid).then(res => {
+        if (res.Success) {
+          this.$message({
+            message: '恭喜你，操作成功',
+            type: 'success'
+          })
+        }
+      })
     },
     /**
      * 当表格的排序条件发生变化的时候会触发该事件

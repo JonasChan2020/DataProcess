@@ -16,6 +16,7 @@ using Yuebon.Commons.Dtos;
 using Yuebon.AspNetCore.Mvc;
 using System.Reflection;
 using Yuebon.DataProcess.Core.common.dbTools.baseDb.Extension;
+using Newtonsoft.Json;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -236,6 +237,45 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                 result.ErrCode = ErrCode.successCode;
             }
             return result;
+        }
+
+        /// <summary>
+        /// 更新数据库结构
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("UpdateDbContents")]
+        [YuebonAuthorize("Edit")]
+        public async Task<IActionResult> UpdateDbContents([FromBody] dynamic formData)
+        {
+            CommonResult result = new CommonResult();
+            try
+            {
+                var aa = formData;
+                string dataStr = formData.ToString();
+                var paramsObj = new { dbid = "" };
+                paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
+                Sd_sysdb model = iService.Get(paramsObj.dbid);
+                bool res = await iService.UpdateDbContents(model, null);
+                if (res)
+                {
+                    result.Success = true;
+                    result.ErrCode = ErrCode.successCode;
+                }
+                else
+                {
+                    result.Success = false;
+                    result.ErrCode = ErrCode.err43001;
+                }
+                
+
+            }
+            catch (Exception ex)
+            {
+                Log4NetHelper.Error("更新数据库结构异常", ex);
+                result.ErrMsg = ErrCode.err43001;
+                result.ErrCode = "43001";
+            }
+            return ToJsonContent(result);
         }
 
         #region 辅助方法

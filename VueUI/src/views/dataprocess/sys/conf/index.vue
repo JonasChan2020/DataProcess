@@ -81,10 +81,10 @@
         @sort-change="handleSortChange"
       >
         <el-table-column type="selection" width="30" />
-        <el-table-column prop="Confcode" label="配置信息编码" sortable="custom" width="120" />
-        <el-table-column prop="Confname" label="配置信息名称" sortable="custom" width="120" />
+        <el-table-column prop="Confcode" label="编码" sortable="custom" width="120" />
+        <el-table-column prop="Confname" label="名称" sortable="custom" width="120" />
         <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
-        <el-table-column prop="Classify_id" label="配置分类" sortable="custom" width="260" align="center">
+        <el-table-column prop="Classify_id" label="分类" sortable="custom" width="260" align="center">
           <template slot-scope="scope">
             {{ scope.row.Classify_Name }}
           </template>
@@ -96,8 +96,16 @@
             <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="CreatorTime" label="创建时间" sortable />
-        <el-table-column prop="LastModifyTime" label="更新时间" sortable />
+        <el-table-column label="操作" sortable="custom" width="120" align="center">
+          <template slot-scope="scope">
+            <el-button
+              type="primary"
+              icon="el-icon-plus"
+              size="small"
+              @click="UpdateDbContents(scope.row.Id)"
+            >详情配置</el-button>
+          </template>
+        </el-table-column>
       </el-table>
       <div class="pagination-container">
         <el-pagination

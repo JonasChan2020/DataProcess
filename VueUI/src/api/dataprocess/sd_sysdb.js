@@ -5,7 +5,7 @@ import defaultSettings from '@/settings'
    * 分页查询
    * @param {查询条件} data
    */
-export function getSd_sysdbListWithPager (data) {
+export function getSd_sysdbListWithPager(data) {
   return http.request({
     url: 'Sd_sysdb/FindWithPagerAsync',
     method: 'post',
@@ -15,18 +15,27 @@ export function getSd_sysdbListWithPager (data) {
 }/**
    * 获取所有可用的
    */
-export function getAllSd_sysdbList () {
+export function getAllSd_sysdbList() {
   return http.request({
     url: 'Sd_sysdb/GetAllEnable',
     method: 'get',
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
 }
+export function UpdateDbContents(dbid) {
+  return http.request({
+    url: 'Sd_sysdb/UpdateDbContents',
+    data: { dbid: dbid },
+    method: 'post',
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
+
 /**
    * 新增或修改保存
    * @param data
    */
-export function saveSd_sysdb (data, url) {
+export function saveSd_sysdb(data, url) {
   return http.request({
     url: url,
     method: 'post',
@@ -38,7 +47,7 @@ export function saveSd_sysdb (data, url) {
    * 获取详情
    * @param {Id} Id
    */
-export function getSd_sysdbDetail (id) {
+export function getSd_sysdbDetail(id) {
   return http({
     url: 'Sd_sysdb/GetById?id=' + id,
     method: 'get',
@@ -49,7 +58,7 @@ export function getSd_sysdbDetail (id) {
    * 批量设置启用状态
    * @param {id集合} ids
    */
-export function setSd_sysdbEnable (data) {
+export function setSd_sysdbEnable(data) {
   return http({
     url: 'Sd_sysdb/SetEnabledMarktBatchAsync',
     method: 'post',
@@ -61,7 +70,7 @@ export function setSd_sysdbEnable (data) {
    * 批量软删除
    * @param {id集合} ids
    */
-export function deleteSoftSd_sysdb (data) {
+export function deleteSoftSd_sysdb(data) {
   return http({
     url: 'Sd_sysdb/DeleteSoftBatchAsync',
     method: 'post',
@@ -74,7 +83,7 @@ export function deleteSoftSd_sysdb (data) {
    * 批量删除
    * @param {id集合} ids
    */
-export function deleteSd_sysdb (data) {
+export function deleteSd_sysdb(data) {
   return http({
     url: 'Sd_sysdb/DeleteBatchAsync',
     method: 'delete',

@@ -46,21 +46,9 @@ namespace Yuebon.DataProcess.Services
         /// <returns></returns>
         public override async Task<long> InsertAsync(Sd_sysdb entity, IDbTransaction trans = null)
         {
-            Sd_detail detailModel = new Sd_detail();
-            detailModel.Id = GuidUtils.CreateNo();
-            detailModel.Sd_id = entity.Id;
-            #region 获取所有表集合
-            DataTools bll = new DataTools(entity.Sdconnectionstr, entity.Sdtype);
-            List<DbTableInfo> tbList = bll.GetTbList(entity.dbName, "");
-            foreach (DbTableInfo item in tbList)
-            {
-                item.Fileds = bll.GetAllColumns(entity.dbName, item.TableName);
-            }
-            detailModel.Tbs = tbList.ToJson();
-            long addDetailResult = await  _detailService.InsertAsync(detailModel, trans);
-            #endregion
             long addResult = await repository.InsertAsync(entity, trans);
-            if (addResult > 0 && addDetailResult > 0)
+            bool result = await UpdateDbContents(entity);
+            if (addResult > 0 && result)
             {
                 return addResult;
             }
@@ -116,6 +104,52 @@ namespace Yuebon.DataProcess.Services
                 TotalItems = pagerInfo.RecordCount
             };
             return pageResult;
+        }
+
+        /// <summary>
+        /// 异步步新增实体。
+        /// </summary>
+        /// <param name="entity">实体</param>
+        /// <param name="trans">事务对象</param>
+        /// <returns></returns>
+        public async Task<bool> UpdateDbContents(Sd_sysdb entity, IDbTransaction trans = null)
+        {
+
+            #region 获取所有表集合
+
+            DataTools bll = new DataTools(entity.Sdconnectionstr, entity.Sdtype);
+            List<DbTableInfo> tbList = bll.GetTbList(entity.dbName, "");
+            foreach (DbTableInfo item in tbList)
+            {
+                item.Fileds = bll.GetAllColumns(entity.dbName, item.TableName);
+            }
+            bool has = true;
+            Sd_detail detailModel = _detailService.GetWhere(string.Format(" sd_id = '{0}'", entity.Id));
+            if (detailModel == null)
+            {
+                has = false;
+                detailModel = new Sd_detail();
+                detailModel.Id = GuidUtils.CreateNo();
+                detailModel.Sd_id = entity.Id;
+            }
+            detailModel.Tbs = tbList.ToJson();
+
+            bool result = false;
+            if (has)
+            {
+                result = await _detailService.UpdateAsync(detailModel, detailModel.Id, trans);
+            }
+            else
+            {
+                long addDetailResult = await _detailService.InsertAsync(detailModel, trans);
+                if (addDetailResult > 0)
+                {
+                    result = true;
+                }
+            }
+
+            #endregion
+            return result;
         }
 
 
