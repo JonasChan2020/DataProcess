@@ -15,10 +15,11 @@ export function getSys_conf_detailsListWithPager (data) {
 }/**
    * 获取所有可用的
    */
-export function getAllSys_conf_detailsList () {
+export function getAllEnableByConfId(data) {
   return http.request({
-    url: 'Sys_conf_details/GetAllEnable',
-    method: 'get',
+    url: 'Sys_conf_details/GetAllEnableByConfId',
+    data: data,
+    method: 'post',
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
 }

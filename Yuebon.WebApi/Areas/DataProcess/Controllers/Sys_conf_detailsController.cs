@@ -12,6 +12,7 @@ using Yuebon.Commons.Pages;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 using Yuebon.DataProcess.IServices;
+using Yuebon.AspNetCore.Mvc;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -74,6 +75,24 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             info.DeleteMark = true;
             info.DeleteTime = DateTime.Now;
             info.DeleteUserId = CurrentUser.UserId;
+        }
+
+        /// <summary>
+        /// 获取所有可用的
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("GetAllEnableByConfId")]
+        [YuebonAuthorize("List")]
+        public virtual async Task<CommonResult<List<Sys_conf_detailsOutputDto>>> GetAllEnableByConfId(string id)
+        {
+            CommonResult<List<Sys_conf_detailsOutputDto>> result = new CommonResult<List<Sys_conf_detailsOutputDto>>();
+            IEnumerable<Sys_conf_details> list = await iService.GetAllByIsNotDeleteAndEnabledMarkAsync(string.Format(" sys_conf_id='{0}'", id));
+            List<Sys_conf_detailsOutputDto> resultList = list.MapTo<Sys_conf_detailsOutputDto>();
+            result.ResData = resultList;
+            result.ErrCode = ErrCode.successCode;
+            result.ErrMsg = ErrCode.err0;
+
+            return result;
         }
     }
 }

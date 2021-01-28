@@ -12,6 +12,7 @@ using Yuebon.Commons.Pages;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 using Yuebon.DataProcess.IServices;
+using Yuebon.AspNetCore.Mvc;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
