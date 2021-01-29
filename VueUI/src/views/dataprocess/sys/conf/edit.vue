@@ -1,17 +1,17 @@
 <template>
   <div class="app-container">
     <el-card>
-      <article-detail />
+      <ConfDetails />
     </el-card>
   </div>
 </template>
 
 <script>
-import ArticleDetail from './components/ArticleDetail.vue'
+import ConfDetails from './confdetails/ConfDetails.vue'
 export default {
-  name: 'EditArticle',
+  name: 'EditConfDetail',
   components: {
-    ArticleDetail
+    ConfDetails
   },
   data() {
     return {
