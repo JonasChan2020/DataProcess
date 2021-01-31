@@ -182,7 +182,9 @@
 
     <el-dialog
       ref="dialogEditForm"
-      :title="editFormTitle+'{TableNameDesc}'"
+               :close-on-click-modal="false"
+               :show-close="true"
+      :title="editFormTitle+'数据模型'"
       :visible.sync="dialogEditFormVisible"
       width="640px"
     >
@@ -552,12 +554,12 @@ export default {
           this.$alert('请选择一条数据进行编辑/修改', '提示')
         } else {
           this.currentDetailId = this.currentDetailSelected[0].Id
-          this.$router.push({ name: 'EditConfDetail', params: { id: this.currentDetailId, showtype: view }})
+          this.$router.push({ name: 'EditConfDetail', params: { id: this.currentDetailId, showtype: view, Sys_conf_id: this.currentSelectId }})
         }
       } else {
         this.currentDetailId = ''
         this.selectedDetailclass = ''
-        this.$router.push({ name: 'EditConfDetail', params: { id: this.currentDetailId, showtype: view }})
+        this.$router.push({ name: 'EditConfDetail', params: { id: this.currentDetailId, showtype: view, Sys_conf_id: this.currentSelectId}})
       }
     },
 

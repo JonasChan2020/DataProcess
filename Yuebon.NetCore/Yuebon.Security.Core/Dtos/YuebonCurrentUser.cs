@@ -151,5 +151,24 @@ namespace Yuebon.Security.Dtos
         /// 当前所选系统（数据处理工具用）
         /// </summary>
         public string SysName { get; set; }
+
+        /// <summary>
+        /// 当前所选系统主数据库ID（数据处理工具用）
+        /// </summary>
+        public string MDbId { get; set; }
+
+        /// <summary>
+        /// 当前所选系统主数据库类型（数据处理工具用）
+        /// </summary>
+        public string MDbType { get; set; }
+        /// <summary>
+        /// 当前所选系统主数据库库名（数据处理工具用）
+        /// </summary>
+        public string MDbName { get; set; }
+
+        /// <summary>
+        /// 当前所选系统主数据连接字符串（数据处理工具用）
+        /// </summary>
+        public string MDbConnectionstr { get; set; }
     }
 }

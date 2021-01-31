@@ -15,9 +15,22 @@ namespace Yuebon.DataProcess.Models
     public class Sys_sys:BaseEntity<string>, ICreationAudited, IModificationAudited, IDeleteAudited
     {
         /// <summary>
+        /// 设置或获取系统编码
+        /// </summary>
+        public string Syscode { get; set; }
+        /// <summary>
+        /// 设置或获取系统名称
+        /// </summary>
+        public string Sysname { get; set; }
+        /// <summary>
         /// 设置或获取系统分类
         /// </summary>
         public string Classify_id { get; set; }
+
+        /// <summary>
+        /// 设置或获取主数据库ID
+        /// </summary>
+        public string MdbId { get; set; }
         /// <summary>
         /// 设置或获取创建时间
         /// </summary>
@@ -62,14 +75,7 @@ namespace Yuebon.DataProcess.Models
         /// 设置或获取状态
         /// </summary>
         public string State { get; set; }
-        /// <summary>
-        /// 设置或获取系统编码
-        /// </summary>
-        public string Syscode { get; set; }
-        /// <summary>
-        /// 设置或获取系统名称
-        /// </summary>
-        public string Sysname { get; set; }
+        
 
     }
 }

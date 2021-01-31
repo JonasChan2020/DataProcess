@@ -120,9 +120,19 @@ namespace Yuebon.AspNetCore.Models
         public static string err80001 = "未选择系统，请在系统管理页面选择系统";
 
         /// <summary>
-        /// 未选择系统
+        /// 未找到指定系统
         /// </summary>
         public static string err80002 = "未找到指定系统";
+
+        /// <summary>
+        /// 未设置主库
+        /// </summary>
+        public static string err80010 = "未设置主库";
+
+        /// <summary>
+        /// 未找到指定表的字段信息
+        /// </summary>
+        public static string err80012 = "未找到指定表的字段信息";
 
     }
 }

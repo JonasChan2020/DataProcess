@@ -21,50 +21,38 @@
     <el-card>
       <div class="list-btn-container">
         <el-button-group>
-          <el-button
-            v-hasPermi="['Sys_sys/Add']"
-            type="primary"
-            icon="el-icon-plus"
-            size="small"
-            @click="ShowEditOrViewDialog()"
-          >新增</el-button>
-          <el-button
-            v-hasPermi="['Sys_sys/Edit']"
-            type="primary"
-            icon="el-icon-edit"
-            class="el-button-modify"
-            size="small"
-            @click="ShowEditOrViewDialog('edit')"
-          >修改</el-button>
-          <el-button
-            v-hasPermi="['Sys_sys/Enable']"
-            type="info"
-            icon="el-icon-video-pause"
-            size="small"
-            @click="setEnable('0')"
-          >禁用</el-button>
-          <el-button
-            v-hasPermi="['Sys_sys/Enable']"
-            type="success"
-            icon="el-icon-video-play"
-            size="small"
-            @click="setEnable('1')"
-          >启用</el-button>
-          <el-button
-            v-hasPermi="['Sys_sys/DeleteSoft']"
-            type="warning"
-            icon="el-icon-delete"
-            size="small"
-            @click="deleteSoft('0')"
-          >软删除</el-button>
-          <el-button
-            v-hasPermi="['Sys_sys/Delete']"
-            type="danger"
-            icon="el-icon-delete"
-            size="small"
-            @click="deletePhysics()"
-          >删除</el-button>
+          <el-button v-hasPermi="['Sys_sys/Add']"
+                     type="primary"
+                     icon="el-icon-plus"
+                     size="small"
+                     @click="ShowEditOrViewDialog()">新增</el-button>
+          <el-button v-hasPermi="['Sys_sys/Edit']"
+                     type="primary"
+                     icon="el-icon-edit"
+                     class="el-button-modify"
+                     size="small"
+                     @click="ShowEditOrViewDialog('edit')">修改</el-button>
+          <el-button v-hasPermi="['Sys_sys/Enable']"
+                     type="info"
+                     icon="el-icon-video-pause"
+                     size="small"
+                     @click="setEnable('0')">禁用</el-button>
+          <el-button v-hasPermi="['Sys_sys/Enable']"
+                     type="success"
+                     icon="el-icon-video-play"
+                     size="small"
+                     @click="setEnable('1')">启用</el-button>
+          <el-button v-hasPermi="['Sys_sys/DeleteSoft']"
+                     type="warning"
+                     icon="el-icon-delete"
+                     size="small"
+                     @click="deleteSoft('0')">软删除</el-button>
           <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableData()">刷新</el-button>
+          <el-button v-hasPermi="['Sys_sys/ChoseMainDb']"
+                     type="primary"
+                     icon="el-icon-edit"
+                     size="small"
+                     @click="chosemaindb()">选择主数据库</el-button>
         </el-button-group>
       </div>
       <el-table

@@ -73,6 +73,37 @@ namespace Yuebon.DataProcess.Core.common.Enity
         /// 默认值
         /// </summary>
         public string FieldDefaultValue { get; set; }
-       
+
+        #region  数据处理工具用
+        /// <summary>
+        /// 字段值获取方式
+        /// </summary>
+        public string DataGetType { get; set; }
+
+        /// <summary>
+        /// 唯一判定项
+        /// </summary>
+        public bool? Is_Key { get; set; }
+
+        /// <summary>
+        /// 配置中显示
+        /// </summary>
+        public bool? Is_Visib { get; set; }
+
+        /// <summary>
+        /// 更新时保留
+        /// </summary>
+        public bool? Is_NoUpdate { get; set; }
+
+        /// <summary>
+        /// 查询不到是否为空
+        /// </summary>
+        public bool? Is_ChangeWhite { get; set; }
+        /// <summary>
+        /// 获取方法参数
+        /// </summary>
+        public string GetFunctionParamter { get; set; }
+        #endregion
+
     }
 }

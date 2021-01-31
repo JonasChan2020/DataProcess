@@ -10,6 +10,7 @@ using Yuebon.DataProcess.IRepositories;
 using Yuebon.DataProcess.IServices;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
+using System.Linq;
 
 namespace Yuebon.DataProcess.Services
 {
@@ -20,11 +21,13 @@ namespace Yuebon.DataProcess.Services
     {
 		private readonly IPlug_plugRepository _repository;
         private readonly IPlug_typeService _classservice;
+        private readonly IPlug_sysrelationService _relaservice;
         private readonly ILogService _logService;
-        public Plug_plugService(IPlug_plugRepository repository, IPlug_typeService classService, ILogService logService) : base(repository)
+        public Plug_plugService(IPlug_plugRepository repository, IPlug_typeService classService, IPlug_sysrelationService relaservice, ILogService logService) : base(repository)
         {
 			_repository=repository;
             _classservice = classService;
+            _relaservice = relaservice;
             _logService =logService;
             //_repository.OnOperationLog += _logService.OnOperationLog;
         }
@@ -48,7 +51,7 @@ namespace Yuebon.DataProcess.Services
                 CurrenetPageIndex = search.CurrenetPageIndex,
                 PageSize = search.PageSize
             };
-            List<Plug_plug> list = await repository.FindWithPagerAsync(where, pagerInfo, search.Sort, order);
+            List<Plug_plug> list = await _repository.FindWithPagerAsync(where, pagerInfo, search.Sort, order);
             List<Plug_plugOutputDto> resultList = list.MapTo<Plug_plugOutputDto>();
             List<Plug_plugOutputDto> listResult = new List<Plug_plugOutputDto>();
             foreach (Plug_plugOutputDto item in resultList)
@@ -67,6 +70,18 @@ namespace Yuebon.DataProcess.Services
                 TotalItems = pagerInfo.RecordCount
             };
             return pageResult;
+        }
+
+        /// <summary>
+        /// 根据系统ID查询所有可用插件
+        /// </summary>
+        /// <param name="SysId"></param>
+        /// <returns></returns>
+        public async Task<List<Plug_plugOutputDto>> GetEnableListWithSys(string SysId)
+        {
+            IEnumerable<Plug_plug> list = await _repository.GetEnableListWithSysIdAsync(SysId);
+            List<Plug_plugOutputDto> resultList = list.MapTo<Plug_plugOutputDto>();
+            return resultList;
         }
     }
 }

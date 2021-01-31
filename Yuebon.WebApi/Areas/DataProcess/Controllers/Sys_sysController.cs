@@ -24,13 +24,15 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
     [Route("api/DataProcess/[controller]")]
     public class Sys_sysController : AreaApiController<Sys_sys, Sys_sysOutputDto,Sys_sysInputDto,ISys_sysService,string>
     {
+        private ISd_sysdbService sysdbService;
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="_iService"></param>
-        public Sys_sysController(ISys_sysService _iService) : base(_iService)
+        public Sys_sysController(ISys_sysService _iService, ISd_sysdbService _sysdbService) : base(_iService)
         {
             iService = _iService;
+            sysdbService = _sysdbService;
             AuthorizeKey.ListKey = "Sys_sys/List";
             AuthorizeKey.InsertKey = "Sys_sys/Add";
             AuthorizeKey.UpdateKey = "Sys_sys/Edit";
@@ -96,6 +98,20 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                 Sys_sys model = iService.Get(paramsObj.sysId);
                 CurrentUser.SysId = model.Id;
                 CurrentUser.SysName = model.Sysname;
+                #region 获取主数据库信息并写入
+                if (!string.IsNullOrEmpty(model.MdbId))
+                {
+                    CurrentUser.MDbId = model.MdbId;
+                    Sd_sysdb mDBModel = sysdbService.Get(model.MdbId);
+                    if (mDBModel != null)
+                    {
+                        CurrentUser.MDbName = mDBModel.dbName;
+                        CurrentUser.MDbType = mDBModel.Sdtype;
+                        CurrentUser.MDbConnectionstr = mDBModel.Sdconnectionstr;
+                    }
+                }
+                #endregion
+
                 YuebonCacheHelper yuebonCacheHelper = new YuebonCacheHelper();
                 yuebonCacheHelper.Replace("login_user_" + CurrentUser.UserId, CurrentUser);
                 result.Success = true;

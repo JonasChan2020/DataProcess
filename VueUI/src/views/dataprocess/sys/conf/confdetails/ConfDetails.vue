@@ -1,56 +1,86 @@
 <template>
   <div>
-    <el-form ref="editFrom" :model="editFrom" :rules="rules">
-      <el-form-item label="创建时间" :label-width="formLabelWidth" prop="CreatorTime">
-        <el-input v-model="editFrom.CreatorTime" placeholder="请输入创建时间" autocomplete="off" clearable />
-      </el-form-item>
-      <el-form-item label="创建人" :label-width="formLabelWidth" prop="CreatorUserId">
-        <el-input v-model="editFrom.CreatorUserId" placeholder="请输入创建人" autocomplete="off" clearable />
-      </el-form-item>
-      <el-form-item label="删除标记" :label-width="formLabelWidth" prop="DeleteMark">
-        <el-input v-model="editFrom.DeleteMark" placeholder="请输入删除标记" autocomplete="off" clearable />
-      </el-form-item>
-      <el-form-item label="删除时间" :label-width="formLabelWidth" prop="DeleteTime">
-        <el-input v-model="editFrom.DeleteTime" placeholder="请输入删除时间" autocomplete="off" clearable />
-      </el-form-item>
-      <el-form-item label="删除人" :label-width="formLabelWidth" prop="DeleteUserId">
-        <el-input v-model="editFrom.DeleteUserId" placeholder="请输入删除人" autocomplete="off" clearable />
-      </el-form-item>
-      <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
-        <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
-      </el-form-item>
-      <el-form-item label="启用标记" :label-width="formLabelWidth" prop="EnabledMark">
-        <el-input v-model="editFrom.EnabledMark" placeholder="请输入启用标记" autocomplete="off" clearable />
-      </el-form-item>
-      <el-form-item label="是否为动态表" :label-width="formLabelWidth" prop="Is_dynamic">
-        <el-input v-model="editFrom.Is_dynamic" placeholder="请输入是否为动态表" autocomplete="off" clearable />
-      </el-form-item>
-      <el-form-item label="是否为标识表" :label-width="formLabelWidth" prop="Is_flag">
-        <el-input v-model="editFrom.Is_flag" placeholder="请输入是否为标识表" autocomplete="off" clearable />
-      </el-form-item>
-      <el-form-item label="最后修改时间" :label-width="formLabelWidth" prop="LastModifyTime">
-        <el-input v-model="editFrom.LastModifyTime" placeholder="请输入最后修改时间" autocomplete="off" clearable />
-      </el-form-item>
-      <el-form-item label="最后修改人" :label-width="formLabelWidth" prop="LastModifyUserId">
-        <el-input v-model="editFrom.LastModifyUserId" placeholder="请输入最后修改人" autocomplete="off" clearable />
-      </el-form-item>
-      <el-form-item label="执行顺序" :label-width="formLabelWidth" prop="Levelnum">
-        <el-input v-model="editFrom.Levelnum" placeholder="请输入执行顺序" autocomplete="off" clearable />
-      </el-form-item>
-      <el-form-item label="排序字段" :label-width="formLabelWidth" prop="SortCode">
-        <el-input v-model="editFrom.SortCode" placeholder="请输入排序字段" autocomplete="off" clearable />
-      </el-form-item>
-      <el-form-item label="状态" :label-width="formLabelWidth" prop="State">
-        <el-input v-model="editFrom.State" placeholder="请输入状态" autocomplete="off" clearable />
-      </el-form-item>
-      <el-form-item label="配置ID" :label-width="formLabelWidth" prop="Sys_conf_id">
-        <el-input v-model="editFrom.Sys_conf_id" placeholder="请输入配置ID" autocomplete="off" clearable />
-      </el-form-item>
-      <el-form-item label="表名" :label-width="formLabelWidth" prop="Tbname">
-        <el-input v-model="editFrom.Tbname" placeholder="请输入表名" autocomplete="off" clearable />
-      </el-form-item>
-
-    </el-form>
+    <el-row>
+      <el-select v-model="Tbname" placeholder="请选择">
+        <el-option v-for="item in SelectTbnameList"
+                   :key="item.TableName"
+                   :label="item.TableName"
+                   :value="item.TableName"
+                   @change="handleSelectTbChange()">
+        </el-option>
+      </el-select>
+    </el-row>
+    <el-table ref="gridtable"
+              :data="tableData"
+              row-key="Id"
+              border
+              stripe
+              highlight-current-row
+              style="width: 100%;margin-bottom: 20px;"
+              :default-sort="{prop: 'SortCode', order: 'ascending'}">
+      <el-table-column type="expand">
+        <template slot-scope="props">
+          <el-form label-position="left" inline class="demo-table-expand">
+            <el-form-item label="名称">
+              <span>{{ props.row.FieldName }}</span>
+            </el-form-item>
+            <el-form-item label="描述">
+              <span>{{ props.row.Description }}</span>
+            </el-form-item>
+            <el-form-item label="数据类型">
+              <span>{{ props.row.DataType }}</span>
+            </el-form-item>
+            <el-form-item label="小数位精度">
+              <span>{{ props.row.FieldScale }}</span>
+            </el-form-item>
+            <el-form-item label="字段长度">
+              <span>{{ props.row.FieldMaxLength }}</span>
+            </el-form-item>
+            <el-form-item label="默认值">
+              <span>{{ props.row.FieldDefaultValue }}</span>
+            </el-form-item>
+            <el-form-item label="是否可空" sortable="custom" width="120" prop="IsNullable" align="center">
+              <template slot-scope="scope">
+                <el-tag :type="scope.row.IsNullable === true ? 'success' : 'info'" disable-transitions>{{ scope.row.IsNullable === true ? "是" : "否" }}</el-tag>
+              </template>
+            </el-form-item>
+            <el-form-item label="是否主键" sortable="custom" width="120" prop="IsIdentity" align="center">
+              <template slot-scope="scope">
+                <el-tag :type="scope.row.IsIdentity === true ? 'success' : 'info'" disable-transitions>{{ scope.row.IsIdentity === true ? "是" : "否" }}</el-tag>
+              </template>
+            </el-form-item>
+            <el-form-item label="是否自增" sortable="custom" width="120" prop="Increment" align="center">
+              <template slot-scope="scope">
+                <el-tag :type="scope.row.Increment === true ? 'success' : 'info'" disable-transitions>{{ scope.row.Increment === true ? "是" : "否" }}</el-tag>
+              </template>
+            </el-form-item>
+          </el-form>
+        </template>
+      </el-table-column>
+      <el-table-column prop="FieldName" label="名称" sortable="custom" width="120" />
+      <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
+      <el-table-column prop="DataGetType" label="获取方式" sortable="custom" width="120">
+        <template slot-scope="scope">
+          <el-select v-model="scope.row.DataGetType"
+                     placeholder="请选择类型">
+            <el-option v-for="item in SelectDataGetTypeList"
+                       :key="item.Id"
+                       :label="item.Pname"
+                       :value="item.Id">
+            </el-option>
+          </el-select>
+        </template>
+      </el-table-column>
+      <el-table-column label="配置" sortable="custom" width="120" align="center">
+        <template slot-scope="scope">
+          <el-button type="primary"
+                     icon="el-icon-plus"
+                     size="small"
+                     @click="OpenConfigPage()">配置</el-button>
+        </template>
+      </el-table-column>
+      <el-table-column prop="Description" label="配置信息" v-if="false" />
+    </el-table>
     <div v-if="showType!=='show'" class="yuebon-page-footer">
       <el-button @click="reset">重置</el-button>
       <el-button v-preventReClick type="primary" @click="saveEditForm">保存</el-button>
@@ -60,106 +90,106 @@
 
 <script>
 
-import { saveSys_conf_details } from '@/api/dataprocess/sys_conf_details'
+  import {
+    saveSys_conf_details, getTbNameList, getSys_conf_detailsDetail, GetColumnListsByDetailId,
+    GetColumnListsBytbName,getDataGetTypeLists} from '@/api/dataprocess/sys_conf_details'
 
-export default {
-  name: 'ConfDetails',
-  data() {
-    return {
-      editFormTitle: '',
-      editFrom: {
-        CreatorTime: '',
-        CreatorUserId: '',
-        DeleteMark: '',
-        DeleteTime: '',
-        DeleteUserId: '',
-        Description: '',
-        EnabledMark: '',
+  export default {
+    name: 'ConfDetails',
+    data() {
+      return {
+        tableloading: true,
+        tableData: [],
+        Sys_conf_id: '',
+        Tbname: '',
         Is_dynamic: '',
         Is_flag: '',
-        LastModifyTime: '',
-        LastModifyUserId: '',
-        Levelnum: '',
-        SortCode: '',
-        State: '',
-        Sys_conf_id: '',
-        Tbname: ''
-
-      },
-      rules: {
-
-      },
-      formLabelWidth: '80px',
-      currentId: '', // 当前操作对象的ID值，主要用于修改
-      showType: 'edit' // 操作类型编辑、新增、查看
-    }
-  },
-  created() {
-
-  },
-  methods: {
-    /**
-     * 初始化数据
-     */
-    InitDictItem() {
-
+        configjson: '',
+        SelectTbnameList: [],
+        SelectedTbName: '',
+        SelectedDataGetType: '',
+        SelectDataGetTypeList: [],
+        currentId: '', // 当前操作对象的ID值，主要用于修改
+        showType: 'edit' // 操作类型编辑、新增、查看
+      }
     },
-    reset() {
-
+    created() {
+      this.InitDictItem(),
+        this.loadTableData()
     },
-    bindEditInfo: function() {
-
-    },
-    /**
-     * 新增/修改保存
-     */
-    saveEditForm() {
-      this.$refs['editFrom'].validate((valid) => {
-        if (valid) {
-          const data = {
-            'CreatorTime': this.editFrom.CreatorTime,
-            'CreatorUserId': this.editFrom.CreatorUserId,
-            'DeleteMark': this.editFrom.DeleteMark,
-            'DeleteTime': this.editFrom.DeleteTime,
-            'DeleteUserId': this.editFrom.DeleteUserId,
-            'Description': this.editFrom.Description,
-            'EnabledMark': this.editFrom.EnabledMark,
-            'Is_dynamic': this.editFrom.Is_dynamic,
-            'Is_flag': this.editFrom.Is_flag,
-            'LastModifyTime': this.editFrom.LastModifyTime,
-            'LastModifyUserId': this.editFrom.LastModifyUserId,
-            'Levelnum': this.editFrom.Levelnum,
-            'SortCode': this.editFrom.SortCode,
-            'State': this.editFrom.State,
-            'Sys_conf_id': this.editFrom.Sys_conf_id,
-            'Tbname': this.editFrom.Tbname,
-
-            'Id': this.currentId
-          }
-          saveSys_conf_details(data).then(res => {
-            if (res.Success) {
-              this.$message({
-                message: '恭喜你，操作成功',
-                type: 'success'
-              })
-              this.dialogEditFormVisible = false
-              this.currentSelected = ''
-              this.$refs['editFrom'].resetFields()
-              this.loadTableData()
-              this.InitDictItem()
-            } else {
-              this.$message({
-                message: res.ErrMsg,
-                type: 'error'
-              })
-            }
-          })
-        } else {
-          return false
+    methods: {
+      /**
+       * 初始化数据
+       */
+      InitDictItem() {
+        if (this.$route.params && this.$route.params.id && this.$route.params.id !== 'null') {
+          this.currentId = this.$route.params.id
+          this.showType = this.$route.params.showtype
+          this.bindEditInfo()
         }
-      })
-    }
+        this.Sys_conf_id = this.$route.params.Sys_conf_id
 
+        getTbNameList().then(res => {
+          this.SelectTbnameList = res.ResData
+        })
+        getDataGetTypeLists().then(res => {
+          this.SelectDataGetTypeList = res.ResData
+        })
+      },
+      reset() {
+
+      },
+      /**
+         * 加载页面table数据
+         */
+      loadTableDataByDetailId: function (detailId) {
+        GetColumnListsByDetailId(detailId).then(res => {
+          this.tableData = res.ResData.Items
+        })
+
+      },
+      /**
+        * 加载页面table数据
+        */
+      loadTableDataByTbName: function (tb) {
+        GetColumnListsBytbName(tb).then(res => {
+          this.tableData = res.ResData.Items
+        })
+
+      },
+      /**
+     * 读取详情
+     */
+      bindEditInfo: function () {
+        getSys_conf_detailsDetail(this.currentId).then(res => {
+          this.Tbname = res.ResData.Tbname
+          this.Sys_conf_id = res.ResData.Sys_conf_id
+          this.Is_dynamic = res.ResData.Is_dynamic
+          this.Is_flag = res.ResData.Is_flag
+          this.configjson = res.ResData.configjson
+          this.loadTableDataByDetailId(this.currentId)
+        })
+
+      },
+      /**
+      * 打开配置页面
+      */
+      OpenConfigPage: function () {
+
+      },
+      /**
+       * 新增/修改保存
+       */
+      saveEditForm() {
+
+      },
+      /**
+         *选择表
+         */
+      handleSelectTbChange: function () {
+        this.Tbname = this.SelectedTbName
+        this.loadTableDataByTbName(this.Tbname)
+      }
+    }
   }
-}
 </script>

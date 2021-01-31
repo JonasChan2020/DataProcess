@@ -13,6 +13,9 @@ using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 using Yuebon.DataProcess.IServices;
 using Yuebon.AspNetCore.Mvc;
+using Yuebon.DataProcess.Core.common.dbTools;
+using Yuebon.DataProcess.Core.common.Enity;
+using Yuebon.DataProcess.Core.common;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -23,13 +26,17 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
     [Route("api/DataProcess/[controller]")]
     public class Sys_conf_detailsController : AreaApiController<Sys_conf_details, Sys_conf_detailsOutputDto,Sys_conf_detailsInputDto,ISys_conf_detailsService,string>
     {
+        private ISys_conf_objService ISysconfobjService;
+        private IPlug_plugService IPlugService;
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="_iService"></param>
-        public Sys_conf_detailsController(ISys_conf_detailsService _iService) : base(_iService)
+        public Sys_conf_detailsController(ISys_conf_detailsService _iService, ISys_conf_objService _ISysconfobjService, IPlug_plugService _IPlugService) : base(_iService)
         {
             iService = _iService;
+            ISysconfobjService = _ISysconfobjService;
+            IPlugService = _IPlugService;
             AuthorizeKey.ListKey = "Sys_conf_details/List";
             AuthorizeKey.InsertKey = "Sys_conf_details/Add";
             AuthorizeKey.UpdateKey = "Sys_conf_details/Edit";
@@ -74,7 +81,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         {
             info.DeleteMark = true;
             info.DeleteTime = DateTime.Now;
-            info.DeleteUserId = CurrentUser.UserId;
+            info.DeleteUserId = CurrentUser.UserId; 
         }
 
         /// <summary>
@@ -83,7 +90,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// <returns></returns>
         [HttpPost("GetAllEnableByConfId")]
         [YuebonAuthorize("List")]
-        public virtual async Task<CommonResult<List<Sys_conf_detailsOutputDto>>> GetAllEnableByConfId(string id)
+        public async Task<IActionResult> GetAllEnableByConfId(string id)
         {
             CommonResult<List<Sys_conf_detailsOutputDto>> result = new CommonResult<List<Sys_conf_detailsOutputDto>>();
             IEnumerable<Sys_conf_details> list = await iService.GetAllByIsNotDeleteAndEnabledMarkAsync(string.Format(" sys_conf_id='{0}'", id));
@@ -92,7 +99,138 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             result.ErrCode = ErrCode.successCode;
             result.ErrMsg = ErrCode.err0;
 
-            return result;
+            return ToJsonContent(result);
+        }
+
+        /// <summary>
+        /// 获取所有表
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("GetTbNameList")]
+        [YuebonAuthorize("List")]
+        public IActionResult GetTbNameList()
+        {
+            CommonResult<List<DbTableInfo>> result = new CommonResult<List<DbTableInfo>>();
+            if (!string.IsNullOrEmpty(CurrentUser.MDbName) && !string.IsNullOrEmpty(CurrentUser.MDbType) && !string.IsNullOrEmpty(CurrentUser.MDbConnectionstr))
+            {
+                DataTools bll = new DataTools(CurrentUser.MDbConnectionstr, CurrentUser.MDbType);
+                List<DbTableInfo> tbList = bll.GetTbList(CurrentUser.MDbName, "");
+                result.ResData = tbList;
+                result.ErrCode = ErrCode.successCode;
+                result.ErrMsg = ErrCode.err0;
+            }
+            else
+            {
+                result.ErrCode = ErrCode.err80010;
+                result.ErrMsg = ErrCode.err80010;
+            }
+            
+
+            return ToJsonContent(result);
+        }
+
+        /// <summary>
+        ///  获取指定表列信息
+        /// </summary>
+        /// <param name="detailId">详情ID</param>
+        /// <returns></returns>
+        [HttpPost("GetColumnListsByDetailId")]
+        [YuebonAuthorize("List")]
+        public IActionResult GetColumnListsByDetailId(string detailId)
+        {
+            CommonResult<List<DbTableInfo>> result = new CommonResult<List<DbTableInfo>>();
+            if (!string.IsNullOrEmpty(CurrentUser.MDbName) && !string.IsNullOrEmpty(CurrentUser.MDbType) && !string.IsNullOrEmpty(CurrentUser.MDbConnectionstr))
+            {
+                Sys_conf_details model = iService.Get(detailId);
+                DataTools bll = new DataTools(CurrentUser.MDbConnectionstr, CurrentUser.MDbType);
+                List<DbFieldInfo> colList = bll.GetAllColumns(CurrentUser.MDbName, model.Tbname);
+                if (colList != null && colList.Count > 0)
+                {
+                    #region 获取列获取方式参数
+                    Sys_conf_obj objModel = ISysconfobjService.GetWhere(string.Format(" sys_conf_detail_id='{0}'", detailId));
+                    if (objModel != null) {
+                        Dictionary<string, string> dic = objModel.Configjson.ToObject<Dictionary<string, string>>();
+                        foreach (DbFieldInfo item in colList)
+                        {
+                            if (dic.ContainsKey(item.FieldName))
+                            {
+                                item.GetFunctionParamter = dic[item.FieldName];
+                            }
+                        }
+                    }
+                    #endregion
+                    result.ResData = colList;
+                    result.ErrCode = ErrCode.successCode;
+                    result.ErrMsg = ErrCode.err0;
+                }
+                else
+                {
+                    result.ErrCode = ErrCode.err80012;
+                    result.ErrMsg = ErrCode.err80012;
+                }
+                
+            }
+            else
+            {
+                result.ErrCode = ErrCode.err80010;
+                result.ErrMsg = ErrCode.err80010;
+            }
+
+
+            return ToJsonContent(result);
+        }
+
+        /// <summary>
+        ///  获取指定表列信息
+        /// </summary>
+        /// <param name="tbName">表名</param>
+        /// <returns></returns>
+        [HttpPost("GetColumnListsBytbName")]
+        [YuebonAuthorize("List")]
+        public IActionResult GetColumnListsBytbName(string tbName)
+        {
+            CommonResult<List<DbTableInfo>> result = new CommonResult<List<DbTableInfo>>();
+            if (!string.IsNullOrEmpty(CurrentUser.MDbName) && !string.IsNullOrEmpty(CurrentUser.MDbType) && !string.IsNullOrEmpty(CurrentUser.MDbConnectionstr))
+            {
+                DataTools bll = new DataTools(CurrentUser.MDbConnectionstr, CurrentUser.MDbType);
+                List<DbFieldInfo> colList = bll.GetAllColumns(CurrentUser.MDbName, tbName);
+                if (colList != null && colList.Count > 0)
+                {
+                    result.ResData = colList;
+                    result.ErrCode = ErrCode.successCode;
+                    result.ErrMsg = ErrCode.err0;
+                }
+                else
+                {
+                    result.ErrCode = ErrCode.err80012;
+                    result.ErrMsg = ErrCode.err80012;
+                }
+
+            }
+            else
+            {
+                result.ErrCode = ErrCode.err80010;
+                result.ErrMsg = ErrCode.err80010;
+            }
+
+
+            return ToJsonContent(result);
+        }
+
+        /// <summary>
+        ///  获取数据获取方式下拉框数据集
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("GetDataGetTypeLists")]
+        [YuebonAuthorize("List")]
+        public async Task<IActionResult> GetDataGetTypeLists()
+        {
+            CommonResult<List<DbTableInfo>> result = new CommonResult<List<DbTableInfo>>();
+            List<Plug_plugOutputDto> plugList = await IPlugService.GetEnableListWithSys(CurrentUser.SysId);
+            result.ResData = plugList;
+            result.ErrCode = ErrCode.successCode;
+            result.ErrMsg = ErrCode.err0;
+            return ToJsonContent(result);
         }
     }
 }

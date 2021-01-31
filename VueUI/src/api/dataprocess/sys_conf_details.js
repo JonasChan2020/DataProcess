@@ -5,14 +5,57 @@ import defaultSettings from '@/settings'
    * 分页查询
    * @param {查询条件} data
    */
-export function getSys_conf_detailsListWithPager (data) {
+export function getSys_conf_detailsListWithPager(data) {
   return http.request({
     url: 'Sys_conf_details/FindWithPagerAsync',
     method: 'post',
     data: data,
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
-}/**
+}
+/**
+ * 获取所有表
+ */
+export function getTbNameList() {
+  return http.request({
+    url: 'Sys_conf_details/GetTbNameList',
+    method: 'post',
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
+/**
+  * 获取指定记录的表字段
+  */
+export function GetColumnListsByDetailId(data) {
+  return http.request({
+    url: 'Sys_conf_details/GetColumnListsByDetailId',
+    data: data,
+    method: 'post',
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
+/**
+  * 获取指定表名的表字段
+  */
+export function GetColumnListsBytbName(data) {
+  return http.request({
+    url: 'Sys_conf_details/GetColumnListsBytbName',
+    data: data,
+    method: 'post',
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
+/**
+  * 获取数据获取方式下拉框数据集
+  */
+export function getDataGetTypeLists() {
+  return http.request({
+    url: 'Sys_conf_details/GetDataGetTypeLists',
+    method: 'post',
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
+/**
    * 获取所有可用的
    */
 export function getAllEnableByConfId(data) {
