@@ -189,7 +189,7 @@ import { getSd_sysdbListWithPager, getSd_sysdbDetail,
   deleteSd_sysdb, UpdateDbContents
 } from '@/api/dataprocess/sd_sysdb'
 import {
-  getAllClassifyTreeTable
+  getAllSdClassifyTreeTable
 } from '@/api/dataprocess/sd_classify'
 
 export default {
@@ -249,6 +249,9 @@ export default {
      * 初始化数据
      */
     InitDictItem() {
+      getAllSdClassifyTreeTable().then(res => {
+        this.selectclasses = res.ResData
+      })
     },
     /**
      * 加载页面table数据
@@ -262,14 +265,10 @@ export default {
         Order: this.sortableData.order,
         Sort: this.sortableData.sort
       }
+
       getSd_sysdbListWithPager(seachdata).then(res => {
         this.tableData = res.ResData.Items
         this.pagination.pageTotal = res.ResData.TotalItems
-        this.tableloading = false
-      })
-      getAllClassifyTreeTable().then(res => {
-        this.tableData = res.ResData
-        this.selectclasses = res.ResData
         this.tableloading = false
       })
     },

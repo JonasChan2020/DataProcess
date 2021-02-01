@@ -21,38 +21,50 @@
     <el-card>
       <div class="list-btn-container">
         <el-button-group>
-          <el-button v-hasPermi="['Sys_sys/Add']"
-                     type="primary"
-                     icon="el-icon-plus"
-                     size="small"
-                     @click="ShowEditOrViewDialog()">新增</el-button>
-          <el-button v-hasPermi="['Sys_sys/Edit']"
-                     type="primary"
-                     icon="el-icon-edit"
-                     class="el-button-modify"
-                     size="small"
-                     @click="ShowEditOrViewDialog('edit')">修改</el-button>
-          <el-button v-hasPermi="['Sys_sys/Enable']"
-                     type="info"
-                     icon="el-icon-video-pause"
-                     size="small"
-                     @click="setEnable('0')">禁用</el-button>
-          <el-button v-hasPermi="['Sys_sys/Enable']"
-                     type="success"
-                     icon="el-icon-video-play"
-                     size="small"
-                     @click="setEnable('1')">启用</el-button>
-          <el-button v-hasPermi="['Sys_sys/DeleteSoft']"
-                     type="warning"
-                     icon="el-icon-delete"
-                     size="small"
-                     @click="deleteSoft('0')">软删除</el-button>
+          <el-button
+            v-hasPermi="['Sys_sys/Add']"
+            type="primary"
+            icon="el-icon-plus"
+            size="small"
+            @click="ShowEditOrViewDialog()"
+          >新增</el-button>
+          <el-button
+            v-hasPermi="['Sys_sys/Edit']"
+            type="primary"
+            icon="el-icon-edit"
+            class="el-button-modify"
+            size="small"
+            @click="ShowEditOrViewDialog('edit')"
+          >修改</el-button>
+          <el-button
+            v-hasPermi="['Sys_sys/Enable']"
+            type="info"
+            icon="el-icon-video-pause"
+            size="small"
+            @click="setEnable('0')"
+          >禁用</el-button>
+          <el-button
+            v-hasPermi="['Sys_sys/Enable']"
+            type="success"
+            icon="el-icon-video-play"
+            size="small"
+            @click="setEnable('1')"
+          >启用</el-button>
+          <el-button
+            v-hasPermi="['Sys_sys/DeleteSoft']"
+            type="warning"
+            icon="el-icon-delete"
+            size="small"
+            @click="deleteSoft('0')"
+          >软删除</el-button>
           <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableData()">刷新</el-button>
-          <el-button v-hasPermi="['Sys_sys/ChoseMainDb']"
-                     type="primary"
-                     icon="el-icon-edit"
-                     size="small"
-                     @click="chosemaindb()">选择主数据库</el-button>
+          <el-button
+            v-hasPermi="['Sys_sys/SitMainDb']"
+            type="primary"
+            icon="el-icon-edit"
+            size="small"
+            @click="chosemaindb()"
+          >选择主数据库</el-button>
         </el-button-group>
       </div>
       <el-table
@@ -72,7 +84,9 @@
         <el-table-column prop="Syscode" label="系统编码" sortable="custom" width="120" />
         <el-table-column prop="Sysname" label="系统名称" sortable="custom" width="120" />
         <el-table-column prop="Classify_id" label="系统分类" sortable="custom" width="260" align="center">
-          <template slot-scope="scope">{{ scope.row.Classify_Name }}</template>
+          <template slot-scope="scope">
+            {{ scope.row.Classify_Name }}
+          </template>
         </el-table-column>
         <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
         <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="90" align="center" />
@@ -138,6 +152,72 @@
         <el-button type="primary" @click="saveEditForm()">确 定</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog ref="dialogSitMainDbForm" :title="选择主数据库" :visible.sync="dialogSitMainDbFormVisible" width="30%">
+      <el-cascader v-model="selectedsdclass" style="width:500px;" :options="selectsdclasses" filterable :props="{label:'Dtname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectSdClassChange" />
+      <el-table
+        ref="gridtable"
+        v-loading="tableloading"
+        :data="tableData"
+        border
+        stripe
+        highlight-current-row
+        style="width: 100%"
+        :default-sort="{prop: 'SortCode', order: 'ascending'}"
+        @select="handleSelectChange"
+        @select-all="handleSelectAllChange"
+        @sort-change="handleSortChange"
+      >
+        <el-table-column type="selection" width="30" />
+        <el-table-column prop="SdName" label="名称" sortable="custom" width="120" />
+        <el-table-column prop="Sdtype" label="类型" sortable="custom" width="120" />
+        <el-table-column prop="Classify_id" label="分类" sortable="custom" width="260" align="center">
+          <template slot-scope="scope">
+            {{ scope.row.Classify_Name }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="dbName" label="库名称" sortable="custom" width="120" />
+        <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
+        <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
+        <el-table-column label="是否主库" sortable="custom" width="120" prop="Is_maindb" align="center">
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.Is_maindb === true ? 'success' : 'info'" disable-transitions>{{ scope.row.Is_maindb === true ? "是" : "否" }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="90" align="center" />
+        <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" sortable="custom" width="120" align="center">
+          <template slot-scope="scope">
+            <el-button
+              type="primary"
+              icon="el-icon-plus"
+              size="small"
+              @click="UpdateDbContents(scope.row.Id)"
+            >更新结构信息</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="pagination-container">
+        <el-pagination
+          background
+          :current-page="pagination.currentPage"
+          :page-sizes="[5,10,20,50,100, 200, 300, 400]"
+          :page-size="pagination.pagesize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="pagination.pageTotal"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogSitMainDbFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveEditItemsDetailForm()">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -150,6 +230,12 @@ import {
 } from '@/api/dataprocess/sys_sys'
 import { getAllClassifyTreeTable
 } from '@/api/dataprocess/sys_classify'
+import {
+
+} from '@/api/dataprocess/sd_sysdb'
+import {
+  getAllSdClassifyTreeTable
+} from '@/api/dataprocess/sd_classify'
 
 export default {
   data() {
@@ -171,7 +257,10 @@ export default {
       },
       selectedclass: '',
       selectclasses: [],
+      selectedsdclass: '',
+      selectsdclasses: [],
       dialogEditFormVisible: false,
+      dialogSitMainDbFormVisible: false,
       editFormTitle: '',
       editFrom: {
         Classify_id: '',
@@ -201,6 +290,9 @@ export default {
      * 初始化数据
      */
     InitDictItem() {
+      getAllSdClassifyTreeTable().then(res => {
+        this.selectsdclasses = res.ResData
+      })
     },
     /**
      * 加载页面table数据
@@ -411,6 +503,9 @@ export default {
         }
       })
     },
+    chosemaindb: function() {
+      this.dialogSitMainDbFormVisible = true
+    },
     /**
      * 当表格的排序条件发生变化的时候会触发该事件
      */
@@ -428,6 +523,12 @@ export default {
 */
     handleSelectClassChange: function() {
       this.editFrom.Classify_id = this.selectedclass
+    },
+    /**
+*选择目标库分类
+*/
+    handleSelectSdClassChange: function() {
+
     },
     /**
      * 当用户手动勾选checkbox数据行事件

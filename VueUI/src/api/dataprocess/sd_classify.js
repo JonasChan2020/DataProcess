@@ -5,7 +5,7 @@ import defaultSettings from '@/settings'
    * 分页查询
    * @param {查询条件} data
    */
-export function getSd_classifyListWithPager (data) {
+export function getSd_classifyListWithPager(data) {
   return http.request({
     url: 'Sd_classify/FindWithPagerAsync',
     method: 'post',
@@ -15,7 +15,7 @@ export function getSd_classifyListWithPager (data) {
 }/**
    * 获取所有可用的
    */
-export function getAllSd_classifyList () {
+export function getAllSd_classifyList() {
   return http.request({
     url: 'Sd_classify/GetAllEnable',
     method: 'get',
@@ -26,7 +26,7 @@ export function getAllSd_classifyList () {
 /**
  * 获取树形分类
 */
-export function getAllClassifyTreeTable () {
+export function getAllSdClassifyTreeTable() {
   return http.request({
     url: 'Sd_classify/GetAllClassifyTreeTable',
     method: 'get',
@@ -37,7 +37,7 @@ export function getAllClassifyTreeTable () {
    * 新增或修改保存
    * @param data
    */
-export function saveSd_classify (data, url) {
+export function saveSd_classify(data, url) {
   return http.request({
     url: url,
     method: 'post',
@@ -49,7 +49,7 @@ export function saveSd_classify (data, url) {
    * 获取详情
    * @param {Id} Id
    */
-export function getSd_classifyDetail (id) {
+export function getSd_classifyDetail(id) {
   return http({
     url: 'Sd_classify/GetById?id=' + id,
     method: 'get',
@@ -60,7 +60,7 @@ export function getSd_classifyDetail (id) {
    * 批量设置启用状态
    * @param {id集合} ids
    */
-export function setSd_classifyEnable (data) {
+export function setSd_classifyEnable(data) {
   return http({
     url: 'Sd_classify/SetEnabledMarktBatchAsync',
     method: 'post',
@@ -72,7 +72,7 @@ export function setSd_classifyEnable (data) {
    * 批量软删除
    * @param {id集合} ids
    */
-export function deleteSoftSd_classify (data) {
+export function deleteSoftSd_classify(data) {
   return http({
     url: 'Sd_classify/DeleteSoftBatchAsync',
     method: 'post',
@@ -85,7 +85,7 @@ export function deleteSoftSd_classify (data) {
    * 批量删除
    * @param {id集合} ids
    */
-export function deleteSd_classify (data) {
+export function deleteSd_classify(data) {
   return http({
     url: 'Sd_classify/DeleteBatchAsync',
     method: 'delete',
