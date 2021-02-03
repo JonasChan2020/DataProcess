@@ -21,11 +21,13 @@ namespace Yuebon.DataProcess.Services
     {
 		private readonly ISys_sysRepository _repository;
         private readonly ISys_classifyService _classservice;
+        private readonly ISd_sysdbService _sysdbservice;
         private readonly ILogService _logService;
-        public Sys_sysService(ISys_sysRepository repository, ISys_classifyService classService, ILogService logService) : base(repository)
+        public Sys_sysService(ISys_sysRepository repository, ISys_classifyService classService, ISd_sysdbService sysdbservice, ILogService logService) : base(repository)
         {
 			_repository=repository;
             _classservice = classService;
+            _sysdbservice = sysdbservice;
             _logService =logService;
             //_repository.OnOperationLog += _logService.OnOperationLog;
         }
@@ -57,6 +59,10 @@ namespace Yuebon.DataProcess.Services
                 if (!string.IsNullOrEmpty(item.Classify_id))
                 {
                     item.Classify_Name = _classservice.Get(item.Classify_id).Stname;
+                }
+                if (!string.IsNullOrEmpty(item.MdbId))
+                {
+                    item.MdbName = _sysdbservice.Get(item.MdbId).SdName;
                 }
                 listResult.Add(item);
             }

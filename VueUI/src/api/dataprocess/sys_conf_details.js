@@ -40,7 +40,7 @@ export function GetColumnListsByDetailId(data) {
 export function GetColumnListsBytbName(data) {
   return http.request({
     url: 'Sys_conf_details/GetColumnListsBytbName',
-    data: data,
+    data: { tbName: data },
     method: 'post',
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
@@ -70,7 +70,7 @@ export function getAllEnableByConfId(data) {
    * 新增或修改保存
    * @param data
    */
-export function saveSys_conf_details (data, url) {
+export function saveSys_conf_details(data, url) {
   return http.request({
     url: url,
     method: 'post',
@@ -82,7 +82,7 @@ export function saveSys_conf_details (data, url) {
    * 获取详情
    * @param {Id} Id
    */
-export function getSys_conf_detailsDetail (id) {
+export function getSys_conf_detailsDetail(id) {
   return http({
     url: 'Sys_conf_details/GetById?id=' + id,
     method: 'get',
@@ -93,7 +93,7 @@ export function getSys_conf_detailsDetail (id) {
    * 批量设置启用状态
    * @param {id集合} ids
    */
-export function setSys_conf_detailsEnable (data) {
+export function setSys_conf_detailsEnable(data) {
   return http({
     url: 'Sys_conf_details/SetEnabledMarktBatchAsync',
     method: 'post',
@@ -105,7 +105,7 @@ export function setSys_conf_detailsEnable (data) {
    * 批量软删除
    * @param {id集合} ids
    */
-export function deleteSoftSys_conf_details (data) {
+export function deleteSoftSys_conf_details(data) {
   return http({
     url: 'Sys_conf_details/DeleteSoftBatchAsync',
     method: 'post',
@@ -118,7 +118,7 @@ export function deleteSoftSys_conf_details (data) {
    * 批量删除
    * @param {id集合} ids
    */
-export function deleteSys_conf_details (data) {
+export function deleteSys_conf_details(data) {
   return http({
     url: 'Sys_conf_details/DeleteBatchAsync',
     method: 'delete',

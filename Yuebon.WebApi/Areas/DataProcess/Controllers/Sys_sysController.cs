@@ -14,6 +14,8 @@ using Yuebon.Commons.Json;
 using Yuebon.AspNetCore.Mvc.Filter;
 using Newtonsoft.Json;
 using Yuebon.Commons.Cache;
+using Yuebon.Commons.Pages;
+using Yuebon.Commons.Dtos;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -78,6 +80,45 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             info.DeleteMark = true;
             info.DeleteTime = DateTime.Now;
             info.DeleteUserId = CurrentUser.UserId;
+        }
+
+        /// <summary>
+        /// 配置主数据库
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("UpdateMDb")]
+        [YuebonAuthorize("Edit")]
+        public async Task<IActionResult> UpdateMDb([FromBody] dynamic formData)
+        {
+            CommonResult result = new CommonResult();
+            try
+            {
+                string dataStr = formData.ToString();
+                var paramsObj = new { sysId = "", dbId = "" };
+                paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
+                Sys_sys model = iService.Get(paramsObj.sysId);
+                model.MdbId = paramsObj.dbId;
+                bool res = await iService.UpdateAsync(model, model.Id);
+                if (res)
+                {
+                    result.Success = true;
+                    result.ErrCode = ErrCode.successCode;
+                }
+                else
+                {
+                    result.Success = false;
+                    result.ErrCode = ErrCode.err43001;
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                Log4NetHelper.Error("配置主数据库失败", ex);
+                result.ErrMsg = ErrCode.err43001;
+                result.ErrCode = "43001";
+            }
+            return ToJsonContent(result);
         }
 
         /// <summary>

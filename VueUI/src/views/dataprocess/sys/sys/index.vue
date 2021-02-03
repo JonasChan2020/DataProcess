@@ -88,6 +88,11 @@
             {{ scope.row.Classify_Name }}
           </template>
         </el-table-column>
+        <el-table-column prop="MdbId" label="主库" sortable="custom" width="260" align="center">
+          <template slot-scope="scope">
+            {{ scope.row.MdbName }}
+          </template>
+        </el-table-column>
         <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
         <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="90" align="center" />
         <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
@@ -95,8 +100,6 @@
             <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="CreatorTime" label="创建时间" sortable />
-        <el-table-column prop="LastModifyTime" label="更新时间" sortable />
         <el-table-column label="选择" sortable="custom" width="120" align="center">
           <template slot-scope="scope">
             <el-button
@@ -153,69 +156,57 @@
       </div>
     </el-dialog>
 
-    <el-dialog ref="dialogSitMainDbForm" :title="选择主数据库" :visible.sync="dialogSitMainDbFormVisible" width="30%">
-      <el-cascader v-model="selectedsdclass" style="width:500px;" :options="selectsdclasses" filterable :props="{label:'Dtname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectSdClassChange" />
-      <el-table
-        ref="gridtable"
-        v-loading="tableloading"
-        :data="tableData"
-        border
-        stripe
-        highlight-current-row
-        style="width: 100%"
-        :default-sort="{prop: 'SortCode', order: 'ascending'}"
-        @select="handleSelectChange"
-        @select-all="handleSelectAllChange"
-        @sort-change="handleSortChange"
-      >
-        <el-table-column type="selection" width="30" />
-        <el-table-column prop="SdName" label="名称" sortable="custom" width="120" />
-        <el-table-column prop="Sdtype" label="类型" sortable="custom" width="120" />
-        <el-table-column prop="Classify_id" label="分类" sortable="custom" width="260" align="center">
-          <template slot-scope="scope">
-            {{ scope.row.Classify_Name }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="dbName" label="库名称" sortable="custom" width="120" />
-        <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
-        <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
-        <el-table-column label="是否主库" sortable="custom" width="120" prop="Is_maindb" align="center">
-          <template slot-scope="scope">
-            <el-tag :type="scope.row.Is_maindb === true ? 'success' : 'info'" disable-transitions>{{ scope.row.Is_maindb === true ? "是" : "否" }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="90" align="center" />
-        <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
-          <template slot-scope="scope">
-            <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" sortable="custom" width="120" align="center">
-          <template slot-scope="scope">
-            <el-button
-              type="primary"
-              icon="el-icon-plus"
-              size="small"
-              @click="UpdateDbContents(scope.row.Id)"
-            >更新结构信息</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <div class="pagination-container">
-        <el-pagination
-          background
-          :current-page="pagination.currentPage"
-          :page-sizes="[5,10,20,50,100, 200, 300, 400]"
-          :page-size="pagination.pagesize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="pagination.pageTotal"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
+    <el-dialog ref="dialogSitMainDbForm" title="选择主数据库" :visible.sync="dialogSitMainDbFormVisible" width="70%">
+      <el-card>
+        <el-cascader v-model="selectedsdclass" style="width:500px;" :options="selectsdclasses" filterable :props="{label:'Dtname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectSdClassChange" />
+      </el-card>
+      <el-card>
+        <el-table
+          ref="gridMDbtable"
+          v-loading="tableMDbloading"
+          :data="tableMDbData"
+          border
+          stripe
+          highlight-current-row
+          style="width: 100%"
+          :default-sort="{prop: 'SortMDbCode', order: 'ascending'}"
+          @select="handleMDbSelectChange"
+          @sort-change="handleMDbSortChange"
+        >
+          <el-table-column type="selection" width="30" />
+          <el-table-column prop="SdName" label="名称" sortable="custom" width="120" />
+          <el-table-column prop="Sdtype" label="类型" sortable="custom" width="120" />
+          <el-table-column prop="Classify_id" label="分类" sortable="custom" width="260" align="center">
+            <template slot-scope="scope">
+              {{ scope.row.Classify_Name }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="dbName" label="库名称" sortable="custom" width="120" />
+          <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
+          <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
+          <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
+            <template slot-scope="scope">
+              <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="pagination-container">
+          <el-pagination
+            background
+            :current-page="MDbpagination.currentPage"
+            :page-sizes="[5,10,20,50,100, 200, 300, 400]"
+            :page-size="MDbpagination.pagesize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="MDbpagination.pageTotal"
+            @size-change="handleMDbSizeChange"
+            @current-change="handleMDbCurrentChange"
+          />
+        </div>
+
+      </el-card>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogSitMainDbFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="saveEditItemsDetailForm()">确 定</el-button>
+        <el-button type="primary" @click="saveMDbForm()">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -226,11 +217,12 @@
 import {
   getSys_sysListWithPager, getSys_sysDetail, choseSys,
   saveSys_sys, setSys_sysEnable, deleteSoftSys_sys,
-  deleteSys_sys
+  deleteSys_sys, updateMDb
 } from '@/api/dataprocess/sys_sys'
 import { getAllClassifyTreeTable
 } from '@/api/dataprocess/sys_classify'
 import {
+  getSd_sysdbListWithSysPager
 
 } from '@/api/dataprocess/sd_sysdb'
 import {
@@ -255,12 +247,10 @@ export default {
         order: 'desc',
         sort: 'CreatorTime'
       },
+
       selectedclass: '',
       selectclasses: [],
-      selectedsdclass: '',
-      selectsdclasses: [],
       dialogEditFormVisible: false,
-      dialogSitMainDbFormVisible: false,
       editFormTitle: '',
       editFrom: {
         Classify_id: '',
@@ -276,11 +266,29 @@ export default {
       },
       formLabelWidth: '80px',
       currentId: '', // 当前操作对象的ID值，主要用于修改
-      currentSelected: []
+      currentSelected: [],
+
+      tableMDbloading: false,
+      tableMDbData: [],
+      SortMDbCode: {
+        order: 'desc',
+        sort: 'CreatorTime'
+      },
+      MDbpagination: {
+        currentPage: 1,
+        pagesize: 20,
+        pageTotal: 0
+      },
+      selectedsdclass: '',
+      selectsdclasses: [],
+      dialogSitMainDbFormVisible: false,
+      currentMDbId: '',
+      currentMDbSelected: []
     }
   },
   created() {
     this.pagination.currentPage = 1
+    this.MDbpagination.currentPage = 1
     this.InitDictItem()
     this.loadTableData()
     this.loadBtnFunc = JSON.parse(localStorage.getItem('yueboncurrentfuns'))
@@ -290,9 +298,7 @@ export default {
      * 初始化数据
      */
     InitDictItem() {
-      getAllSdClassifyTreeTable().then(res => {
-        this.selectsdclasses = res.ResData
-      })
+
     },
     /**
      * 加载页面table数据
@@ -504,7 +510,15 @@ export default {
       })
     },
     chosemaindb: function() {
-      this.dialogSitMainDbFormVisible = true
+      if (this.currentSelected.length > 0) {
+        getAllSdClassifyTreeTable(this.currentSelected[0].Id).then(res => {
+          this.selectsdclasses = res.ResData
+        })
+        this.loadMDbTableData()
+        this.dialogSitMainDbFormVisible = true
+      } else {
+        alert('请先选择一个系统')
+      }
     },
     /**
      * 当表格的排序条件发生变化的时候会触发该事件
@@ -523,12 +537,6 @@ export default {
 */
     handleSelectClassChange: function() {
       this.editFrom.Classify_id = this.selectedclass
-    },
-    /**
-*选择目标库分类
-*/
-    handleSelectSdClassChange: function() {
-
     },
     /**
      * 当用户手动勾选checkbox数据行事件
@@ -556,6 +564,89 @@ export default {
     handleCurrentChange(val) {
       this.pagination.currentPage = val
       this.loadTableData()
+    },
+
+    /**
+    * 加载页面table数据
+    */
+    loadMDbTableData: function() {
+      this.tableMDbloading = true
+      var seachdata = {
+        CurrenetPageIndex: this.MDbpagination.currentPage,
+        PageSize: this.MDbpagination.pagesize,
+        Filter: {
+          Classify_id: this.selectedsdclass,
+          Sys_id: this.currentSelected[0].Id
+        },
+        Order: this.SortMDbCode.order,
+        Sort: this.SortMDbCode.sort
+      }
+
+      getSd_sysdbListWithSysPager(seachdata).then(res => {
+        this.tableMDbData = res.ResData.Items
+        this.MDbpagination.pageTotal = res.ResData.TotalItems
+        this.tableMDbloading = false
+      })
+    },
+
+    /**
+      *选择目标库分类
+*/
+    handleSelectSdClassChange: function() {
+      this.loadMDbTableData()
+    },
+    /**
+     * 当表格的排序条件发生变化的时候会触发该事件
+     */
+    handleMDbSortChange: function(column) {
+      this.SortMDbCode.sort = column.prop
+      if (column.order === 'ascending') {
+        this.SortMDbCode.order = 'asc'
+      } else {
+        this.SortMDbCode.order = 'desc'
+      }
+      this.loadMDbTableData()
+    },
+    /**
+ * 当用户手动勾选checkbox数据行事件
+ */
+    handleMDbSelectChange: function(selection, row) {
+      this.currentMDbSelected = selection
+    },
+    /**
+     * 选择每页显示数量
+     */
+    handleMDbSizeChange(val) {
+      this.MDbpagination.pagesize = val
+      this.MDbpagination.currentPage = 1
+      this.loadMDbTableData()
+    },
+    /**
+     * 选择当页面
+     */
+    handleMDbCurrentChange(val) {
+      this.MDbpagination.currentPage = val
+      this.MDbloadTableData()
+    },
+    saveMDbForm() {
+      updateMDb(this.currentSelected[0].Id, this.currentMDbSelected[0].Id).then(res => {
+        if (res.Success) {
+          this.$message({
+            message: '恭喜你，操作成功',
+            type: 'success'
+          })
+          this.dialogSitMainDbFormVisible = false
+          this.currentMDbSelected = ''
+          this.selectedsdclass = ''
+          this.loadTableData()
+          this.InitDictItem()
+        } else {
+          this.$message({
+            message: res.ErrMsg,
+            type: 'error'
+          })
+        }
+      })
     }
   }
 }

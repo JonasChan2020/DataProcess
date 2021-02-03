@@ -26,10 +26,11 @@ export function getAllSd_classifyList() {
 /**
  * 获取树形分类
 */
-export function getAllSdClassifyTreeTable() {
+export function getAllSdClassifyTreeTable(data) {
   return http.request({
     url: 'Sd_classify/GetAllClassifyTreeTable',
-    method: 'get',
+    method: 'post',
+    data: { sysId: data },
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
 }
@@ -61,6 +62,7 @@ export function getSd_classifyDetail(id) {
    * @param {id集合} ids
    */
 export function setSd_classifyEnable(data) {
+  setSys_classifyEnable
   return http({
     url: 'Sd_classify/SetEnabledMarktBatchAsync',
     method: 'post',

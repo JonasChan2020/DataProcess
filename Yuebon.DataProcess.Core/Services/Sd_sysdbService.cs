@@ -81,6 +81,10 @@ namespace Yuebon.DataProcess.Services
             {
                 where += string.Format(" and sys_id = '{0}'", search.Filter.Sys_id);
             }
+            if (!string.IsNullOrEmpty(search.Filter.Classify_id))
+            {
+                where += string.Format(" and classify_id = '{0}'", search.Filter.Classify_id);
+            }
             List<Sd_sysdb> list = await repository.FindWithPagerAsync(where, pagerInfo, search.Sort, order);
             List<Sd_sysdbOutputDto> resultList = list.MapTo<Sd_sysdbOutputDto>();
             List<Sd_sysdbOutputDto> listResult = new List<Sd_sysdbOutputDto>();

@@ -13,6 +13,7 @@ using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 using Yuebon.DataProcess.IServices;
 using Yuebon.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -224,25 +225,39 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// 获取功能菜单适用于Vue 树形列表
         /// </summary>
         /// <returns></returns>
-        [HttpGet("GetAllClassifyTreeTable")]
+        [HttpPost("GetAllClassifyTreeTable")]
         [YuebonAuthorize("List")]
-        public async Task<IActionResult> GetAllClassifyTreeTable()
+        public async Task<IActionResult> GetAllClassifyTreeTable([FromBody] dynamic formData)
         {
             CommonResult result = new CommonResult();
             try
             {
-                if (string.IsNullOrEmpty(CurrentUser.SysId))
+                string dataStr = formData.ToString();
+                var paramsObj = new { sysId = "" };
+                paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
+                if (!string.IsNullOrEmpty(paramsObj.sysId))
                 {
-                    result.ErrMsg = ErrCode.err80001;
-                    result.ErrCode = "80001";
-                }
-                else
-                {
-                    List<Sd_classifyOutputDto> list = await iService.GetAllClassifyTreeTable(CurrentUser.SysId);
+                    List<Sd_classifyOutputDto> list = await iService.GetAllClassifyTreeTable(paramsObj.sysId);
                     result.Success = true;
                     result.ErrCode = ErrCode.successCode;
                     result.ResData = list;
                 }
+                else
+                {
+                    if (string.IsNullOrEmpty(CurrentUser.SysId))
+                    {
+                        result.ErrMsg = ErrCode.err80001;
+                        result.ErrCode = "80001";
+                    }
+                    else
+                    {
+                        List<Sd_classifyOutputDto> list = await iService.GetAllClassifyTreeTable(CurrentUser.SysId);
+                        result.Success = true;
+                        result.ErrCode = ErrCode.successCode;
+                        result.ResData = list;
+                    }
+                }
+               
                 
             }
             catch (Exception ex)

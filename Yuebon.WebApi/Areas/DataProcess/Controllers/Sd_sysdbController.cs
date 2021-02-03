@@ -240,6 +240,43 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         }
 
         /// <summary>
+        /// 根据条件查询数据库,并返回对象集合(用于分页数据显示)
+        /// </summary>
+        /// <param name="search"></param>
+        /// <param name="sysid"></param>
+        /// <returns></returns>
+        [HttpPost("FindWithPagerWithSysAsync")]
+        [YuebonAuthorize("List")]
+        public async Task<CommonResult<PageResult<Sd_sysdbOutputDto>>> FindWithPagerWithSysAsync(SearchInputDto<Sd_sysdb> search)
+        {
+            CommonResult<PageResult<Sd_sysdbOutputDto>> result = new CommonResult<PageResult<Sd_sysdbOutputDto>>();
+            if (search.Filter == null)
+            {
+                search.Filter = new Sd_sysdb();
+            }
+            if ( !string.IsNullOrEmpty(search.Filter.Sys_id))
+            {
+                result.ResData = await iService.FindWithPagerAsync(search);
+                result.ErrCode = ErrCode.successCode;
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(CurrentUser.SysId))
+                {
+                    search.Filter.Sys_id = CurrentUser.SysId;
+                    result.ResData = await iService.FindWithPagerAsync(search);
+                    result.ErrCode = ErrCode.successCode;
+                }
+                else
+                {
+                    result.ErrCode = ErrCode.successCode;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// 更新数据库结构
         /// </summary>
         /// <returns></returns>
@@ -250,7 +287,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             CommonResult result = new CommonResult();
             try
             {
-                var aa = formData;
                 string dataStr = formData.ToString();
                 var paramsObj = new { dbid = "" };
                 paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
@@ -277,6 +313,8 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             }
             return ToJsonContent(result);
         }
+
+      
 
         #region 辅助方法
 

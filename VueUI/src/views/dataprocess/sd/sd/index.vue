@@ -91,11 +91,6 @@
         <el-table-column prop="dbName" label="库名称" sortable="custom" width="120" />
         <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
         <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
-        <el-table-column label="是否主库" sortable="custom" width="120" prop="Is_maindb" align="center">
-          <template slot-scope="scope">
-            <el-tag :type="scope.row.Is_maindb === true ? 'success' : 'info'" disable-transitions>{{ scope.row.Is_maindb === true ? "是" : "否" }}</el-tag>
-          </template>
-        </el-table-column>
         <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="90" align="center" />
         <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
           <template slot-scope="scope">
@@ -165,10 +160,6 @@
         </el-form-item>
 
         <el-form-item label="选项" :label-width="formLabelWidth" prop="">
-          <el-checkbox v-model="editFrom.Is_maindb">是否为主数据库</el-checkbox>
-        </el-form-item>
-
-        <el-form-item label="选项" :label-width="formLabelWidth" prop="">
           <el-checkbox v-model="editFrom.EnabledMark">启用</el-checkbox>
         </el-form-item>
 
@@ -226,7 +217,6 @@ export default {
         dbName: '',
         UserId: '',
         Password: '',
-        Is_maindb: '',
         SortCode: ''
 
       },
@@ -249,7 +239,7 @@ export default {
      * 初始化数据
      */
     InitDictItem() {
-      getAllSdClassifyTreeTable().then(res => {
+      getAllSdClassifyTreeTable('').then(res => {
         this.selectclasses = res.ResData
       })
     },
@@ -313,7 +303,6 @@ export default {
         this.editFrom.dbName = res.ResData.dbName
         this.editFrom.UserId = res.ResData.UserId
         this.editFrom.Password = res.ResData.Password
-        this.editFrom.Is_maindb = res.ResData.Is_maindb
         this.editFrom.SortCode = res.ResData.SortCode
         this.selectedclass = res.ResData.Classify_id
       })
@@ -336,13 +325,12 @@ export default {
             'dbName': this.editFrom.dbName,
             'UserId': this.editFrom.UserId,
             'Password': this.editFrom.Password,
-            'Is_maindb': this.editFrom.Is_maindb,
             'SortCode': this.editFrom.SortCode,
             'Id': this.currentId
           }
-          var url = 'Sd_sysdb/Insert'
+          var url = 'Sd_sysdb/InsertAsync'
           if (this.currentId !== '') {
-            url = 'Sd_sysdb/Update?id=' + this.currentId
+            url = 'Sd_sysdb/UpdateAsync?id=' + this.currentId
           }
           saveSd_sysdb(data, url).then(res => {
             if (res.Success) {

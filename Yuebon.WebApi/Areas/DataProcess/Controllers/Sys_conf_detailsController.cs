@@ -16,6 +16,7 @@ using Yuebon.AspNetCore.Mvc;
 using Yuebon.DataProcess.Core.common.dbTools;
 using Yuebon.DataProcess.Core.common.Enity;
 using Yuebon.DataProcess.Core.common;
+using Newtonsoft.Json;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -187,13 +188,17 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// <returns></returns>
         [HttpPost("GetColumnListsBytbName")]
         [YuebonAuthorize("List")]
-        public IActionResult GetColumnListsBytbName(string tbName)
+        public IActionResult GetColumnListsBytbName([FromBody] dynamic formData)
         {
             CommonResult<List<DbTableInfo>> result = new CommonResult<List<DbTableInfo>>();
             if (!string.IsNullOrEmpty(CurrentUser.MDbName) && !string.IsNullOrEmpty(CurrentUser.MDbType) && !string.IsNullOrEmpty(CurrentUser.MDbConnectionstr))
             {
+                string dataStr = formData.ToString();
+                var paramsObj = new { tbName = "" };
+                paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
+
                 DataTools bll = new DataTools(CurrentUser.MDbConnectionstr, CurrentUser.MDbType);
-                List<DbFieldInfo> colList = bll.GetAllColumns(CurrentUser.MDbName, tbName);
+                List<DbFieldInfo> colList = bll.GetAllColumns(CurrentUser.MDbName, paramsObj.tbName);
                 if (colList != null && colList.Count > 0)
                 {
                     result.ResData = colList;

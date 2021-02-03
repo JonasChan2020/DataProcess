@@ -182,8 +182,8 @@
 
     <el-dialog
       ref="dialogEditForm"
-               :close-on-click-modal="false"
-               :show-close="true"
+      :close-on-click-modal="false"
+      :show-close="true"
       :title="editFormTitle+'数据模型'"
       :visible.sync="dialogEditFormVisible"
       width="640px"
@@ -306,7 +306,7 @@ export default {
         this.tableData = res.ResData.Items
         this.pagination.pageTotal = res.ResData.TotalItems
       })
-      getAllClassifyTreeTable().then(res => {
+      getAllClassifyTreeTable('').then(res => {
         this.selectclasses = res.ResData
       })
     },
@@ -559,7 +559,7 @@ export default {
       } else {
         this.currentDetailId = ''
         this.selectedDetailclass = ''
-        this.$router.push({ name: 'EditConfDetail', params: { id: this.currentDetailId, showtype: view, Sys_conf_id: this.currentSelectId}})
+        this.$router.push({ name: 'EditConfDetail', params: { id: this.currentDetailId, showtype: view, Sys_conf_id: this.currentSelectId }})
       }
     },
 

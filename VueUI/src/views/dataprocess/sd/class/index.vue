@@ -78,7 +78,7 @@
         highlight-current-row
         style="width: 100%"
         default-expand-all
-:tree-props="{ children: 'Children' }"
+        :tree-props="{ children: 'Children' }"
         @select="handleSelectChange"
         @select-all="handleSelectAllChange"
         @sort-change="handleSortChange"
@@ -138,7 +138,7 @@
 import {
   getSd_classifyDetail,
   saveSd_classify, setSd_classifyEnable, deleteSoftSd_classify,
-  deleteSd_classify, getAllClassifyTreeTable
+  deleteSd_classify, getAllSdClassifyTreeTable
 } from '@/api/dataprocess/sd_classify'
 export default {
   data() {
@@ -195,7 +195,7 @@ export default {
      */
     loadTableData: function() {
       this.tableloading = true
-      getAllClassifyTreeTable().then(res => {
+      getAllSdClassifyTreeTable('').then(res => {
         this.tableData = res.ResData
         this.selectclasses = res.ResData
         this.tableloading = false

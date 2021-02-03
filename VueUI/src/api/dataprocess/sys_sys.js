@@ -6,7 +6,7 @@ import { getAllSd_sysdbList } from './sd_sysdb'
    * 分页查询
    * @param {查询条件} data
    */
-export function getSys_sysListWithPager (data) {
+export function getSys_sysListWithPager(data) {
   return http.request({
     url: 'Sys_sys/FindWithPagerAsync',
     method: 'post',
@@ -16,14 +16,14 @@ export function getSys_sysListWithPager (data) {
 }/**
    * 获取所有可用的
    */
-export function getAllSys_sysList () {
+export function getAllSys_sysList() {
   return http.request({
     url: 'Sys_sys/GetAllEnable',
     method: 'get',
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
 }
-export function choseSys (sysId) {
+export function choseSys(sysId) {
   return http.request({
     url: 'Sys_sys/ChoseSys',
     data: { sysId: sysId },
@@ -32,10 +32,23 @@ export function choseSys (sysId) {
   })
 }
 /**
+   * 配置主数据库
+   * @param sysId
+   * @param dbId
+   */
+export function updateMDb(sysId, dbId) {
+  return http.request({
+    url: 'Sys_sys/UpdateMDb',
+    data: { sysId: sysId, dbId: dbId },
+    method: 'post',
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
+/**
    * 新增或修改保存
    * @param data
    */
-export function saveSys_sys (data, url) {
+export function saveSys_sys(data, url) {
   alert(data)
   return http.request({
     url: url,
@@ -48,7 +61,7 @@ export function saveSys_sys (data, url) {
    * 获取详情
    * @param {Id} Id
    */
-export function getSys_sysDetail (id) {
+export function getSys_sysDetail(id) {
   return http({
     url: 'Sys_sys/GetById?id=' + id,
     method: 'get',
@@ -59,7 +72,7 @@ export function getSys_sysDetail (id) {
    * 批量设置启用状态
    * @param {id集合} ids
    */
-export function setSys_sysEnable (data) {
+export function setSys_sysEnable(data) {
   return http({
     url: 'Sys_sys/SetEnabledMarktBatchAsync',
     method: 'post',
@@ -71,7 +84,7 @@ export function setSys_sysEnable (data) {
    * 批量软删除
    * @param {id集合} ids
    */
-export function deleteSoftSys_sys (data) {
+export function deleteSoftSys_sys(data) {
   return http({
     url: 'Sys_sys/DeleteSoftBatchAsync',
     method: 'post',
@@ -84,7 +97,7 @@ export function deleteSoftSys_sys (data) {
    * 批量删除
    * @param {id集合} ids
    */
-export function deleteSys_sys (data) {
+export function deleteSys_sys(data) {
   return http({
     url: 'Sys_sys/DeleteBatchAsync',
     method: 'delete',

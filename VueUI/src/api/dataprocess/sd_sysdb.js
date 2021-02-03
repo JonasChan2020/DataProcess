@@ -12,7 +12,21 @@ export function getSd_sysdbListWithPager(data) {
     data: data,
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
-}/**
+}
+
+/**
+   * 分页查询
+   * @param {查询条件} data
+   */
+export function getSd_sysdbListWithSysPager(data) {
+  return http.request({
+    url: 'Sd_sysdb/FindWithPagerWithSysAsync',
+    method: 'post',
+    data: data,
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
+/**
    * 获取所有可用的
    */
 export function getAllSd_sysdbList() {

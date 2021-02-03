@@ -92,6 +92,12 @@ namespace Yuebon.DataProcess.Dtos
         /// </summary>
         [MaxLength(0)]
         public string MdbId { get; set; }
+
+        /// <summary>
+        /// 设置或获取主数据库名称
+        /// </summary>
+        [MaxLength(0)]
+        public string MdbName { get; set; }
 
     }
 }
