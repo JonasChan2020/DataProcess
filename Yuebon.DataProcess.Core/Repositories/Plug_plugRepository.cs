@@ -34,7 +34,7 @@ namespace Yuebon.DataProcess.Repositories
         {
             string sql = $"select pg.*  from dp_plug_plug pg "
                 + " left join dp_plug_sysrelation pgrela on pg.id=pgrela.plug_id"
-                + " where pgrela.sys_id='" + sysId + "'";
+                + " where pgrela.sys_id='" + sysId + "' or is_public='1' ";
             return await DapperConn.QueryAsync<Plug_plug>(sql, trans);
         }
     }

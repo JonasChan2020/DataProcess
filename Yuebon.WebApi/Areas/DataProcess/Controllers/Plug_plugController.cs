@@ -12,6 +12,9 @@ using Yuebon.Commons.Pages;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 using Yuebon.DataProcess.IServices;
+using Yuebon.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -74,6 +77,32 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             info.DeleteMark = true;
             info.DeleteTime = DateTime.Now;
             info.DeleteUserId = CurrentUser.UserId;
+        }
+
+        /// <summary>
+        /// 异步更新数据
+        /// </summary>
+        /// <param name="tinfo"></param>
+        /// <param name="id">主键Id</param>
+        /// <returns></returns>
+        [HttpPost("UpdateLoadplug")]
+        [YuebonAuthorize("Edit")]
+        public async Task<IActionResult> UpdateLoadplug([FromForm] IFormFile file)
+        {
+            CommonResult result = new CommonResult();
+            try
+            {
+                string a = file.FileName;
+                string b = file.Name;
+                result.ErrCode = ErrCode.successCode;
+                result.ErrMsg = ErrCode.err0;
+            }
+            catch (Exception)
+            {
+                result.ErrMsg = ErrCode.err43002;
+                result.ErrCode = "43002";
+            }
+            return ToJsonContent(result);
         }
     }
 }

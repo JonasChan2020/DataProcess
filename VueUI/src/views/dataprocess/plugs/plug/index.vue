@@ -67,19 +67,17 @@
           <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableData()">刷新</el-button>
         </el-button-group>
       </div>
-      <el-table
-        ref="gridtable"
-        v-loading="tableloading"
-        :data="tableData"
-        border
-        stripe
-        highlight-current-row
-        style="width: 100%"
-        :default-sort="{prop: 'SortCode', order: 'ascending'}"
-        @select="handleSelectChange"
-        @select-all="handleSelectAllChange"
-        @sort-change="handleSortChange"
-      >
+      <el-table ref="gridtable"
+                v-loading="tableloading"
+                :data="tableData"
+                border
+                stripe
+                highlight-current-row
+                style="width: 100%"
+                :default-sort="{prop: 'SortCode', order: 'ascending'}"
+                @select="handleSelectChange"
+                @select-all="handleSelectAllChange"
+                @sort-change="handleSortChange">
         <el-table-column type="selection" width="30" />
         <el-table-column prop="Pcode" label="插件编码" sortable="custom" width="120" />
         <el-table-column prop="Pname" label="插件名称" sortable="custom" width="120" />
@@ -119,7 +117,9 @@
     </el-card>
     <el-dialog
       ref="dialogEditForm"
-      :title="editFormTitle+'{TableNameDesc}'"
+      :close-on-click-modal="false"
+      :show-close="true"
+      :title="editFormTitle+'插件'"
       :visible.sync="dialogEditFormVisible"
       width="640px"
     >
@@ -133,14 +133,30 @@
         <el-form-item label="标签" :label-width="formLabelWidth" prop="Ptag">
           <el-input v-model="editFrom.Ptag" placeholder="请输入标签" autocomplete="off" clearable />
         </el-form-item>
-        <el-form-item label="插件路径" :label-width="formLabelWidth" prop="Ppath">
-          <el-input v-model="editFrom.Ppath" placeholder="请输入插件路径" autocomplete="off" clearable />
+        <el-form-item label="关联系统" :label-width="formLabelWidth" prop="Description">
+          <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
           <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="插件类型" :label-width="formLabelWidth" prop="Ptype">
           <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'Ptname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
+        </el-form-item>
+        <el-form-item label="上传插件" :label-width="formLabelWidth" prop="">
+          <el-upload class="upload-demo"
+                     ref="upload"
+                     action=""
+                     :accept="acceptFileType"
+                     :limit="1"
+                     @on-exceed="handleExceed"
+                     :before-upload="beforeUpload"
+                     @on-preview="handlePreview"
+                    @on-remove="handleRemove"
+                     :file-list="fileList"
+                     :auto-upload="false">
+            <el-button slot="trigger" size="small" type="primary">选取ZIP格式文件</el-button>
+            <div slot="tip" class="el-upload_tip">只能上传.zip文件</div>
+          </el-upload>
         </el-form-item>
         <el-form-item label="排序" :label-width="formLabelWidth" prop="SortCode">
           <el-input v-model.number="editFrom.SortCode" placeholder="请输入排序,默认为99" autocomplete="off" clearable />
@@ -162,7 +178,7 @@
 
 import { getPlug_plugListWithPager, getPlug_plugDetail,
   savePlug_plug, setPlug_plugEnable, deleteSoftPlug_plug,
-  deletePlug_plug
+    deletePlug_plug, updateLoadplug
 } from '@/api/dataprocess/plug_plug'
 import {
   getAllClassifyTreeTable
@@ -197,7 +213,6 @@ export default {
         Pcode: '',
         Pdesc: '',
         Pname: '',
-        Ppath: '',
         Ptag: '',
         Ptype: '',
         SortCode: ''
@@ -208,7 +223,12 @@ export default {
       },
       formLabelWidth: '80px',
       currentId: '', // 当前操作对象的ID值，主要用于修改
-      currentSelected: []
+      currentSelected: [],
+
+      fileList: [],
+      uploadLoading: false,
+      acceptFileType: '.zip',
+      downLoadLoading: ''
     }
   },
   created() {
@@ -282,7 +302,6 @@ export default {
         this.editFrom.Pcode = res.ResData.Pcode
         this.editFrom.Pdesc = res.ResData.Pdesc
         this.editFrom.Pname = res.ResData.Pname
-        this.editFrom.Ppath = res.ResData.Ppath
         this.editFrom.Ptag = res.ResData.Ptag
         this.editFrom.Ptype = res.ResData.Ptype
         this.editFrom.SortCode = res.ResData.SortCode
@@ -302,12 +321,12 @@ export default {
             'Pcode': this.editFrom.Pcode,
             'Pdesc': this.editFrom.Pdesc,
             'Pname': this.editFrom.Pname,
-            'Ppath': this.editFrom.Ppath,
             'Ptag': this.editFrom.Ptag,
             'Ptype': this.editFrom.Ptype,
             'SortCode': this.editFrom.SortCode,
             'Id': this.currentId
           }
+          submitUpload();
           var url = 'Plug_plug/Insert'
           if (this.currentId !== '') {
             url = 'Plug_plug/Update?id=' + this.currentId
@@ -469,6 +488,86 @@ export default {
     handleCurrentChange(val) {
       this.pagination.currentPage = val
       this.loadTableData()
+    },
+
+    
+    handleExceed(files, fileList) {
+      this.$message.warning('只能选择1个文件!');
+    },
+    submitUpload() {
+      this.uploadLoading = true;
+      var that = this;
+      setTimeout(function () {
+        if (that.$refs.upload.$children[0].fileList.length == 1) {
+          that.$refs.upload.submit();
+        } else {
+          that.uploadLoading = false;
+          that.$message({
+            type: 'error',
+            showClose: true,
+            duration: 3000,
+            message: '请选择文件!'
+          });
+        };
+      }, 100);
+    },
+    handleRemove(file, fileList) {
+      //console.log(file,fileList);
+    },
+    handlePreview(file) {
+      //console.log(file);
+    },
+    beforeUpload(file) {
+      var that = this;
+      //文件类型
+      var fileName = file.name.substring(file.name.lastIndexOf('.') + 1);
+      if (fileName != 'zip') {
+        that.$message({
+          type: 'error',
+          showClose: true,
+          duration: 3000,
+          message: '文件类型不是.zip文件!'
+        });
+        return false;
+      }
+      //读取文件大小
+      //var fileSize = file.size;
+      //console.log(fileSize);
+      //if (fileSize > 1048576) {
+      //  that.uploadTemplateDialog = false;
+      //  that.$message({
+      //    type: 'error',
+      //    showClose: true,
+      //    duration: 3000,
+      //    message: '文件大于1M!'
+      //  });
+      //  return false;
+      //}
+      that.downloadLoading = that.$loading({
+        lock: true,
+        text: '数据导入中...',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0,0,0,0.7)'
+      });
+      let fd = new FormData();
+      fd.append('file', file);
+      updateLoadplug(fd).then(res => {
+        that.downloadLoading.close();
+        that.uploadLoading = false;
+        let resp = res.data
+        if (resp.resultCode == 200) {
+          that.$message.success(resp.resultMsg);
+          //that.queryData();//更新数据
+        } else {
+          that.$message({
+            type: 'error',
+            showClose: true,
+            duration: 60000,
+            message: resp.resultMsg
+          });
+        }
+      })
+      return false;
     }
   }
 }

@@ -23,6 +23,19 @@ export function getAllPlug_plugList () {
   })
 }
 /**
+   * 上传插件
+   * @param data
+   */
+export function updateLoadplug(data) {
+  return http.request({
+    url: 'Plug_plug/UpdateLoadplug',
+    method: 'post',
+    data: data,
+    timeout:20000,
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
+/**
    * 新增或修改保存
    * @param data
    */
