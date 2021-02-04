@@ -154,6 +154,41 @@ namespace Yuebon.Commons.Helpers
             }
         }
 
+        /// <summary>
+        /// 判断文件是否存在
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static bool FileExist(string path)
+        {
+            return File.Exists(path);
+        }
+
+        /// <summary>
+        /// 删除目录
+        /// </summary>
+        /// <param name="dir">要删除的目录</param>
+        public static void DeleteFolder(string dir)
+        {
+            if (Directory.Exists(dir))
+            {
+                string[] fileSystemEntries = Directory.GetFileSystemEntries(dir);
+                for (int i = 0; i < fileSystemEntries.Length; i++)
+                {
+                    string text = fileSystemEntries[i];
+                    if (File.Exists(text))
+                    {
+                        File.Delete(text);
+                    }
+                    else
+                    {
+                        DeleteFolder(text);
+                    }
+                }
+                Directory.Delete(dir);
+            }
+        }
+
 
 
         /// <summary>

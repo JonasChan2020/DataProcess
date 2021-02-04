@@ -134,5 +134,10 @@ namespace Yuebon.AspNetCore.Models
         /// </summary>
         public static string err80012 = "未找到指定表的字段信息";
 
+        /// <summary>
+        /// 未找到指定表的字段信息
+        /// </summary>
+        public static string err80021 = "上传文件错误";
+
     }
 }
