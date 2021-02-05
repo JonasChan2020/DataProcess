@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-row>
-      <el-select v-model="Tbname" placeholder="请选择" @change="handleSelectTbChange(Tbname)">
+      需配置的数据表：<el-select v-model="Tbname" placeholder="请选择" @change="handleSelectTbChange(Tbname)">
         <el-option
           v-for="item in SelectTbnameList"
           :key="item.TableName"
@@ -22,18 +22,19 @@
     >
 
       <el-table-column prop="FieldName" label="名称" sortable="custom" width="120" />
-      <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
-      <el-table-column prop="DataGetType" label="获取方式" sortable="custom" width="120">
+      <el-table-column prop="Description" label="描述" sortable="custom" width="200" />
+      <el-table-column prop="DataGetType" label="获取方式" sortable="custom" width="200">
         <template slot-scope="scope">
           <el-select
             v-model="scope.row.DataGetType"
+            @change:"handleDataGetTypeChange"
             placeholder="请选择类型"
           >
             <el-option
               v-for="item in SelectDataGetTypeList"
               :key="item.Id"
               :label="item.Pname"
-              :value="item.Id"
+              :value="{value:item.Id,btnvisib:item.HasPage,index:scope.$index}"
             />
           </el-select>
         </template>
@@ -49,6 +50,7 @@
             type="primary"
             icon="el-icon-plus"
             size="small"
+            disabled="true"
             @click="OpenConfigPage()"
           >配置</el-button>
         </template>
@@ -209,6 +211,13 @@ export default {
         }
       })
       $table.toggleRowExpansion(row)
+    },
+
+    handleDataGetTypeChange: function (params) {
+      const { value, btnvisib, index } = params;
+      if (btnvisib) {
+        this.tableData[index].buttonVisible = !buttonVisible
+      }
     }
   }
 }

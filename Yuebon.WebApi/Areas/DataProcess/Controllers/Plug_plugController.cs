@@ -1,20 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Yuebon.AspNetCore.Controllers;
 using Yuebon.AspNetCore.Models;
 using Yuebon.Commons.Helpers;
-using Yuebon.Commons.Log;
 using Yuebon.Commons.Mapping;
 using Yuebon.Commons.Models;
-using Yuebon.Commons.Pages;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 using Yuebon.DataProcess.IServices;
 using Yuebon.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using System.Reflection;
@@ -97,7 +93,8 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             CommonResult result = new CommonResult();
             try
             {
-                if (isFileExist(tinfo.Ppath, tinfo.Pcode))
+                bool has = tinfo.HasPage != null ? Convert.ToBoolean(tinfo.HasPage) : true; //如果为空则默认为具有编辑页面
+                if (isFileExist(tinfo.Ppath, tinfo.Pcode, has))
                 {
                     Plug_plug info = tinfo.MapTo<Plug_plug>();
                     OnBeforeInsert(info);
@@ -140,8 +137,13 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         {
             CommonResult result = new CommonResult();
 
+            string oldFilePath = "";
             Plug_plug newInfo = tinfo.MapTo<Plug_plug>();
             Plug_plug info = iService.Get(id);
+            if (!string.IsNullOrEmpty(info.Ppath))
+            {
+                oldFilePath = info.Ppath;
+            }
             info = SwapValue(info, newInfo);
 
             OnBeforeUpdate(info);
@@ -149,6 +151,14 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             bool bl = await iService.UpdateAsync(info, id).ConfigureAwait(false);
             if (bl)
             {
+
+                #region 删除旧的插件上传文件
+                if (!string.IsNullOrEmpty(oldFilePath))
+                {
+                    FileHelper.DeleteFolder(oldFilePath);
+                }
+                #endregion
+
                 result.ErrCode = ErrCode.successCode;
                 result.ErrMsg = ErrCode.err0;
             }
@@ -220,16 +230,31 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// <param name="filePath"></param>
         /// <param name="plugCode"></param>
         /// <returns></returns>
-        private bool isFileExist(string filePath,string plugCode)
+        private bool isFileExist(string filePath,string plugCode,bool haspage)
         {
-            if (FileHelper.FileExist(filePath + "\\" + plugCode.ToLower() + ".dll") && FileHelper.FileExist(filePath + "\\" + plugCode.ToLower() + ".vue"))
+            if (haspage)
             {
-                return true;
+                if (FileHelper.FileExist(filePath + "\\" + plugCode.ToLower() + ".dll") && FileHelper.FileExist(filePath + "\\" + plugCode.ToLower() + ".vue"))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             else
             {
-                return false;
+                if (FileHelper.FileExist(filePath + "\\" + plugCode.ToLower() + ".dll"))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
+            
         }
         #endregion
     }

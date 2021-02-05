@@ -51,6 +51,12 @@ namespace Yuebon.DataProcess.Dtos
         /// 设置或获取是否为公共插件 0否，1是
         /// </summary>
         public bool? Is_public { get; set; }
+
+        /// <summary>
+        /// 设置或获取是否具有编辑页面
+        /// </summary>
+        public bool? HasPage { get; set; }
+
         /// <summary>
         /// 设置或获取最后修改时间
         /// </summary>
