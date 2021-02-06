@@ -27,14 +27,14 @@
         <template slot-scope="scope">
           <el-select
             v-model="scope.row.DataGetType"
-            @change:"handleDataGetTypeChange"
+            @change="handleDataGetTypeChange"
             placeholder="请选择类型"
           >
             <el-option
               v-for="item in SelectDataGetTypeList"
               :key="item.Id"
               :label="item.Pname"
-              :value="{value:item.Id,btnvisib:item.HasPage,index:scope.$index}"
+              :value="{value:item.Id,btnvisib:item.HasPage,index:scope.$index,configuri:item.ConfigUri}"
             />
           </el-select>
         </template>
@@ -46,12 +46,12 @@
       </el-table-column>
       <el-table-column label="配置" sortable="custom" width="120" align="center">
         <template slot-scope="scope">
-          <el-button
+          <el-button 
             type="primary"
             icon="el-icon-plus"
             size="small"
-            disabled="true"
-            @click="OpenConfigPage()"
+            :disabled="scope.row.HasPage==false"
+            @click="OpenConfigPage(scope.row.ConfigUri)"
           >配置</el-button>
         </template>
       </el-table-column>
@@ -186,8 +186,13 @@ export default {
     /**
       * 打开配置页面
       */
-    OpenConfigPage: function() {
+    OpenConfigPage: function (configuri) {
+      if (configuri == null) {
+        this.$alert('未找到配置页面', '提示');
+        return false
+      } else {
 
+      }
     },
     /**
        * 新增/修改保存
@@ -214,10 +219,9 @@ export default {
     },
 
     handleDataGetTypeChange: function (params) {
-      const { value, btnvisib, index } = params;
-      if (btnvisib) {
-        this.tableData[index].buttonVisible = !buttonVisible
-      }
+      const { value, btnvisib, index, configuri } = params;
+      this.tableData[index].HasPage = btnvisib
+      this.tableData[index].ConfigUri = configuri
     }
   }
 }

@@ -81,6 +81,16 @@ namespace Yuebon.DataProcess.Core.common.Enity
         public string DataGetType { get; set; }
 
         /// <summary>
+        /// 是否具有配置页面
+        /// </summary>
+        public bool HasPage { get; set; }
+
+        /// <summary>
+        /// 配置页面地址
+        /// </summary>
+        public string ConfigUri { get; set; }
+
+        /// <summary>
         /// 唯一判定项
         /// </summary>
         public bool? Is_Key { get; set; }
