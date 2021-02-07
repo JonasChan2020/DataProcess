@@ -1,41 +1,34 @@
 <template>
   <div>
+    
     <el-row>
       需配置的数据表：<el-select v-model="Tbname" placeholder="请选择" @change="handleSelectTbChange(Tbname)">
-        <el-option
-          v-for="item in SelectTbnameList"
-          :key="item.TableName"
-          :label="item.TableName"
-          :value="item.TableName"
-        />
+        <el-option v-for="item in SelectTbnameList"
+                   :key="item.TableName"
+                   :label="item.TableName"
+                   :value="item.TableName" />
       </el-select>
     </el-row>
-    <el-table
-      ref="gridtable"
-      :data="tableData"
-      row-key="FieldName"
-      border
-      stripe
-      highlight-current-row
-      style="width: 100%;margin-bottom: 20px;"
-      :default-sort="{prop: 'SortCode', order: 'ascending'}"
-    >
+    <el-table ref="gridtable"
+              :data="tableData"
+              row-key="FieldName"
+              border
+              stripe
+              highlight-current-row
+              style="width: 100%;margin-bottom: 20px;"
+              :default-sort="{prop: 'SortCode', order: 'ascending'}">
 
       <el-table-column prop="FieldName" label="名称" sortable="custom" width="120" />
       <el-table-column prop="Description" label="描述" sortable="custom" width="200" />
       <el-table-column prop="DataGetType" label="获取方式" sortable="custom" width="200">
         <template slot-scope="scope">
-          <el-select
-            v-model="scope.row.DataGetType"
-            @change="handleDataGetTypeChange"
-            placeholder="请选择类型"
-          >
-            <el-option
-              v-for="item in SelectDataGetTypeList"
-              :key="item.Id"
-              :label="item.Pname"
-              :value="{value:item.Id,btnvisib:item.HasPage,index:scope.$index,configuri:item.ConfigUri}"
-            />
+          <el-select v-model="scope.row.DataGetType"
+                     placeholder="请选择类型"
+                     @change="handleDataGetTypeChange">
+            <el-option v-for="item in SelectDataGetTypeList"
+                       :key="item.Id"
+                       :label="item.Pname"
+                       :value="{value:item.Id,btnvisib:item.HasPage,index:scope.$index,configuri:item.ConfigUri}" />
           </el-select>
         </template>
       </el-table-column>
@@ -46,13 +39,11 @@
       </el-table-column>
       <el-table-column label="配置" sortable="custom" width="120" align="center">
         <template slot-scope="scope">
-          <el-button 
-            type="primary"
-            icon="el-icon-plus"
-            size="small"
-            :disabled="scope.row.HasPage==false"
-            @click="OpenConfigPage(scope.row.ConfigUri)"
-          >配置</el-button>
+          <el-button type="primary"
+                     icon="el-icon-plus"
+                     size="small"
+                     :disabled="scope.row.HasPage==false"
+                     @click="OpenConfigPage(scope.row.ConfigUri)">配置</el-button>
         </template>
       </el-table-column>
       <el-table-column v-if="false" prop="Description" label="配置信息" />
@@ -101,19 +92,29 @@
       <el-button @click="reset">重置</el-button>
       <el-button v-preventReClick type="primary" @click="saveEditForm">保存</el-button>
     </div>
+    <el-dialog ref="dialogEditForm"
+               :close-on-click-modal="false"
+               :show-close="true"
+               :title="'插件'"
+               :visible.sync="dialogEditFormVisible"
+               width="640px">
+      <component v-bind:is="loadertpl"></component>
+    </el-dialog>
   </div>
+  
 </template>
 
 <script>
-
 import {
   saveSys_conf_details, getTbNameList, getSys_conf_detailsDetail, GetColumnListsByDetailId,
   GetColumnListsBytbName, getDataGetTypeLists } from '@/api/dataprocess/sys_conf_details'
 
 export default {
-  name: 'ConfDetails',
+    name: 'ConfDetails',
+    props: ['cpname'],
   data() {
     return {
+      tpl: 'sys/conf/index.vue',
       tableloading: true,
       tableData: [],
       Sys_conf_id: '',
@@ -121,18 +122,32 @@ export default {
       Is_dynamic: '',
       Is_flag: '',
       configjson: '',
+      dialogEditFormVisible:false,
       SelectTbnameList: [],
       SelectedTbName: '',
       SelectedDataGetType: '',
       SelectDataGetTypeList: [],
       currentId: '', // 当前操作对象的ID值，主要用于修改
-      showType: 'edit' // 操作类型编辑、新增、查看
+      showType: 'edit', // 操作类型编辑、新增、查看
+      customplugpage:''
     }
-  },
+    },
+    computed: {
+      loadertpl() {
+        const self = this;
+        if (!self.tpl) return "";
+
+        return function (resolve) {
+          require([`@/views/dataprocess/${self.tpl}`], resolve)
+        };
+      }
+    },
+
   created() {
     this.InitDictItem()
   },
-  methods: {
+    methods: {
+
     /**
        * 初始化数据
        */
@@ -187,12 +202,9 @@ export default {
       * 打开配置页面
       */
     OpenConfigPage: function (configuri) {
-      if (configuri == null) {
-        this.$alert('未找到配置页面', '提示');
-        return false
-      } else {
-
-      }
+      this.tpl = "sys/class/index.vue"
+      this.dialogEditFormVisible = true
+     
     },
     /**
        * 新增/修改保存
@@ -211,18 +223,18 @@ export default {
     toogleExpand(row) {
       const $table = this.$refs.gridtable
       this.tableData.map((item) => {
-        if (row.FieldName != item.FieldName) {
+        if (row.FieldName !== item.FieldName) {
           $table.toggleRowExpansion(item, false)
         }
       })
       $table.toggleRowExpansion(row)
     },
 
-    handleDataGetTypeChange: function (params) {
-      const { value, btnvisib, index, configuri } = params;
+    handleDataGetTypeChange: function(params) {
+      const { value, btnvisib, index, configuri } = params
       this.tableData[index].HasPage = btnvisib
       this.tableData[index].ConfigUri = configuri
     }
-  }
+    },
 }
 </script>
