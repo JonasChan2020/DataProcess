@@ -78,7 +78,7 @@ namespace Yuebon.DataProcess.Core.common.Enity
         /// <summary>
         /// 字段值获取方式
         /// </summary>
-        public string DataGetType { get; set; }
+        public DataGetType DataGetType { get; set; }
 
         /// <summary>
         /// 是否具有配置页面
@@ -93,12 +93,22 @@ namespace Yuebon.DataProcess.Core.common.Enity
         /// <summary>
         /// 唯一判定项
         /// </summary>
-        public bool? Is_Key { get; set; }
+        public bool? Is_SingleDataKey { get; set; }
 
         /// <summary>
         /// 配置中显示
         /// </summary>
-        public bool? Is_Visib { get; set; }
+        public bool? Is_Visible { get; set; }
+
+        /// <summary>
+        /// 是否为ID字段
+        /// </summary>
+        public bool? Is_KeyColumn { get; set; }
+
+        /// <summary>
+        /// 是否不为空
+        /// </summary>
+        public bool? Is_NotNull { get; set; }
 
         /// <summary>
         /// 更新时保留
@@ -115,5 +125,21 @@ namespace Yuebon.DataProcess.Core.common.Enity
         public string GetFunctionParamter { get; set; }
         #endregion
 
+    }
+
+    public class DataGetType
+    {
+        /// <summary>
+        /// 获取方法插件ID
+        /// </summary>
+        public string value { get; set; }
+        /// <summary>
+        /// 按钮是否可用
+        /// </summary>
+        public bool btnvisib { get; set; }
+        /// <summary>
+        /// 顺序
+        /// </summary>
+        public int index { get; set; }
     }
 }

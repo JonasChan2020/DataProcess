@@ -67,6 +67,17 @@ export function getAllEnableByConfId(data) {
   })
 }
 /**
+   * 更改执行顺序
+   */
+export function changeLevelNumAsync(data) {
+  return http.request({
+    url: 'Sys_conf_details/ChangeLevelNumAsync',
+    data: data,
+    method: 'post',
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
+/**
    * 新增或修改保存
    * @param data
    */
@@ -84,8 +95,8 @@ export function saveSys_conf_details(data, url) {
    */
 export function getSys_conf_detailsDetail(id) {
   return http({
-    url: 'Sys_conf_details/GetById?id=' + id,
-    method: 'get',
+    url: 'Sys_conf_details/GetByConfDetailId?id=' + id,
+    method: 'post',
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
 }

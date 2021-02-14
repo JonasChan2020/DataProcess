@@ -87,6 +87,11 @@ namespace Yuebon.DataProcess.Dtos
         /// </summary>
         [MaxLength(0)]
         public string Tbname { get; set; }
+        /// <summary>
+        /// 设置或获取详细配置json
+        /// </summary>
+        [MaxLength(0)]
+        public string configjson { get; set; }
 
     }
 }

@@ -52,6 +52,11 @@ namespace Yuebon.DataProcess.Dtos
         /// 设置或获取表名
         /// </summary>
         public string Tbname { get; set; }
+
+        /// <summary>
+        /// 设置或获取详细配置json字符串
+        /// </summary>
+        public string configjson { get; set; }
 
     }
 }

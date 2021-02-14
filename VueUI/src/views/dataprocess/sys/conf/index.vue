@@ -96,49 +96,49 @@
             <div class="list-btn-container">
               <el-button-group>
                 <el-button
-                  v-hasPermi="['Sys_conf_details/Add']"
-                  type="primary"
-                  icon="el-icon-plus"
-                  size="small"
-                  @click="ShowEditOrViewDetailDialog('add')"
-                >新增</el-button>
+                           v-hasPermi="['Sys_conf_details/Add']"
+                           type="primary"
+                           icon="el-icon-plus"
+                           size="small"
+                           @click="ShowEditOrViewDetailDialog('add')">新增</el-button>
                 <el-button
-                  v-hasPermi="['Sys_conf_details/Edit']"
-                  type="primary"
-                  icon="el-icon-edit"
-                  class="el-button-modify"
-                  size="small"
-                  @click="ShowEditOrViewDetailDialog('edit')"
-                >修改</el-button>
+                           v-hasPermi="['Sys_conf_details/Edit']"
+                           type="primary"
+                           icon="el-icon-edit"
+                           class="el-button-modify"
+                           size="small"
+                           @click="ShowEditOrViewDetailDialog('edit')">修改</el-button>
                 <el-button
-                  v-hasPermi="['Sys_conf_details/Enable']"
-                  type="info"
-                  icon="el-icon-video-pause"
-                  size="small"
-                  @click="setDetailEnable('0')"
-                >禁用</el-button>
-                <el-button
-                  v-hasPermi="['Sys_conf_details/Enable']"
-                  type="success"
-                  icon="el-icon-video-play"
-                  size="small"
-                  @click="setDetailEnable('1')"
-                >启用</el-button>
-                <el-button
-                  v-hasPermi="['Sys_conf_details/DeleteSoft']"
-                  type="warning"
-                  icon="el-icon-delete"
-                  size="small"
-                  @click="deleteDetailSoft('0')"
-                >软删除</el-button>
-                <el-button
-                  v-hasPermi="['Sys_conf_details/Delete']"
-                  type="danger"
-                  icon="el-icon-delete"
-                  size="small"
-                  @click="deleteDetailPhysics()"
-                >删除</el-button>
+                           v-hasPermi="['Sys_conf_details/DeleteSoft']"
+                           type="warning"
+                           icon="el-icon-delete"
+                           size="small"
+                           @click="deleteDetailSoft('0')">删除</el-button>
                 <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableDetailData()">刷新</el-button>
+                <el-button
+                           v-hasPermi="['Sys_conf_details/Edit']"
+                           type="primary"
+                           icon="el-icon-edit"
+                           size="small"
+                           @click="changeLevelNum('up')">上移</el-button>
+                <el-button
+                           v-hasPermi="['Sys_conf_details/Edit']"
+                           type="primary"
+                           icon="el-icon-edit"
+                           size="small"
+                           @click="changeLevelNum('down')">下移</el-button>
+                <el-button
+                           v-hasPermi="['Sys_conf_details/Edit']"
+                           type="primary"
+                           icon="el-icon-edit"
+                           size="small"
+                           @click="changeLevelNum('top')">置顶</el-button>
+                <el-button
+                           v-hasPermi="['Sys_conf_details/Edit']"
+                           type="primary"
+                           icon="el-icon-edit"
+                           size="small"
+                           @click="changeLevelNum('buttom')">置底</el-button>
               </el-button-group>
             </div>
             <el-table
@@ -227,8 +227,8 @@ import {
   getAllClassifyTreeTable
 } from '@/api/dataprocess/sys_conf_classify'
 import {
-  getAllEnableByConfId, setSys_conf_detailsEnable, deleteSoftSys_conf_details,
-  deleteSys_conf_details
+    getAllEnableByConfId, deleteSys_conf_details,
+   changeLevelNumAsync
 } from '@/api/dataprocess/sys_conf_details'
 
 export default {
@@ -315,10 +315,12 @@ export default {
        */
     loadTableDetailData: function() {
       var seachdata = {
-        id: this.currentSelectId
+        Filter: {
+          Sys_conf_id: this.currentSelectId
+        }
       }
       getAllEnableByConfId(seachdata).then(res => {
-        this.tableDetailData = res.ResData.Items
+        this.tableDetailData = res.ResData
       })
     },
     /**
@@ -562,37 +564,6 @@ export default {
         this.$router.push({ name: 'EditConfDetail', params: { id: this.currentDetailId, showtype: view, Sys_conf_id: this.currentSelectId }})
       }
     },
-
-    setDetailEnable: function(val) {
-      if (this.currentDetailSelected.length === 0) {
-        this.$alert('请先选择要操作的数据', '提示')
-        return false
-      } else {
-        var currentDetailIds = []
-        this.currentDetailSelected.forEach(element => {
-          currentDetailIds.push(element.Id)
-        })
-        const data = {
-          Ids: currentDetailIds,
-          Flag: val
-        }
-        setSys_conf_detailsEnable(data).then(res => {
-          if (res.Success) {
-            this.$message({
-              message: '恭喜你，操作成功',
-              type: 'success'
-            })
-            this.currentDetailSelected = ''
-            this.loadTableDetailData()
-          } else {
-            this.$message({
-              message: res.ErrMsg,
-              type: 'error'
-            })
-          }
-        })
-      }
-    },
     deleteDetailSoft: function(val) {
       if (this.currentDetailSelected.length === 0) {
         this.$alert('请先选择要操作的数据', '提示')
@@ -605,35 +576,6 @@ export default {
         const data = {
           Ids: currentDetailIds,
           Flag: val
-        }
-        deleteSoftSys_conf_details(data).then(res => {
-          if (res.Success) {
-            this.$message({
-              message: '恭喜你，操作成功',
-              type: 'success'
-            })
-            this.currentDetailSelected = ''
-            this.loadTableDetailData()
-          } else {
-            this.$message({
-              message: res.ErrMsg,
-              type: 'error'
-            })
-          }
-        })
-      }
-    },
-    deleteDetailPhysics: function() {
-      if (this.currentDetailSelected.length === 0) {
-        this.$alert('请先选择要操作的数据', '提示')
-        return false
-      } else {
-        var currentDetailIds = []
-        this.currentDetailSelected.forEach(element => {
-          currentDetailIds.push(element.Id)
-        })
-        const data = {
-          Ids: currentDetailIds
         }
         deleteSys_conf_details(data).then(res => {
           if (res.Success) {
@@ -652,12 +594,38 @@ export default {
         })
       }
     },
+    changeLevelNum: function(actionStr) {
+      if (this.currentDetailSelected.length > 1 || this.currentDetailSelected.length === 0) {
+        this.$alert('请选择一条数据进行编辑/修改', '提示')
+      } else {
+        this.currentDetailId = this.currentDetailSelected[0].Id
+        const data = {
+          Id: this.currentDetailId,
+          actionStr: actionStr
+        }
+        changeLevelNumAsync(data).then(res => {
+          if (res.Success) {
+            this.$message({
+              message: '恭喜你，操作成功',
+              type: 'success'
+            })
+            this.loadTableDetailData()
+          } else {
+            this.$message({
+              message: res.ErrMsg,
+              type: 'error'
+            })
+          }
+        })
+        
+      }
+    },
 
     /**
        * 当用户手动勾选详情checkbox数据行事件
        */
     handleDetailSelectChange: function(selection, row) {
-      this.currentDetailId = selection
+      this.currentDetailSelected = selection
     },
     /**
        * 当用户手动勾选详情全选checkbox事件
