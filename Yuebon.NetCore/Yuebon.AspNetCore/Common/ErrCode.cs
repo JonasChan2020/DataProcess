@@ -139,5 +139,13 @@ namespace Yuebon.AspNetCore.Models
         /// </summary>
         public static string err80021 = "上传文件错误";
 
+        #region 数据源管理
+        /// <summary>
+        /// 不能连接数据源
+        /// </summary>
+        public static string err80301 = "不能连接数据源";
+
+        #endregion
+
     }
 }

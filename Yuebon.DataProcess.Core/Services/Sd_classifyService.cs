@@ -36,10 +36,10 @@ namespace Yuebon.DataProcess.Services
         /// 获取分类适用于Vue 树形列表
         /// </summary>
         /// <returns></returns>
-        public async Task<List<Sd_classifyOutputDto>> GetAllClassifyTreeTable(string SysId)
+        public async Task<List<Sd_classifyOutputDto>> GetAllClassifyTreeTable()
         {
             List<Sd_classifyOutputDto> reslist = new List<Sd_classifyOutputDto>();
-            IEnumerable<Sd_classify> elist = _repository.GetListWhere("sysid='" + SysId + "'");
+            IEnumerable<Sd_classify> elist = await _repository.GetListWhereAsync("");
             List<Sd_classify> list = elist.OrderBy(t => t.SortCode).ToList();
             List<Sd_classify> oneMenuList = list.FindAll(t => t.Parentid == "");
             foreach (Sd_classify item in oneMenuList)

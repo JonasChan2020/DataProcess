@@ -94,9 +94,9 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             CommonResult result = new CommonResult();
 
             #region 验证非空及重复
-            if (!string.IsNullOrEmpty(tinfo.Stcode))
+            if (!string.IsNullOrEmpty(tinfo.ClassCode))
             {
-                string where = string.Format("stcode='{0}'", tinfo.Stcode);
+                string where = string.Format("classcode='{0}'", tinfo.ClassCode);
                 Sys_conf_classify model = iService.GetWhere(where);
                 if (model != null)
                 {
@@ -160,9 +160,9 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             CommonResult result = new CommonResult();
 
             #region 验证非空及重复
-            if (!string.IsNullOrEmpty(tinfo.Stcode))
+            if (!string.IsNullOrEmpty(tinfo.ClassCode))
             {
-                string where = string.Format("stcode='{0}' and id<>'{1}'", tinfo.Stcode, tinfo.Id);
+                string where = string.Format("classcode='{0}' and id<>'{1}'", tinfo.ClassCode, tinfo.Id);
                 Sys_conf_classify model = iService.GetWhere(where);
                 if (model != null)
                 {
@@ -178,8 +178,8 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             #endregion
 
             Sys_conf_classify info = iService.Get(id);
-            info.Stcode = tinfo.Stcode;
-            info.Stname = tinfo.Stname;
+            info.ClassCode = tinfo.ClassCode;
+            info.ClassName = tinfo.ClassName;
             info.Description = tinfo.Description;
             info.Parentid = tinfo.Parentid;
             info.SortCode = tinfo.SortCode;

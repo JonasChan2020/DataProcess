@@ -5,25 +5,22 @@ using System.Threading.Tasks;
 using Yuebon.AspNetCore.Controllers;
 using Yuebon.AspNetCore.Models;
 using Yuebon.Commons.Helpers;
-using Yuebon.Commons.Log;
 using Yuebon.Commons.Mapping;
 using Yuebon.Commons.Models;
-using Yuebon.Commons.Pages;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 using Yuebon.DataProcess.IServices;
 using Yuebon.AspNetCore.Mvc;
-using Yuebon.DataProcess.Core.common.dbTools;
-using Yuebon.DataProcess.Core.common.Enity;
-using Yuebon.DataProcess.Core.common;
 using Newtonsoft.Json;
 using System.Reflection;
-using Yuebon.AspNetCore.Mvc.Filter;
 using Yuebon.Commons.Dtos;
 using Yuebon.AspNetCore.ViewModel;
 using System.Linq;
 using Yuebon.Commons.Extensions;
 using Yuebon.Commons.Core.Dtos;
+using Yuebon.DataProcess.Core.OutSideDbService;
+using Yuebon.DataProcess.Core.OutSideDbService.Entity;
+using Yuebon.DataProcess.Core.common;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -127,8 +124,8 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             CommonResult<List<DbTableInfo>> result = new CommonResult<List<DbTableInfo>>();
             if (!string.IsNullOrEmpty(CurrentUser.MDbName) && !string.IsNullOrEmpty(CurrentUser.MDbType) && !string.IsNullOrEmpty(CurrentUser.MDbConnectionstr))
             {
-                DataTools bll = new DataTools(CurrentUser.MDbConnectionstr, CurrentUser.MDbType);
-                List<DbTableInfo> tbList = bll.GetTbList(CurrentUser.MDbName, "");
+                DbTools bll = new DbTools(CurrentUser.MDbConnectionstr, CurrentUser.MDbType);
+                List<DbTableInfo> tbList = bll.GetAllTables(CurrentUser.MDbName, "");
                 result.ResData = tbList;
                 result.ErrCode = ErrCode.successCode;
                 result.ErrMsg = ErrCode.err0;
@@ -156,7 +153,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             if (!string.IsNullOrEmpty(CurrentUser.MDbName) && !string.IsNullOrEmpty(CurrentUser.MDbType) && !string.IsNullOrEmpty(CurrentUser.MDbConnectionstr))
             {
                 Sys_conf_details model = iService.Get(detailId);
-                DataTools bll = new DataTools(CurrentUser.MDbConnectionstr, CurrentUser.MDbType);
+                DbTools bll = new DbTools(CurrentUser.MDbConnectionstr, CurrentUser.MDbType);
                 List<DbFieldInfo> colList = bll.GetAllColumns(CurrentUser.MDbName, model.Tbname);
                 if (colList != null && colList.Count > 0)
                 {
@@ -210,7 +207,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                 var paramsObj = new { tbName = "" };
                 paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
 
-                DataTools bll = new DataTools(CurrentUser.MDbConnectionstr, CurrentUser.MDbType);
+                DbTools bll = new DbTools(CurrentUser.MDbConnectionstr, CurrentUser.MDbType);
                 List<DbFieldInfo> colList = bll.GetAllColumns(CurrentUser.MDbName, paramsObj.tbName);
                 if (colList != null && colList.Count > 0)
                 {
@@ -264,7 +261,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             if (!string.IsNullOrEmpty(CurrentUser.MDbName) && !string.IsNullOrEmpty(CurrentUser.MDbType) && !string.IsNullOrEmpty(CurrentUser.MDbConnectionstr))
             {
                 Sys_conf_detailsOutputDto model = await iService.GetOutDtoAsync(id);
-                DataTools bll = new DataTools(CurrentUser.MDbConnectionstr, CurrentUser.MDbType);
+                DbTools bll = new DbTools(CurrentUser.MDbConnectionstr, CurrentUser.MDbType);
                 List<DbFieldInfo> colList = bll.GetAllColumns(CurrentUser.MDbName, model.Tbname);
                 if (colList != null && colList.Count > 0)
                 {

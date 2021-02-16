@@ -113,12 +113,18 @@ namespace Yuebon.DataProcess.Core.OutSideDbService.DbFiles
         /// </summary>
         public void Close()
         {
-            DbConnection dbConnection = dbTransaction.Connection;
-            if (dbConnection != null && dbConnection.State != ConnectionState.Closed)
+            if (dbTransaction != null)
             {
-                dbConnection.Close();
+                DbConnection dbConnection = dbTransaction.Connection;
+                if (dbConnection != null && dbConnection.State != ConnectionState.Closed)
+                {
+                    dbConnection.Close();
+                }
             }
-
+            if (Connection != null)
+            {
+                Connection.Close();
+            }
         }
         #endregion
 

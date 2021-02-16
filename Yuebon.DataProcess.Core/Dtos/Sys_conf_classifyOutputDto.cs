@@ -79,12 +79,12 @@ namespace Yuebon.DataProcess.Dtos
         /// 设置或获取类型编码
         /// </summary>
         [MaxLength(0)]
-        public string Stcode { get; set; }
+        public string ClassCode { get; set; }
         /// <summary>
         /// 设置或获取类型名称
         /// </summary>
         [MaxLength(0)]
-        public string Stname { get; set; }
+        public string ClassName { get; set; }
         /// <summary>
         /// 设置或获取所属系统ID
         /// </summary>

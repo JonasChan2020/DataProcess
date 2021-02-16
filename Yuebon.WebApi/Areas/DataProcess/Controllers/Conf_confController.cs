@@ -46,7 +46,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         protected override void OnBeforeInsert(Conf_conf info)
         {
             info.Id = GuidUtils.CreateNo();
-            info.Sysid = CurrentUser.SysId;
             info.CreatorTime = DateTime.Now;
             info.CreatorUserId = CurrentUser.UserId;
             info.DeleteMark = false;
@@ -63,7 +62,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// <returns></returns>
         protected override void OnBeforeUpdate(Conf_conf info)
         {
-            info.Sysid = CurrentUser.SysId;
             info.LastModifyUserId = CurrentUser.UserId;
             info.LastModifyTime = DateTime.Now;
         }
@@ -78,31 +76,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             info.DeleteMark = true;
             info.DeleteTime = DateTime.Now;
             info.DeleteUserId = CurrentUser.UserId;
-        }
-
-        /// <summary>
-        /// 根据条件查询数据库,并返回对象集合(用于分页数据显示)
-        /// 
-        /// </summary>
-        /// <param name="search"></param>
-        /// <returns></returns>
-        [HttpPost("FindWithPagerAsync")]
-        [YuebonAuthorize("List")]
-        public override async Task<CommonResult<PageResult<Conf_confOutputDto>>> FindWithPagerAsync(SearchInputDto<Conf_conf> search)
-        {
-            CommonResult<PageResult<Conf_confOutputDto>> result = new CommonResult<PageResult<Conf_confOutputDto>>();
-            if (!string.IsNullOrEmpty(CurrentUser.SysId))
-            {
-                search.Filter = new Conf_conf();
-                search.Filter.Sysid = CurrentUser.SysId;
-                result.ResData = await iService.FindWithPagerAsync(search);
-                result.ErrCode = ErrCode.successCode;
-            }
-            else
-            {
-                result.ErrCode = ErrCode.successCode;
-            }
-            return result;
         }
     }
 }

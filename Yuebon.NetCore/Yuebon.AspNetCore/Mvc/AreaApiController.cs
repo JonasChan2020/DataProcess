@@ -163,7 +163,7 @@ namespace Yuebon.AspNetCore.Controllers
         /// <param name="info">原实体类</param>
         /// <param name="newInfo">新实体类</param>
         /// <returns></returns>
-        public T SwapValue(T info, T newInfo)
+        private T SwapValue(T info, T newInfo)
         {
             PropertyInfo[] propertys = newInfo.GetType().GetProperties();
             foreach (PropertyInfo property in propertys)

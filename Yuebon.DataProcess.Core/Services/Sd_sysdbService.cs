@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Yuebon.DataProcess.IRepositories;
@@ -6,15 +5,15 @@ using Yuebon.DataProcess.IServices;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 using System.Data;
-using Yuebon.DataProcess.Core.common.dbTools;
-using Yuebon.DataProcess.Core.common.Enity;
-using Yuebon.DataProcess.Core.common;
 using Yuebon.Commons.Services;
 using Yuebon.Security.IServices;
 using Yuebon.Commons.Helpers;
 using Yuebon.Commons.Pages;
 using Yuebon.Commons.Dtos;
 using Yuebon.Commons.Mapping;
+using Yuebon.DataProcess.Core.OutSideDbService;
+using Yuebon.DataProcess.Core.OutSideDbService.Entity;
+using Yuebon.DataProcess.Core.common;
 
 namespace Yuebon.DataProcess.Services
 {
@@ -92,7 +91,7 @@ namespace Yuebon.DataProcess.Services
             {
                 if (!string.IsNullOrEmpty(item.Classify_id))
                 {
-                    item.Classify_Name = _classservice.Get(item.Classify_id).Dtname;
+                    item.Classify_Name = _classservice.Get(item.Classify_id).ClassName;
                 }
                 if (!string.IsNullOrEmpty(item.Sys_id))
                 {
@@ -121,8 +120,8 @@ namespace Yuebon.DataProcess.Services
 
             #region 获取所有表集合
 
-            DataTools bll = new DataTools(entity.Sdconnectionstr, entity.Sdtype);
-            List<DbTableInfo> tbList = bll.GetTbList(entity.dbName, "");
+            DbTools bll = new DbTools(entity.Sdconnectionstr, entity.Sdtype);
+            List<DbTableInfo> tbList = bll.GetAllTables(entity.dbName, "");
             foreach (DbTableInfo item in tbList)
             {
                 item.Fileds = bll.GetAllColumns(entity.dbName, item.TableName);

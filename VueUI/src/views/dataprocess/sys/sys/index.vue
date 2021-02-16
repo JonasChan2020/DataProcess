@@ -141,7 +141,7 @@
           <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="系统分类" :label-width="formLabelWidth" prop="Classify_id">
-          <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'Stname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
+          <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
         </el-form-item>
         <el-form-item label="排序" :label-width="formLabelWidth" prop="SortCode">
           <el-input v-model.number="editFrom.SortCode" placeholder="请输入排序,默认为99" autocomplete="off" clearable />
@@ -158,7 +158,7 @@
 
     <el-dialog ref="dialogSitMainDbForm" title="选择主数据库" :visible.sync="dialogSitMainDbFormVisible" width="70%">
       <el-card>
-        <el-cascader v-model="selectedsdclass" style="width:500px;" :options="selectsdclasses" filterable :props="{label:'Dtname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectSdClassChange" />
+        <el-cascader v-model="selectedsdclass" style="width:500px;" :options="selectsdclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectSdClassChange" />
       </el-card>
       <el-card>
         <el-table
@@ -511,7 +511,7 @@ export default {
     },
     chosemaindb: function() {
       if (this.currentSelected.length > 0) {
-        getAllSdClassifyTreeTable(this.currentSelected[0].Id).then(res => {
+        getAllSdClassifyTreeTable().then(res => {
           this.selectsdclasses = res.ResData
         })
         this.loadMDbTableData()

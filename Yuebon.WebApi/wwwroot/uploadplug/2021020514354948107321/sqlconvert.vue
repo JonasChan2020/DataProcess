@@ -135,7 +135,7 @@
           <el-input v-model="editFrom.Sdtype" placeholder="请输入数据库类型" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="连接分类" :label-width="formLabelWidth" prop="Classify_id">
-          <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'Dtname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
+          <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
         </el-form-item>
         <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
           <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
@@ -239,7 +239,7 @@ export default {
      * 初始化数据
      */
     InitDictItem() {
-      getAllSdClassifyTreeTable('').then(res => {
+      getAllSdClassifyTreeTable().then(res => {
         this.selectclasses = res.ResData
       })
     },

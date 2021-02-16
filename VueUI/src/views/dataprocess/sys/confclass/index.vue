@@ -84,8 +84,8 @@
         @sort-change="handleSortChange"
       >
         <el-table-column type="selection" width="30" />
-        <el-table-column prop="Stcode" label="类型编码" sortable="custom" width="380" />
-        <el-table-column prop="Stname" label="类型名称" sortable="custom" width="180" />
+        <el-table-column prop="ClassCode" label="类型编码" sortable="custom" width="380" />
+        <el-table-column prop="ClassName" label="类型名称" sortable="custom" width="180" />
         <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
         <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="90" align="center" />
         <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
@@ -106,17 +106,17 @@
     >
 
       <el-form ref="editFrom" :model="editFrom" :rules="rules">
-        <el-form-item label="类型编码" :label-width="formLabelWidth" prop="Stcode">
-          <el-input v-model="editFrom.Stcode" placeholder="请输入类型编码" autocomplete="off" clearable />
+        <el-form-item label="类型编码" :label-width="formLabelWidth" prop="ClassCode">
+          <el-input v-model="editFrom.ClassCode" placeholder="请输入类型编码" autocomplete="off" clearable />
         </el-form-item>
-        <el-form-item label="类型名称" :label-width="formLabelWidth" prop="Stname">
-          <el-input v-model="editFrom.Stname" placeholder="请输入类型名称" autocomplete="off" clearable />
+        <el-form-item label="类型名称" :label-width="formLabelWidth" prop="ClassName">
+          <el-input v-model="editFrom.ClassName" placeholder="请输入类型名称" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
           <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="上级分类" :label-width="formLabelWidth" prop="Parentid">
-          <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'Stname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
+          <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
         </el-form-item>
         <el-form-item label="排序" :label-width="formLabelWidth" prop="SortCode">
           <el-input v-model.number="editFrom.SortCode" placeholder="请输入排序,默认为99" autocomplete="off" clearable />
@@ -168,8 +168,8 @@ export default {
         EnabledMark: '',
         Parentid: '',
         SortCode: '',
-        Stcode: '',
-        Stname: ''
+        ClassCode: '',
+        ClassName: ''
       },
       rules: {
 
@@ -232,8 +232,8 @@ export default {
     },
     bindEditInfo: function() {
       getSys_conf_classifyDetail(this.currentId).then(res => {
-        this.editFrom.Stcode = res.ResData.Stcode
-        this.editFrom.Stname = res.ResData.Stname
+        this.editFrom.ClassCode = res.ResData.ClassCode
+        this.editFrom.ClassName = res.ResData.ClassName
         this.editFrom.Description = res.ResData.Description
         this.editFrom.EnabledMark = res.ResData.EnabledMark
         this.editFrom.Parentid = res.ResData.Parentid
@@ -251,8 +251,8 @@ export default {
             'Description': this.editFrom.Description,
             'Parentid': this.editFrom.Parentid,
             'SortCode': this.editFrom.SortCode,
-            'Stcode': this.editFrom.Stcode,
-            'Stname': this.editFrom.Stname,
+            'ClassCode': this.editFrom.ClassCode,
+            'ClassName': this.editFrom.ClassName,
             'EnabledMark': this.editFrom.EnabledMark,
             'Id': this.currentId
           }

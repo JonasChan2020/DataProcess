@@ -12,30 +12,33 @@ namespace Yuebon.DataProcess.Dtos
     public class Conf_confOutputDto
     {
         /// <summary>
-        /// 设置或获取配置分类ID
+        /// 设置或获取关联库或系统ID
         /// </summary>
         [MaxLength(0)]
-        public string Classify_id { get; set; }
+        public string FromId { get; set; }
 
         /// <summary>
-        /// 设置或获取分类名称
+        /// 设置或获取被关联库或系统ID
         /// </summary>
         [MaxLength(0)]
-        public string Classify_Name { get; set; }
-        /// <summary>
-        /// 设置或获取配置编码
+        public string ToId { get; set; }
+
+        /// <summary>
+        /// 设置或获取关联库或系统名称
         /// </summary>
         [MaxLength(0)]
-        public string Confcode { get; set; }
-        /// <summary>
-        /// 设置或获取配置名称
+        public string FromName { get; set; }
+
+        /// <summary>
+        /// 设置或获取被关联库或系统名称
         /// </summary>
         [MaxLength(0)]
-        public string Confname { get; set; }
+        public string ToName { get; set; }
         /// <summary>
-        /// 设置或获取配置类型0：校验，1：导入，2：导出
+        /// 设置或获取配置类型0：系统，1：数据库
         /// </summary>
-        public bool? Conftype { get; set; }
+        [MaxLength(1)]
+        public int? Conftype { get; set; }
         /// <summary>
         /// 设置或获取创建时间
         /// </summary>
@@ -64,11 +67,6 @@ namespace Yuebon.DataProcess.Dtos
         [MaxLength(0)]
         public string Description { get; set; }
         /// <summary>
-        /// 设置或获取数据源ID
-        /// </summary>
-        [MaxLength(0)]
-        public string Dsid { get; set; }
-        /// <summary>
         /// 设置或获取启用标记
         /// </summary>
         public bool? EnabledMark { get; set; }
@@ -95,17 +93,6 @@ namespace Yuebon.DataProcess.Dtos
         /// </summary>
         [MaxLength(0)]
         public string State { get; set; }
-        /// <summary>
-        /// 设置或获取系统ID
-        /// </summary>
-        [MaxLength(0)]
-        public string Sysid { get; set; }
 
-        /// <summary>
-        /// 设置或获取所属系统名称
-        /// </summary>
-        [MaxLength(0)]
-        public string Sys_Name { get; set; }
-
     }
 }

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Yuebon.AspNetCore.Controllers;
 using Yuebon.AspNetCore.Models;
@@ -15,8 +14,8 @@ using Yuebon.DataProcess.IServices;
 using Yuebon.Commons.Dtos;
 using Yuebon.AspNetCore.Mvc;
 using System.Reflection;
-using Yuebon.DataProcess.Core.common.dbTools.baseDb.Extension;
 using Newtonsoft.Json;
+using Yuebon.DataProcess.Core.OutSideDbService.Extension;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -49,7 +48,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         protected override void OnBeforeInsert(Sd_sysdb info)
         {
             info.Id = GuidUtils.CreateNo();
-            info.Sys_id = CurrentUser.SysId;
             info.CreatorTime = DateTime.Now;
             info.CreatorUserId = CurrentUser.UserId;
             info.DeleteMark = false;
@@ -66,7 +64,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// <returns></returns>
         protected override void OnBeforeUpdate(Sd_sysdb info)
         {
-            info.Sys_id = CurrentUser.SysId;
             info.LastModifyUserId = CurrentUser.UserId;
             info.LastModifyTime = DateTime.Now;
         }
@@ -91,7 +88,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// </summary>
         /// <param name="tinfo"></param>
         /// <returns></returns>
-        [HttpPost("Insert")]
+        [HttpPost("InsertAsync")]
         [YuebonAuthorize("Add")]
         public override async Task<IActionResult> InsertAsync(Sd_sysdbInputDto tinfo)
         {
@@ -152,7 +149,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// <param name="tinfo"></param>
         /// <param name="id">主键Id</param>
         /// <returns></returns>
-        [HttpPost("Update")]
+        [HttpPost("UpdateAsync")]
         [YuebonAuthorize("Edit")]
         public override async Task<IActionResult> UpdateAsync(Sd_sysdbInputDto tinfo, string id)
         {
@@ -225,17 +222,10 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         public override async Task<CommonResult<PageResult<Sd_sysdbOutputDto>>> FindWithPagerAsync(SearchInputDto<Sd_sysdb> search)
         {
             CommonResult<PageResult<Sd_sysdbOutputDto>> result = new CommonResult<PageResult<Sd_sysdbOutputDto>>();
-            if (!string.IsNullOrEmpty(CurrentUser.SysId))
-            {
-                search.Filter = new Sd_sysdb();
-                search.Filter.Sys_id = CurrentUser.SysId;
-                result.ResData = await iService.FindWithPagerAsync(search);
-                result.ErrCode = ErrCode.successCode;
-            }
-            else
-            {
-                result.ErrCode = ErrCode.successCode;
-            }
+            search.Filter = new Sd_sysdb();
+            result.ResData = await iService.FindWithPagerAsync(search);
+            result.Success = true;
+            result.ErrCode = ErrCode.successCode;
             return result;
         }
 
@@ -254,24 +244,9 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             {
                 search.Filter = new Sd_sysdb();
             }
-            if ( !string.IsNullOrEmpty(search.Filter.Sys_id))
-            {
-                result.ResData = await iService.FindWithPagerAsync(search);
-                result.ErrCode = ErrCode.successCode;
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(CurrentUser.SysId))
-                {
-                    search.Filter.Sys_id = CurrentUser.SysId;
-                    result.ResData = await iService.FindWithPagerAsync(search);
-                    result.ErrCode = ErrCode.successCode;
-                }
-                else
-                {
-                    result.ErrCode = ErrCode.successCode;
-                }
-            }
+            result.ResData = await iService.FindWithPagerAsync(search);
+            result.Success = true;
+            result.ErrCode = ErrCode.successCode;
 
             return result;
         }

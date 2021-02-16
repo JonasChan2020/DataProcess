@@ -10,22 +10,10 @@ namespace Yuebon.DataProcess.Dtos
     {
         public DataProcessProfile()
         {
-           CreateMap<Conf_classify, Conf_classifyOutputDto>();
-           CreateMap<Conf_classifyInputDto, Conf_classify>();
            CreateMap<Conf_conf, Conf_confOutputDto>();
            CreateMap<Conf_confInputDto, Conf_conf>();
            CreateMap<Conf_detail, Conf_detailOutputDto>();
            CreateMap<Conf_detailInputDto, Conf_detail>();
-           CreateMap<Conf_detail_conf, Conf_detail_confOutputDto>();
-           CreateMap<Conf_detail_confInputDto, Conf_detail_conf>();
-           CreateMap<Ds_classify, Ds_classifyOutputDto>();
-           CreateMap<Ds_classifyInputDto, Ds_classify>();
-           CreateMap<Ds_detail, Ds_detailOutputDto>();
-           CreateMap<Ds_detailInputDto, Ds_detail>();
-           CreateMap<Ds_ds, Ds_dsOutputDto>();
-           CreateMap<Ds_dsInputDto, Ds_ds>();
-           CreateMap<Ds_relation, Ds_relationOutputDto>();
-           CreateMap<Ds_relationInputDto, Ds_relation>();
            CreateMap<Plug_plug, Plug_plugOutputDto>();
            CreateMap<Plug_plugInputDto, Plug_plug>();
            CreateMap<Plug_sysrelation, Plug_sysrelationOutputDto>();

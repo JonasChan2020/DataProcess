@@ -1,125 +1,138 @@
 <template>
   <div class="app-container">
-    <div class="filter-container">
-      <el-card>
-        <el-form
-          ref="searchform"
-          :inline="true"
-          :model="searchform"
-          class="demo-form-inline"
-          size="small"
-        >
-          <el-form-item label="名称：">
-            <el-input v-model="searchform.keywords" clearable placeholder="名称" />
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="handleSearch()">查询</el-button>
-          </el-form-item>
-        </el-form>
-      </el-card>
-    </div>
-    <el-card>
-      <div class="list-btn-container">
-        <el-button-group>
-          <el-button
-            v-hasPermi="['Conf_conf/Add']"
-            type="primary"
-            icon="el-icon-plus"
-            size="small"
-            @click="ShowEditOrViewDialog()"
-          >新增</el-button>
-          <el-button
-            v-hasPermi="['Conf_conf/Edit']"
-            type="primary"
-            icon="el-icon-edit"
-            class="el-button-modify"
-            size="small"
-            @click="ShowEditOrViewDialog('edit')"
-          >修改</el-button>
-          <el-button
-            v-hasPermi="['Conf_conf/Enable']"
-            type="info"
-            icon="el-icon-video-pause"
-            size="small"
-            @click="setEnable('0')"
-          >禁用</el-button>
-          <el-button
-            v-hasPermi="['Conf_conf/Enable']"
-            type="success"
-            icon="el-icon-video-play"
-            size="small"
-            @click="setEnable('1')"
-          >启用</el-button>
-          <el-button
-            v-hasPermi="['Conf_conf/DeleteSoft']"
-            type="warning"
-            icon="el-icon-delete"
-            size="small"
-            @click="deleteSoft('0')"
-          >软删除</el-button>
-          <el-button
-            v-hasPermi="['Conf_conf/Delete']"
-            type="danger"
-            icon="el-icon-delete"
-            size="small"
-            @click="deletePhysics()"
-          >删除</el-button>
-          <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableData()">刷新</el-button>
-        </el-button-group>
-      </div>
-      <el-table
-        ref="gridtable"
-        v-loading="tableloading"
-        :data="tableData"
-        border
-        stripe
-        highlight-current-row
-        style="width: 100%"
-        :default-sort="{prop: 'SortCode', order: 'ascending'}"
-        @select="handleSelectChange"
-        @select-all="handleSelectAllChange"
-        @sort-change="handleSortChange"
-      >
-        <el-table-column type="selection" width="30" />
-        <el-table-column prop="Confcode" label="配置编码" sortable="custom" width="120" />
-        <el-table-column prop="Confname" label="配置名称" sortable="custom" width="120" />
-        <el-table-column prop="Dsid" label="数据源ID" sortable="custom" width="120" />
-        <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
-        <el-table-column prop="Classify_id" label="配置分类" sortable="custom" width="260" align="center">
-          <template slot-scope="scope">
-            {{ scope.row.Classify_Name }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
-        <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="90" align="center" />
-        <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
-          <template slot-scope="scope">
-            <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="CreatorTime" label="创建时间" sortable />
-        <el-table-column prop="LastModifyTime" label="更新时间" sortable />
-
-      </el-table>
-      <div class="pagination-container">
-        <el-pagination
-          background
-          :current-page="pagination.currentPage"
-          :page-sizes="[5,10,20,50,100, 200, 300, 400]"
-          :page-size="pagination.pagesize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="pagination.pageTotal"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </el-card>
-    <el-dialog
-      ref="dialogEditForm"
-      :title="editFormTitle+'{TableNameDesc}'"
-      :visible.sync="dialogEditFormVisible"
-      width="640px"
-    >
+    <el-row :gutter="24">
+      <el-col :span="10">
+        <el-row :gutter="24">
+          <el-col :span="24">
+            <el-card>
+              <el-select v-model="Tbname" placeholder="请选择系统或数据库" @change="handleSelectSysDbChange()">
+                <el-option v-for="item in SelectTbnameList"
+                           :key="item.TableName"
+                           :label="item.TableName"
+                           :value="item.TableName" />
+              </el-select>
+            </el-card>
+          </el-col>
+        </el-row>
+        <el-row :gutter="24">
+          <el-col :span="24">
+            <el-card>
+              <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
+              <el-table ref="gridtable"
+                        v-loading="tableloading"
+                        :data="tableData"
+                        border
+                        stripe
+                        highlight-current-row
+                        style="width: 100%"
+                        :default-sort="{prop: 'SortCode', order: 'ascending'}"
+                        @select="handleSelectChange"
+                        @select-all="handleSelectAllChange"
+                        @sort-change="handleSortChange">
+                <el-table-column type="selection" width="30" />
+                <el-table-column prop="SdName" label="编码" sortable="custom" width="120" />
+                <el-table-column prop="Sdtype" label="名称" sortable="custom" width="120" />
+                <el-table-column label="操作" sortable="custom" width="120" align="center">
+                  <template slot-scope="scope">
+                    <el-button type="primary"
+                               icon="el-icon-plus"
+                               size="small"
+                               @click="UpdateDbContents(scope.row.Id)">更新结构信息</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <div class="pagination-container">
+                <el-pagination background
+                               :current-page="pagination.currentPage"
+                               :page-sizes="[5,10,20,50,100, 200, 300, 400]"
+                               :page-size="pagination.pagesize"
+                               layout="total, sizes, prev, pager, next, jumper"
+                               :total="pagination.pageTotal"
+                               @size-change="handleSizeChange"
+                               @current-change="handleCurrentChange" />
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+      </el-col>
+      <el-col :span="14">
+        <el-card>
+          <div class="list-btn-container">
+            <el-button-group>
+              <el-button v-hasPermi="['Sd_sysdb/Add']"
+                         type="primary"
+                         icon="el-icon-plus"
+                         size="small"
+                         @click="ShowEditOrViewDialog()">新增</el-button>
+              <el-button v-hasPermi="['Sd_sysdb/Edit']"
+                         type="primary"
+                         icon="el-icon-edit"
+                         class="el-button-modify"
+                         size="small"
+                         @click="ShowEditOrViewDialog('edit')">修改</el-button>
+              <el-button v-hasPermi="['Sd_sysdb/Enable']"
+                         type="info"
+                         icon="el-icon-video-pause"
+                         size="small"
+                         @click="setEnable('0')">禁用</el-button>
+              <el-button v-hasPermi="['Sd_sysdb/Enable']"
+                         type="success"
+                         icon="el-icon-video-play"
+                         size="small"
+                         @click="setEnable('1')">启用</el-button>
+              <el-button v-hasPermi="['Sd_sysdb/DeleteSoft']"
+                         type="warning"
+                         icon="el-icon-delete"
+                         size="small"
+                         @click="deleteSoft('0')">软删除</el-button>
+              <el-button v-hasPermi="['Sd_sysdb/Delete']"
+                         type="danger"
+                         icon="el-icon-delete"
+                         size="small"
+                         @click="deletePhysics()">删除</el-button>
+              <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableData()">刷新</el-button>
+            </el-button-group>
+          </div>
+          <el-table ref="gridtable"
+                    v-loading="tableloading"
+                    :data="tableData"
+                    border
+                    stripe
+                    highlight-current-row
+                    style="width: 100%"
+                    :default-sort="{prop: 'SortCode', order: 'ascending'}"
+                    @select="handleSelectChange"
+                    @select-all="handleSelectAllChange"
+                    @sort-change="handleSortChange">
+            <el-table-column type="selection" width="30" />
+            <el-table-column prop="SdName" label="编码" sortable="custom" width="120" />
+            <el-table-column prop="Sdtype" label="名称" sortable="custom" width="120" />
+            <el-table-column label="操作" sortable="custom" width="120" align="center">
+              <template slot-scope="scope">
+                <el-button type="primary"
+                           icon="el-icon-plus"
+                           size="small"
+                           @click="UpdateDbContents(scope.row.Id)">更新结构信息</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <div class="pagination-container">
+            <el-pagination background
+                           :current-page="pagination.currentPage"
+                           :page-sizes="[5,10,20,50,100, 200, 300, 400]"
+                           :page-size="pagination.pagesize"
+                           layout="total, sizes, prev, pager, next, jumper"
+                           :total="pagination.pageTotal"
+                           @size-change="handleSizeChange"
+                           @current-change="handleCurrentChange" />
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+    <el-dialog ref="dialogEditForm"
+               :title="editFormTitle+'{TableNameDesc}'"
+               :visible.sync="dialogEditFormVisible"
+               width="640px">
       <el-form ref="editFrom" :model="editFrom" :rules="rules">
         <el-form-item label="配置编码" :label-width="formLabelWidth" prop="Confcode">
           <el-input v-model="editFrom.Confcode" placeholder="请输入配置编码" autocomplete="off" clearable />
@@ -158,303 +171,23 @@ import { getConf_confListWithPager, getConf_confDetail,
   saveConf_conf, setConf_confEnable, deleteSoftConf_conf,
   deleteConf_conf
 } from '@/api/dataprocess/conf_conf'
-import {
-  getAllClassifyTreeTable
-} from '@/api/dataprocess/conf_classify'
 
 export default {
   data() {
     return {
-      searchform: {
-        keywords: ''
-      },
-      loadBtnFunc: [],
-      tableData: [],
-      tableloading: true,
-      pagination: {
-        currentPage: 1,
-        pagesize: 20,
-        pageTotal: 0
-      },
-      sortableData: {
-        order: 'desc',
-        sort: 'CreatorTime'
-      },
-      selectedclass: '',
-      selectclasses: [],
-      dialogEditFormVisible: false,
-      editFormTitle: '',
-      editFrom: {
-        Classify_id: '',
-        Confcode: '',
-        Confname: '',
-        Description: '',
-        Dsid: '',
-        EnabledMark: '',
-        SortCode: ''
-
-      },
-      rules: {
-
-      },
-      formLabelWidth: '80px',
-      currentId: '', // 当前操作对象的ID值，主要用于修改
-      currentSelected: []
+      
     }
   },
   created() {
-    this.pagination.currentPage = 1
-    this.InitDictItem()
-    this.loadTableData()
-    this.loadBtnFunc = JSON.parse(localStorage.getItem('yueboncurrentfuns'))
+    
   },
   methods: {
     /**
-     * 初始化数据
-     */
-    InitDictItem() {
+    *系统或数据库选择
+    */
+    handleSelectTbChange: function (value) {
+      
     },
-    /**
-     * 加载页面table数据
-     */
-    loadTableData: function() {
-      this.tableloading = true
-      var seachdata = {
-        CurrenetPageIndex: this.pagination.currentPage,
-        PageSize: this.pagination.pagesize,
-        Keywords: this.searchform.keywords,
-        Order: this.sortableData.order,
-        Sort: this.sortableData.sort
-      }
-      getConf_confListWithPager(seachdata).then(res => {
-        this.tableData = res.ResData.Items
-        this.pagination.pageTotal = res.ResData.TotalItems
-        this.tableloading = false
-      })
-      getAllClassifyTreeTable().then(res => {
-        this.tableData = res.ResData
-        this.selectclasses = res.ResData
-        this.tableloading = false
-      })
-    },
-    /**
-     * 点击查询
-     */
-    handleSearch: function() {
-      this.pagination.currentPage = 1
-      this.loadTableData()
-    },
-
-    /**
-     * 新增、修改或查看明细信息（绑定显示数据）     *
-     */
-    ShowEditOrViewDialog: function(view) {
-      if (view !== undefined) {
-        if (this.currentSelected.length > 1 || this.currentSelected.length === 0) {
-          this.$alert('请选择一条数据进行编辑/修改', '提示')
-        } else {
-          this.currentId = this.currentSelected[0].Id
-          this.editFormTitle = '编辑'
-          this.dialogEditFormVisible = true
-          this.bindEditInfo()
-        }
-      } else {
-        this.editFormTitle = '新增'
-        this.currentId = ''
-        this.selectedclass = ''
-        this.dialogEditFormVisible = true
-      }
-    },
-    bindEditInfo: function() {
-      getConf_confDetail(this.currentId).then(res => {
-        this.editFrom.Classify_id = res.ResData.Classify_id
-        this.editFrom.Confcode = res.ResData.Confcode
-        this.editFrom.Confname = res.ResData.Confname
-        this.editFrom.Description = res.ResData.Description
-        this.editFrom.Dsid = res.ResData.Dsid
-        this.editFrom.EnabledMark = res.ResData.EnabledMark
-        this.editFrom.SortCode = res.ResData.SortCode
-        this.selectedclass = res.ResData.Classify_id
-      })
-    },
-    /**
-     * 新增/修改保存
-     */
-    saveEditForm() {
-      this.$refs['editFrom'].validate((valid) => {
-        if (valid) {
-          const data = {
-            'Classify_id': this.editFrom.Classify_id,
-            'Confcode': this.editFrom.Confcode,
-            'Confname': this.editFrom.Confname,
-            'Description': this.editFrom.Description,
-            'Dsid': this.editFrom.Dsid,
-            'EnabledMark': this.editFrom.EnabledMark,
-            'SortCode': this.editFrom.SortCode,
-            'Id': this.currentId
-          }
-          var url = 'Conf_conf/Insert'
-          if (this.currentId !== '') {
-            url = 'Conf_conf/Update?id=' + this.currentId
-          }
-          saveConf_conf(data, url).then(res => {
-            if (res.Success) {
-              this.$message({
-                message: '恭喜你，操作成功',
-                type: 'success'
-              })
-              this.dialogEditFormVisible = false
-              this.currentSelected = ''
-              this.selectedclass = ''
-              this.$refs['editFrom'].resetFields()
-              this.loadTableData()
-              this.InitDictItem()
-            } else {
-              this.$message({
-                message: res.ErrMsg,
-                type: 'error'
-              })
-            }
-          })
-        } else {
-          return false
-        }
-      })
-    },
-    setEnable: function(val) {
-      if (this.currentSelected.length === 0) {
-        this.$alert('请先选择要操作的数据', '提示')
-        return false
-      } else {
-        var currentIds = []
-        this.currentSelected.forEach(element => {
-          currentIds.push(element.Id)
-        })
-        const data = {
-          Ids: currentIds,
-          Flag: val
-        }
-        setConf_confEnable(data).then(res => {
-          if (res.Success) {
-            this.$message({
-              message: '恭喜你，操作成功',
-              type: 'success'
-            })
-            this.currentSelected = ''
-            this.loadTableData()
-          } else {
-            this.$message({
-              message: res.ErrMsg,
-              type: 'error'
-            })
-          }
-        })
-      }
-    },
-    deleteSoft: function(val) {
-      if (this.currentSelected.length === 0) {
-        this.$alert('请先选择要操作的数据', '提示')
-        return false
-      } else {
-        var currentIds = []
-        this.currentSelected.forEach(element => {
-          currentIds.push(element.Id)
-        })
-        const data = {
-          Ids: currentIds,
-          Flag: val
-        }
-        deleteSoftConf_conf(data).then(res => {
-          if (res.Success) {
-            this.$message({
-              message: '恭喜你，操作成功',
-              type: 'success'
-            })
-            this.currentSelected = ''
-            this.loadTableData()
-          } else {
-            this.$message({
-              message: res.ErrMsg,
-              type: 'error'
-            })
-          }
-        })
-      }
-    },
-    deletePhysics: function() {
-      if (this.currentSelected.length === 0) {
-        this.$alert('请先选择要操作的数据', '提示')
-        return false
-      } else {
-        var currentIds = []
-        this.currentSelected.forEach(element => {
-          currentIds.push(element.Id)
-        })
-        const data = {
-          Ids: currentIds
-        }
-        deleteConf_conf(data).then(res => {
-          if (res.Success) {
-            this.$message({
-              message: '恭喜你，操作成功',
-              type: 'success'
-            })
-            this.currentSelected = ''
-            this.loadTableData()
-          } else {
-            this.$message({
-              message: res.ErrMsg,
-              type: 'error'
-            })
-          }
-        })
-      }
-    },
-    /**
-     * 当表格的排序条件发生变化的时候会触发该事件
-     */
-    handleSortChange: function(column) {
-      this.sortableData.sort = column.prop
-      if (column.order === 'ascending') {
-        this.sortableData.order = 'asc'
-      } else {
-        this.sortableData.order = 'desc'
-      }
-      this.loadTableData()
-    },
-    /**
-*选择分类
-*/
-    handleSelectClassChange: function() {
-      this.editFrom.Classify_id = this.selectedclass
-    },
-    /**
-     * 当用户手动勾选checkbox数据行事件
-     */
-    handleSelectChange: function(selection, row) {
-      this.currentSelected = selection
-    },
-    /**
-     * 当用户手动勾选全选checkbox事件
-     */
-    handleSelectAllChange: function(selection) {
-      this.currentSelected = selection
-    },
-    /**
-     * 选择每页显示数量
-     */
-    handleSizeChange(val) {
-      this.pagination.pagesize = val
-      this.pagination.currentPage = 1
-      this.loadTableData()
-    },
-    /**
-     * 选择当页面
-     */
-    handleCurrentChange(val) {
-      this.pagination.currentPage = val
-      this.loadTableData()
-    }
   }
 }
 </script>

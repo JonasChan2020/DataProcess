@@ -47,7 +47,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         {
             info.Id = GuidUtils.CreateNo();
             info.Parentid = string.IsNullOrEmpty(info.Parentid) ? "" : info.Parentid;
-            info.Sysid = CurrentUser.SysId;
             info.State = "0";
             info.CreatorTime = DateTime.Now;
             info.CreatorUserId = CurrentUser.UserId;
@@ -66,7 +65,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         protected override void OnBeforeUpdate(Sd_classify info)
         {
             info.Parentid = string.IsNullOrEmpty(info.Parentid) ? "" : info.Parentid;
-            info.Sysid = CurrentUser.SysId;
             info.LastModifyUserId = CurrentUser.UserId;
             info.LastModifyTime = DateTime.Now;
         }
@@ -95,9 +93,9 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             CommonResult result = new CommonResult();
 
             #region 验证非空及重复
-            if (!string.IsNullOrEmpty(tinfo.Dtcode))
+            if (!string.IsNullOrEmpty(tinfo.ClassCode))
             {
-                string where = string.Format("dtcode='{0}'", tinfo.Dtcode);
+                string where = string.Format("classcode='{0}'", tinfo.ClassCode);
                 Sd_classify model = iService.GetWhere(where);
                 if (model != null)
                 {
@@ -161,9 +159,9 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             CommonResult result = new CommonResult();
 
             #region 验证非空及重复
-            if (!string.IsNullOrEmpty(tinfo.Dtcode))
+            if (!string.IsNullOrEmpty(tinfo.ClassCode))
             {
-                string where = string.Format("dtcode='{0}' and id<>'{1}'", tinfo.Dtcode, tinfo.Id);
+                string where = string.Format("classcode='{0}' and id<>'{1}'", tinfo.ClassCode, tinfo.Id);
                 Sd_classify model = iService.GetWhere(where);
                 if (model != null)
                 {
@@ -179,8 +177,8 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             #endregion
 
             Sd_classify info = iService.Get(id);
-            info.Dtcode = tinfo.Dtcode;
-            info.Dtname = tinfo.Dtname;
+            info.ClassCode = tinfo.ClassCode;
+            info.ClassName = tinfo.ClassName;
             info.Description = tinfo.Description;
             info.Parentid = tinfo.Parentid;
             info.SortCode = tinfo.SortCode;
@@ -227,38 +225,15 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// <returns></returns>
         [HttpPost("GetAllClassifyTreeTable")]
         [YuebonAuthorize("List")]
-        public async Task<IActionResult> GetAllClassifyTreeTable([FromBody] dynamic formData)
+        public async Task<IActionResult> GetAllClassifyTreeTable()
         {
             CommonResult result = new CommonResult();
             try
             {
-                string dataStr = formData.ToString();
-                var paramsObj = new { sysId = "" };
-                paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
-                if (!string.IsNullOrEmpty(paramsObj.sysId))
-                {
-                    List<Sd_classifyOutputDto> list = await iService.GetAllClassifyTreeTable(paramsObj.sysId);
-                    result.Success = true;
-                    result.ErrCode = ErrCode.successCode;
-                    result.ResData = list;
-                }
-                else
-                {
-                    if (string.IsNullOrEmpty(CurrentUser.SysId))
-                    {
-                        result.ErrMsg = ErrCode.err80001;
-                        result.ErrCode = "80001";
-                    }
-                    else
-                    {
-                        List<Sd_classifyOutputDto> list = await iService.GetAllClassifyTreeTable(CurrentUser.SysId);
-                        result.Success = true;
-                        result.ErrCode = ErrCode.successCode;
-                        result.ResData = list;
-                    }
-                }
-               
-                
+                List<Sd_classifyOutputDto> list = await iService.GetAllClassifyTreeTable();
+                result.Success = true;
+                result.ErrCode = ErrCode.successCode;
+                result.ResData = list;
             }
             catch (Exception ex)
             {

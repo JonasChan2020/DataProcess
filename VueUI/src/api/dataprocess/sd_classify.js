@@ -26,11 +26,10 @@ export function getAllSd_classifyList() {
 /**
  * 获取树形分类
 */
-export function getAllSdClassifyTreeTable(data) {
+export function getAllSdClassifyTreeTable() {
   return http.request({
     url: 'Sd_classify/GetAllClassifyTreeTable',
     method: 'post',
-    data: { sysId: data },
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
 }

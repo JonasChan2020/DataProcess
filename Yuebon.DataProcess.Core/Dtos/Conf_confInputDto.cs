@@ -13,29 +13,22 @@ namespace Yuebon.DataProcess.Dtos
     public class Conf_confInputDto: IInputDto<string>
     {
         /// <summary>
-        /// 设置或获取配置分类ID
+        /// 设置或获取配置类型0：系统，1：数据库
         /// </summary>
-        public string Classify_id { get; set; }
-        /// <summary>
-        /// 设置或获取配置编码
-        /// </summary>
-        public string Confcode { get; set; }
-        /// <summary>
-        /// 设置或获取配置名称
-        /// </summary>
-        public string Confname { get; set; }
-        /// <summary>
-        /// 设置或获取配置类型0：校验，1：导入，2：导出
-        /// </summary>
-        public bool? Conftype { get; set; }
+        public int? Conftype { get; set; }
         /// <summary>
         /// 设置或获取描述
         /// </summary>
         public string Description { get; set; }
         /// <summary>
-        /// 设置或获取数据源ID
+        /// 设置或获取关联库或系统ID
         /// </summary>
-        public string Dsid { get; set; }
+        public string FromId { get; set; }
+
+        /// <summary>
+        /// 设置或获取被关联库或系统ID
+        /// </summary>
+        public string ToId { get; set; }
         /// <summary>
         /// 设置或获取启用标记
         /// </summary>
@@ -52,10 +45,7 @@ namespace Yuebon.DataProcess.Dtos
         /// 设置或获取状态
         /// </summary>
         public string State { get; set; }
-        /// <summary>
-        /// 设置或获取系统ID
-        /// </summary>
-        public string Sysid { get; set; }
+      
 
     }
 }

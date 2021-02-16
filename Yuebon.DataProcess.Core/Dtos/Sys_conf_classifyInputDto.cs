@@ -43,11 +43,11 @@ namespace Yuebon.DataProcess.Dtos
         /// <summary>
         /// 设置或获取类型编码
         /// </summary>
-        public string Stcode { get; set; }
+        public string ClassCode { get; set; }
         /// <summary>
         /// 设置或获取类型名称
         /// </summary>
-        public string Stname { get; set; }
+        public string ClassName { get; set; }
         /// <summary>
         /// 设置或获取所属系统ID
         /// </summary>

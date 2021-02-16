@@ -41,7 +41,7 @@ namespace Yuebon.DataProcess.Models
         /// <summary>
         /// 设置或获取类型编码
         /// </summary>
-        public string Dtcode { get; set; }
+        public string ClassCode { get; set; }
         /// <summary>
         /// 设置或获取类型描述
         /// </summary>
@@ -49,7 +49,7 @@ namespace Yuebon.DataProcess.Models
         /// <summary>
         /// 设置或获取类型名称
         /// </summary>
-        public string Dtname { get; set; }
+        public string ClassName { get; set; }
         /// <summary>
         /// 设置或获取启用标记
         /// </summary>

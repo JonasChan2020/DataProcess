@@ -44,13 +44,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         protected override void OnBeforeInsert(Conf_detail info)
         {
             info.Id = GuidUtils.CreateNo();
-            info.CreatorTime = DateTime.Now;
-            info.CreatorUserId = CurrentUser.UserId;
-            info.DeleteMark = false;
-            if (info.SortCode == null)
-            {
-                info.SortCode = 99;
-            }
         }
         
         /// <summary>
@@ -60,8 +53,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// <returns></returns>
         protected override void OnBeforeUpdate(Conf_detail info)
         {
-            info.LastModifyUserId = CurrentUser.UserId;
-            info.LastModifyTime = DateTime.Now;
+
         }
 
         /// <summary>
@@ -71,9 +63,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// <returns></returns>
         protected override void OnBeforeSoftDelete(Conf_detail info)
         {
-            info.DeleteMark = true;
-            info.DeleteTime = DateTime.Now;
-            info.DeleteUserId = CurrentUser.UserId;
+            
         }
     }
 }

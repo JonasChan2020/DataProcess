@@ -123,6 +123,7 @@
     </el-card>
     <el-dialog
       ref="dialogEditForm"
+               :close-on-click-modal="false"
       :title="editFormTitle+'连接'"
       :visible.sync="dialogEditFormVisible"
       width="640px"
@@ -135,7 +136,10 @@
           <el-input v-model="editFrom.Sdtype" placeholder="请输入数据库类型" autocomplete="off" clearable />
         </el-form-item>
         <el-form-item label="连接分类" :label-width="formLabelWidth" prop="Classify_id">
-          <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'Dtname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
+          <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
+        </el-form-item>
+        <el-form-item label="所属系统" :label-width="formLabelWidth" prop="Sys_id">
+          <el-cascader v-model="selectedsys" style="width:500px;" :options="selectsyses" filterable :props="{label:'Sysname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectSysChange" />
         </el-form-item>
         <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
           <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
@@ -169,7 +173,6 @@
         <el-button type="primary" @click="saveEditForm()">确 定</el-button>
       </div>
     </el-dialog>
-
   </div>
 </template>
 
@@ -181,7 +184,10 @@ import { getSd_sysdbListWithPager, getSd_sysdbDetail,
 } from '@/api/dataprocess/sd_sysdb'
 import {
   getAllSdClassifyTreeTable
-} from '@/api/dataprocess/sd_classify'
+  } from '@/api/dataprocess/sd_classify'
+  import {
+    getAllSys_sysList
+  } from '@/api/dataprocess/sys_sys'
 
 export default {
   data() {
@@ -203,6 +209,8 @@ export default {
       },
       selectedclass: '',
       selectclasses: [],
+      selectedsys: '',
+      selectsyses: [],
       dialogEditFormVisible: false,
       editFormTitle: '',
       editFrom: {
@@ -239,9 +247,13 @@ export default {
      * 初始化数据
      */
     InitDictItem() {
-      getAllSdClassifyTreeTable('').then(res => {
+      getAllSdClassifyTreeTable().then(res => {
         this.selectclasses = res.ResData
       })
+      getAllSys_sysList().then(res => {
+        this.selectsyses = res.ResData
+      })
+      
     },
     /**
      * 加载页面table数据
@@ -287,6 +299,7 @@ export default {
         this.editFormTitle = '新增'
         this.currentId = ''
         this.selectedclass = ''
+        this.selectedsys = ''
         this.dialogEditFormVisible = true
       }
     },
@@ -298,6 +311,7 @@ export default {
         this.editFrom.Sddesc = res.ResData.Sddesc
         this.editFrom.SdName = res.ResData.SdName
         this.editFrom.Sdtype = res.ResData.Sdtype
+        this.editFrom.Sys_id = res.ResData.Sys_id
         this.editFrom.HostAddress = res.ResData.HostAddress
         this.editFrom.Port = res.ResData.Port
         this.editFrom.dbName = res.ResData.dbName
@@ -305,6 +319,7 @@ export default {
         this.editFrom.Password = res.ResData.Password
         this.editFrom.SortCode = res.ResData.SortCode
         this.selectedclass = res.ResData.Classify_id
+        this.selectedsys = res.ResData.Sys_id
       })
     },
     /**
@@ -320,6 +335,7 @@ export default {
             'Sddesc': this.editFrom.Sddesc,
             'SdName': this.editFrom.SdName,
             'Sdtype': this.editFrom.Sdtype,
+            'Sys_id': this.editFrom.Sys_id,
             'HostAddress': this.editFrom.HostAddress,
             'Port': this.editFrom.Port,
             'dbName': this.editFrom.dbName,
@@ -341,6 +357,7 @@ export default {
               this.dialogEditFormVisible = false
               this.currentSelected = ''
               this.selectedclass = ''
+              this.selectedsys = ''
               this.$refs['editFrom'].resetFields()
               this.loadTableData()
               this.InitDictItem()
@@ -476,6 +493,12 @@ export default {
 */
     handleSelectClassChange: function() {
       this.editFrom.Classify_id = this.selectedclass
+    },
+  /**
+*选择系统
+*/
+    handleSelectSysChange: function () {
+      this.editFrom.Sys_id = this.selectedsys
     },
     /**
      * 当用户手动勾选checkbox数据行事件

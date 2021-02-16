@@ -58,7 +58,7 @@ namespace Yuebon.DataProcess.Services
             {
                 if (!string.IsNullOrEmpty(item.Classify_id))
                 {
-                    item.Classify_Name = _classservice.Get(item.Classify_id).Stname;
+                    item.Classify_Name = _classservice.Get(item.Classify_id).ClassName;
                 }
                 if (!string.IsNullOrEmpty(item.MdbId))
                 {
