@@ -119,7 +119,7 @@
     </el-card>
 
     <!-- 添加或修改菜单对话框 -->
-    <el-dialog ref="dialogEditMenuForm" v-el-drag-dialog :title="editMenuFormTitle+'模块/菜单'" append-to-body :visible.sync="dialogMenuEditFormVisible" width="40%">
+    <el-dialog ref="dialogEditMenuForm" v-el-drag-dialog  :close-on-click-modal="false" :title="editMenuFormTitle+'模块/菜单'" append-to-body :visible.sync="dialogMenuEditFormVisible" width="40%">
       <el-form ref="editMenuFrom" :model="editMenuFrom" :rules="rules">
         <el-row>
           <el-col :span="12">

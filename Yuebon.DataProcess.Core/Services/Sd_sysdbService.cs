@@ -68,23 +68,25 @@ namespace Yuebon.DataProcess.Services
         /// <returns></returns>
         public override async Task<PageResult<Sd_sysdbOutputDto>> FindWithPagerAsync(SearchInputDto<Sd_sysdb> search)
         {
-
-            bool order = search.Order == "asc" ? false : true;
             string where = GetDataPrivilege();
             PagerInfo pagerInfo = new PagerInfo
             {
                 CurrenetPageIndex = search.CurrenetPageIndex,
                 PageSize = search.PageSize
             };
-            if (!string.IsNullOrEmpty(search.Filter.Sys_id))
+            if (search.Filter != null && !string.IsNullOrEmpty(search.Pkey))
+            {
+                where += string.Format(" and id = '{0}'", search.Pkey);
+            }
+            if (search.Filter != null && !string.IsNullOrEmpty(search.Filter.Sys_id))
             {
                 where += string.Format(" and sys_id = '{0}'", search.Filter.Sys_id);
             }
-            if (!string.IsNullOrEmpty(search.Filter.Classify_id))
+            if (search.Filter != null && !string.IsNullOrEmpty(search.Filter.Classify_id))
             {
                 where += string.Format(" and classify_id = '{0}'", search.Filter.Classify_id);
             }
-            List<Sd_sysdb> list = await repository.FindWithPagerAsync(where, pagerInfo, search.Sort, order);
+            List<Sd_sysdb> list = await repository.FindWithPagerAsync(where, pagerInfo);
             List<Sd_sysdbOutputDto> resultList = list.MapTo<Sd_sysdbOutputDto>();
             List<Sd_sysdbOutputDto> listResult = new List<Sd_sysdbOutputDto>();
             foreach (Sd_sysdbOutputDto item in resultList)

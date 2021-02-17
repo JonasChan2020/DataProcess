@@ -318,9 +318,9 @@ export default {
         this.tableloading = false
       })
       getAllClassifyTreeTable().then(res => {
-        this.tableData = res.ResData
+        //this.tableData = res.ResData
         this.selectclasses = res.ResData
-        this.tableloading = false
+        //this.tableloading = false
       })
     },
     /**

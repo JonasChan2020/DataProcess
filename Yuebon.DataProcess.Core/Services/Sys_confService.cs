@@ -42,19 +42,17 @@ namespace Yuebon.DataProcess.Services
         /// <returns></returns>
         public override async Task<PageResult<Sys_confOutputDto>> FindWithPagerAsync(SearchInputDto<Sys_conf> search)
         {
-
-            bool order = search.Order == "asc" ? false : true;
             string where = GetDataPrivilege();
             PagerInfo pagerInfo = new PagerInfo
             {
                 CurrenetPageIndex = search.CurrenetPageIndex,
                 PageSize = search.PageSize
             };
-            if (!string.IsNullOrEmpty(search.Filter.Sysid))
+            if (search.Filter!=null&&!string.IsNullOrEmpty(search.Filter.Sysid))
             {
                 where += string.Format(" and sysid = '{0}'", search.Filter.Sysid);
             }
-            List<Sys_conf> list = await repository.FindWithPagerAsync(where, pagerInfo, search.Sort, order);
+            List<Sys_conf> list = await repository.FindWithPagerAsync(where, pagerInfo);
             List<Sys_confOutputDto> resultList = list.MapTo<Sys_confOutputDto>();
             List<Sys_confOutputDto> listResult = new List<Sys_confOutputDto>();
             foreach (Sys_confOutputDto item in resultList)

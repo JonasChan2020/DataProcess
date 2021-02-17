@@ -1,17 +1,15 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Yuebon.AspNetCore.Common;
 using Yuebon.AspNetCore.Models;
 using Yuebon.AspNetCore.Mvc;
 using Yuebon.AspNetCore.Mvc.Filter;
 using Yuebon.AspNetCore.ViewModel;
-using Yuebon.Commons.Cache;
 using Yuebon.Commons.Core.Dtos;
 using Yuebon.Commons.Dtos;
 using Yuebon.Commons.Extensions;
@@ -514,7 +512,12 @@ namespace Yuebon.AspNetCore.Controllers
         public virtual async Task<CommonResult<PageResult<TODto>>> FindWithPagerAsync(SearchInputDto<T> search)
         {
             CommonResult<PageResult<TODto>> result = new CommonResult<PageResult<TODto>>();
-            result.ResData = await iService.FindWithPagerAsync(search);
+            PageResult<TODto> res = await iService.FindWithPagerAsync(search);
+            if (!string.IsNullOrEmpty(search.Sort)&& !string.IsNullOrEmpty(search.Order))
+            {
+                res.Items = search.Order == "desc" ? res.Items.OrderByDescending(p => GetPropertyValue(p, search.Sort)).ToList() : res.Items.OrderBy(p => GetPropertyValue(p, search.Sort)).ToList();
+            }
+            result.ResData = res;
             result.ErrCode = ErrCode.successCode;
             return result;
         }
@@ -541,7 +544,11 @@ namespace Yuebon.AspNetCore.Controllers
 
 
         #region 辅助方法
-
+        private object GetPropertyValue(object obj, string property)
+        {
+            System.Reflection.PropertyInfo propertyInfo = obj.GetType().GetProperty(property);
+            return propertyInfo.GetValue(obj, null);
+        }
         #endregion
 
     }

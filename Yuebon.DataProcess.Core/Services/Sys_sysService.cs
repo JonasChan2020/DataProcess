@@ -46,6 +46,14 @@ namespace Yuebon.DataProcess.Services
 
             bool order = search.Order == "asc" ? false : true;
             string where = GetDataPrivilege();
+            if (search.Filter!=null&&!string.IsNullOrEmpty(search.Filter.Classify_id))
+            {
+                where += string.Format(" and classify_id = '{0}'", search.Filter.Classify_id);
+            }
+            if (search.Filter != null && !string.IsNullOrEmpty(search.Pkey))
+            {
+                where += string.Format(" and id = '{0}'", search.Pkey);
+            }
             PagerInfo pagerInfo = new PagerInfo
             {
                 CurrenetPageIndex = search.CurrenetPageIndex,

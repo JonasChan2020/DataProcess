@@ -1,19 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Yuebon.AspNetCore.Controllers;
-using Yuebon.AspNetCore.Models;
 using Yuebon.Commons.Helpers;
-using Yuebon.Commons.Log;
-using Yuebon.Commons.Mapping;
-using Yuebon.Commons.Models;
-using Yuebon.Commons.Pages;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 using Yuebon.DataProcess.IServices;
-using Yuebon.Commons.Dtos;
-using Yuebon.AspNetCore.Mvc;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -80,29 +71,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             info.DeleteUserId = CurrentUser.UserId;
         }
 
-        /// <summary>
-        /// 根据条件查询数据库,并返回对象集合(用于分页数据显示)
-        /// 
-        /// </summary>
-        /// <param name="search"></param>
-        /// <returns></returns>
-        [HttpPost("FindWithPagerAsync")]
-        [YuebonAuthorize("List")]
-        public override async Task<CommonResult<PageResult<Sys_confOutputDto>>> FindWithPagerAsync(SearchInputDto<Sys_conf> search)
-        {
-            CommonResult<PageResult<Sys_confOutputDto>> result = new CommonResult<PageResult<Sys_confOutputDto>>();
-            if (!string.IsNullOrEmpty(CurrentUser.SysId))
-            {
-                search.Filter = new Sys_conf();
-                search.Filter.Sysid = CurrentUser.SysId;
-                result.ResData = await iService.FindWithPagerAsync(search);
-                result.ErrCode = ErrCode.successCode;
-            }
-            else
-            {
-                result.ErrCode = ErrCode.successCode;
-            }
-            return result;
-        }
+
     }
 }

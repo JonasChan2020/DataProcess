@@ -281,8 +281,12 @@ namespace Yuebon.Commons.Pages
             }
             else
             {
-                //SELECT * FROM 表名称 LIMIT M,N 
-                string strOrder = string.Format(" order by {0} {1}", this.fieldNameToSort, this.isDescending ? "DESC" : "ASC");
+                string strOrder = "";
+                if (!string.IsNullOrEmpty(this.fieldNameToSort))
+                {
+                    //SELECT * FROM 表名称 LIMIT M,N 
+                    strOrder = string.Format(" order by {0} {1}", this.fieldNameToSort, this.isDescending ? "DESC" : "ASC");
+                }
 
                 int minRow = pageSize * (pageIndex - 1);
                 int maxRow = pageSize * pageIndex;

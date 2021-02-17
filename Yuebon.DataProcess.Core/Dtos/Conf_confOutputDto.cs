@@ -24,12 +24,6 @@ namespace Yuebon.DataProcess.Dtos
         public string ToId { get; set; }
 
         /// <summary>
-        /// 设置或获取关联库或系统名称
-        /// </summary>
-        [MaxLength(0)]
-        public string FromName { get; set; }
-
-        /// <summary>
         /// 设置或获取被关联库或系统名称
         /// </summary>
         [MaxLength(0)]

@@ -211,23 +211,22 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 
         #endregion
 
-        /// <summary>
-        /// 根据条件查询数据库,并返回对象集合(用于分页数据显示)
-        /// 
-        /// </summary>
-        /// <param name="search"></param>
-        /// <returns></returns>
-        [HttpPost("FindWithPagerAsync")]
-        [YuebonAuthorize("List")]
-        public override async Task<CommonResult<PageResult<Sd_sysdbOutputDto>>> FindWithPagerAsync(SearchInputDto<Sd_sysdb> search)
-        {
-            CommonResult<PageResult<Sd_sysdbOutputDto>> result = new CommonResult<PageResult<Sd_sysdbOutputDto>>();
-            search.Filter = new Sd_sysdb();
-            result.ResData = await iService.FindWithPagerAsync(search);
-            result.Success = true;
-            result.ErrCode = ErrCode.successCode;
-            return result;
-        }
+        ///// <summary>
+        ///// 根据条件查询数据库,并返回对象集合(用于分页数据显示)
+        ///// 
+        ///// </summary>
+        ///// <param name="search"></param>
+        ///// <returns></returns>
+        //[HttpPost("FindWithPagerAsync")]
+        //[YuebonAuthorize("List")]
+        //public override async Task<CommonResult<PageResult<Sd_sysdbOutputDto>>> FindWithPagerAsync(SearchInputDto<Sd_sysdb> search)
+        //{
+        //    CommonResult<PageResult<Sd_sysdbOutputDto>> result = new CommonResult<PageResult<Sd_sysdbOutputDto>>();
+        //    result.ResData = await iService.FindWithPagerAsync(search);
+        //    result.Success = true;
+        //    result.ErrCode = ErrCode.successCode;
+        //    return result;
+        //}
 
         /// <summary>
         /// 根据条件查询数据库,并返回对象集合(用于分页数据显示)

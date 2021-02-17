@@ -147,5 +147,31 @@ namespace Yuebon.AspNetCore.Models
 
         #endregion
 
+        #region 数据交互管理
+        /// <summary>
+        /// 系统未设置主数据库，请先设置主数据库
+        /// </summary>
+        public static string err80401 = "系统未设置主数据库，请先设置主数据库";
+        /// <summary>
+        /// 找不到所选系统
+        /// </summary>
+        public static string err80402 = "找不到所选系统";
+        /// <summary>
+        /// 找不到所选数据库
+        /// </summary>
+        public static string err80403 = "找不到所选数据库";
+        /// <summary>
+        /// 所选数据库已加入系统，请直接关联系统
+        /// </summary>
+        public static string err80404 = "所选数据库已加入系统，请直接关联系统";
+
+        /// <summary>
+        /// 所选数据库已加入系统，但找不到对应系统
+        /// </summary>
+        public static string err80405= "所选数据库已加入系统，但找不到对应系统";
+
+
+        #endregion
+
     }
 }

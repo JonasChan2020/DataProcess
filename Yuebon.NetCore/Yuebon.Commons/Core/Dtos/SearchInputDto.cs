@@ -21,6 +21,13 @@ namespace Yuebon.Commons.Dtos
             get; set;
         }
         /// <summary>
+        /// Pkey
+        /// </summary>
+        public string Pkey
+        {
+            get; set;
+        }
+        /// <summary>
         /// 编码/代码
         /// </summary>
         public string EnCode
@@ -41,6 +48,7 @@ namespace Yuebon.Commons.Dtos
         {
             get; set;
         }
+
 
         /// <summary>
         /// 查询条件

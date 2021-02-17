@@ -99,10 +99,10 @@ namespace Yuebon.Commons.Models
         public bool Success
         {
             get {
-                if (ErrCode == "0")
-                {
-                    m_Success = true;
-                }
+                //if (ErrCode == "0")
+                //{
+                //    m_Success = true;
+                //}
                 return m_Success; 
             }
             set {
@@ -117,6 +117,23 @@ namespace Yuebon.Commons.Models
         {
             get => m_ResData;
             set => m_ResData = value;
+        }
+
+        /// <summary>
+        /// 自定义返回编码
+        /// </summary>
+        private string m_CustomCode;
+        /// <summary>
+        /// 自定义返回编码
+        /// </summary>
+        [DataMember]
+        public string CustomCode
+        {
+            get
+            {
+                return m_CustomCode;
+            }
+            set { m_CustomCode = value; }
         }
     }
 

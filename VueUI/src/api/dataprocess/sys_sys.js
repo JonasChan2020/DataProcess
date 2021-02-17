@@ -49,7 +49,6 @@ export function updateMDb(sysId, dbId) {
    * @param data
    */
 export function saveSys_sys(data, url) {
-  alert(data)
   return http.request({
     url: url,
     method: 'post',
