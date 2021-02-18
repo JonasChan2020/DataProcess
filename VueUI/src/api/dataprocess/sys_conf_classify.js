@@ -26,10 +26,11 @@ export function getAllSys_conf_classifyList () {
 /**
  * 获取树形分类
 */
-export function getAllClassifyTreeTable () {
+export function getAllSysConfClassifyTreeTable (data) {
   return http.request({
     url: 'Sys_conf_classify/GetAllClassifyTreeTable',
-    method: 'get',
+    method: 'post',
+    data: data,
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Yuebon.Commons.Dtos;
 using Yuebon.Commons.IServices;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
@@ -16,6 +17,6 @@ namespace Yuebon.DataProcess.IServices
         /// 获取分类适用于Vue 树形列表
         /// </summary>
         /// <returns></returns>
-        Task<List<Sys_conf_classifyOutputDto>> GetAllClassifyTreeTable(string SysId);
+        Task<List<Sys_conf_classifyOutputDto>> GetAllClassifyTreeTable(SearchInputDto<Sys_conf_classify> search);
     }
 }

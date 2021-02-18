@@ -33,15 +33,19 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
     {
         private ISys_conf_objService ISysconfobjService;
         private IPlug_plugService IPlugService;
+        private ISys_sysService SysService;
+        private ISd_sysdbService SdService;
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="_iService"></param>
-        public Sys_conf_detailsController(ISys_conf_detailsService _iService, ISys_conf_objService _ISysconfobjService, IPlug_plugService _IPlugService) : base(_iService)
+        public Sys_conf_detailsController(ISys_conf_detailsService _iService, ISys_conf_objService _ISysconfobjService, IPlug_plugService _IPlugService, ISys_sysService _SysService, ISd_sysdbService _SdService) : base(_iService)
         {
             iService = _iService;
             ISysconfobjService = _ISysconfobjService;
             IPlugService = _IPlugService;
+            SysService = _SysService;
+            SdService = _SdService;
             AuthorizeKey.ListKey = "Sys_conf_details/List";
             AuthorizeKey.InsertKey = "Sys_conf_details/Add";
             AuthorizeKey.UpdateKey = "Sys_conf_details/Edit";
@@ -119,24 +123,43 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// <returns></returns>
         [HttpPost("GetTbNameList")]
         [YuebonAuthorize("List")]
-        public IActionResult GetTbNameList()
+        public IActionResult GetTbNameList([FromBody] dynamic formData)
         {
             CommonResult<List<DbTableInfo>> result = new CommonResult<List<DbTableInfo>>();
-            if (!string.IsNullOrEmpty(CurrentUser.MDbName) && !string.IsNullOrEmpty(CurrentUser.MDbType) && !string.IsNullOrEmpty(CurrentUser.MDbConnectionstr))
+            string dataStr = formData.ToString();
+            var paramsObj = new { SysId = "" };
+            paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
+            if (!string.IsNullOrEmpty(paramsObj.SysId))
             {
-                DbTools bll = new DbTools(CurrentUser.MDbConnectionstr, CurrentUser.MDbType);
-                List<DbTableInfo> tbList = bll.GetAllTables(CurrentUser.MDbName, "");
-                result.ResData = tbList;
-                result.ErrCode = ErrCode.successCode;
-                result.ErrMsg = ErrCode.err0;
+                Sys_sys sysModel = SysService.Get(paramsObj.SysId);
+                if (sysModel != null)
+                {
+                    Sd_sysdb dbModel = SdService.Get(sysModel.MdbId);
+                    if (dbModel != null)
+                    {
+                        DbTools bll = new DbTools(dbModel.Sdconnectionstr, dbModel.Sdtype);
+                        List<DbTableInfo> tbList = bll.GetAllTables(dbModel.dbName, "");
+                        result.ResData = tbList;
+                        result.ErrCode = ErrCode.successCode;
+                        result.ErrMsg = ErrCode.err0;
+                    }
+                    else
+                    {
+                        result.ErrCode = ErrCode.err80406;
+                        result.ErrMsg = ErrCode.err80406;
+                    }
+                }
+                else
+                {
+                    result.ErrCode = ErrCode.err80405;
+                    result.ErrMsg = ErrCode.err80405;
+                }
             }
             else
             {
-                result.ErrCode = ErrCode.err80010;
-                result.ErrMsg = ErrCode.err80010;
+                result.ErrCode = ErrCode.err1;
+                result.ErrMsg = "未获取到所选系统参数";
             }
-            
-
             return ToJsonContent(result);
         }
 
@@ -147,47 +170,66 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// <returns></returns>
         [HttpPost("GetColumnListsByDetailId")]
         [YuebonAuthorize("List")]
-        public IActionResult GetColumnListsByDetailId(string detailId)
+        public IActionResult GetColumnListsByDetailId([FromBody] dynamic formData)
         {
             CommonResult<List<DbTableInfo>> result = new CommonResult<List<DbTableInfo>>();
-            if (!string.IsNullOrEmpty(CurrentUser.MDbName) && !string.IsNullOrEmpty(CurrentUser.MDbType) && !string.IsNullOrEmpty(CurrentUser.MDbConnectionstr))
+            string dataStr = formData.ToString();
+            var paramsObj = new { SysId = "", detailId="" };
+            paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
+            if (!string.IsNullOrEmpty(paramsObj.SysId))
             {
-                Sys_conf_details model = iService.Get(detailId);
-                DbTools bll = new DbTools(CurrentUser.MDbConnectionstr, CurrentUser.MDbType);
-                List<DbFieldInfo> colList = bll.GetAllColumns(CurrentUser.MDbName, model.Tbname);
-                if (colList != null && colList.Count > 0)
+                Sys_sys sysModel = SysService.Get(paramsObj.SysId);
+                if (sysModel != null)
                 {
-                    #region 获取列获取方式参数
-                    Sys_conf_obj objModel = ISysconfobjService.GetWhere(string.Format(" sys_conf_detail_id='{0}'", detailId));
-                    if (objModel != null) {
-                        Dictionary<string, string> dic = objModel.Configjson.ToObject<Dictionary<string, string>>();
-                        foreach (DbFieldInfo item in colList)
+                    Sd_sysdb dbModel = SdService.Get(sysModel.MdbId);
+                    if (dbModel != null)
+                    {
+                        Sys_conf_details model = iService.Get(paramsObj.detailId);
+                        DbTools bll = new DbTools(dbModel.Sdconnectionstr, dbModel.Sdtype);
+                        List<DbFieldInfo> colList = bll.GetAllColumns(dbModel.dbName, model.Tbname);
+                        if (colList != null && colList.Count > 0)
                         {
-                            if (dic.ContainsKey(item.FieldName))
+                            #region 获取列获取方式参数
+                            Sys_conf_obj objModel = ISysconfobjService.GetWhere(string.Format(" sys_conf_detail_id='{0}'", paramsObj.detailId));
+                            if (objModel != null)
                             {
-                                item.GetFunctionParamter = dic[item.FieldName];
+                                Dictionary<string, string> dic = objModel.Configjson.ToObject<Dictionary<string, string>>();
+                                foreach (DbFieldInfo item in colList)
+                                {
+                                    if (dic.ContainsKey(item.FieldName))
+                                    {
+                                        item.GetFunctionParamter = dic[item.FieldName];
+                                    }
+                                }
                             }
+                            #endregion
+                            result.ResData = colList;
+                            result.ErrCode = ErrCode.successCode;
+                            result.ErrMsg = ErrCode.err0;
+                        }
+                        else
+                        {
+                            result.ErrCode = ErrCode.err80012;
+                            result.ErrMsg = ErrCode.err80012;
                         }
                     }
-                    #endregion
-                    result.ResData = colList;
-                    result.ErrCode = ErrCode.successCode;
-                    result.ErrMsg = ErrCode.err0;
+                    else
+                    {
+                        result.ErrCode = ErrCode.err80406;
+                        result.ErrMsg = ErrCode.err80406;
+                    }
                 }
                 else
                 {
-                    result.ErrCode = ErrCode.err80012;
-                    result.ErrMsg = ErrCode.err80012;
+                    result.ErrCode = ErrCode.err80405;
+                    result.ErrMsg = ErrCode.err80405;
                 }
-                
             }
             else
             {
-                result.ErrCode = ErrCode.err80010;
-                result.ErrMsg = ErrCode.err80010;
+                result.ErrCode = ErrCode.err1;
+                result.ErrMsg = "未获取到所选系统参数";
             }
-
-
             return ToJsonContent(result);
         }
 
@@ -201,34 +243,48 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         public IActionResult GetColumnListsBytbName([FromBody] dynamic formData)
         {
             CommonResult<List<DbTableInfo>> result = new CommonResult<List<DbTableInfo>>();
-            if (!string.IsNullOrEmpty(CurrentUser.MDbName) && !string.IsNullOrEmpty(CurrentUser.MDbType) && !string.IsNullOrEmpty(CurrentUser.MDbConnectionstr))
+            string dataStr = formData.ToString();
+            var paramsObj = new { SysId = "", tbName="" };
+            paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
+            if (!string.IsNullOrEmpty(paramsObj.SysId))
             {
-                string dataStr = formData.ToString();
-                var paramsObj = new { tbName = "" };
-                paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
-
-                DbTools bll = new DbTools(CurrentUser.MDbConnectionstr, CurrentUser.MDbType);
-                List<DbFieldInfo> colList = bll.GetAllColumns(CurrentUser.MDbName, paramsObj.tbName);
-                if (colList != null && colList.Count > 0)
+                Sys_sys sysModel = SysService.Get(paramsObj.SysId);
+                if (sysModel != null)
                 {
-                    result.ResData = colList;
-                    result.ErrCode = ErrCode.successCode;
-                    result.ErrMsg = ErrCode.err0;
+                    Sd_sysdb dbModel = SdService.Get(sysModel.MdbId);
+                    if (dbModel != null)
+                    {
+                        DbTools bll = new DbTools(dbModel.Sdconnectionstr, dbModel.Sdtype);
+                        List<DbFieldInfo> colList = bll.GetAllColumns(dbModel.dbName, paramsObj.tbName);
+                        if (colList != null && colList.Count > 0)
+                        {
+                            result.ResData = colList;
+                            result.ErrCode = ErrCode.successCode;
+                            result.ErrMsg = ErrCode.err0;
+                        }
+                        else
+                        {
+                            result.ErrCode = ErrCode.err80012;
+                            result.ErrMsg = ErrCode.err80012;
+                        }
+                    }
+                    else
+                    {
+                        result.ErrCode = ErrCode.err80406;
+                        result.ErrMsg = ErrCode.err80406;
+                    }
                 }
                 else
                 {
-                    result.ErrCode = ErrCode.err80012;
-                    result.ErrMsg = ErrCode.err80012;
+                    result.ErrCode = ErrCode.err80405;
+                    result.ErrMsg = ErrCode.err80405;
                 }
-
             }
             else
             {
-                result.ErrCode = ErrCode.err80010;
-                result.ErrMsg = ErrCode.err80010;
+                result.ErrCode = ErrCode.err1;
+                result.ErrMsg = "未获取到所选系统参数";
             }
-
-
             return ToJsonContent(result);
         }
 
@@ -238,10 +294,13 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// <returns></returns>
         [HttpPost("GetDataGetTypeLists")]
         [YuebonAuthorize("List")]
-        public async Task<IActionResult> GetDataGetTypeLists()
+        public async Task<IActionResult> GetDataGetTypeLists([FromBody] dynamic formData)
         {
             CommonResult<List<DbTableInfo>> result = new CommonResult<List<DbTableInfo>>();
-            List<Plug_plugOutputDto> plugList = await IPlugService.GetEnableListWithSys(CurrentUser.SysId);
+            string dataStr = formData.ToString();
+            var paramsObj = new { SysId = "" };
+            paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
+            List<Plug_plugOutputDto> plugList = await IPlugService.GetEnableListWithSys(paramsObj.SysId);
             result.ResData = plugList;
             result.ErrCode = ErrCode.successCode;
             result.ErrMsg = ErrCode.err0;
@@ -255,56 +314,76 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// <returns></returns>
         [HttpPost("GetByConfDetailId")]
         [YuebonAuthorize("List")]
-        public async Task<CommonResult<Sys_conf_detailsOutputDto>> GetByConfDetailId(string id)
+        public async Task<CommonResult<Sys_conf_detailsOutputDto>> GetByConfDetailId([FromBody] dynamic formData)
         {
             CommonResult<Sys_conf_detailsOutputDto> result = new CommonResult<Sys_conf_detailsOutputDto>();
-            if (!string.IsNullOrEmpty(CurrentUser.MDbName) && !string.IsNullOrEmpty(CurrentUser.MDbType) && !string.IsNullOrEmpty(CurrentUser.MDbConnectionstr))
+            string dataStr = formData.ToString();
+            var paramsObj = new { SysId = "", id = "" };
+            paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
+            if (!string.IsNullOrEmpty(paramsObj.SysId))
             {
-                Sys_conf_detailsOutputDto model = await iService.GetOutDtoAsync(id);
-                DbTools bll = new DbTools(CurrentUser.MDbConnectionstr, CurrentUser.MDbType);
-                List<DbFieldInfo> colList = bll.GetAllColumns(CurrentUser.MDbName, model.Tbname);
-                if (colList != null && colList.Count > 0)
+                Sys_sys sysModel = SysService.Get(paramsObj.SysId);
+                if (sysModel != null)
                 {
-                    #region 获取列获取方式参数
-                    Sys_conf_obj objModel = ISysconfobjService.GetWhere(string.Format(" sys_conf_detail_id='{0}'", id));
-                    if (objModel != null)
+                    Sd_sysdb dbModel = SdService.Get(sysModel.MdbId);
+                    if (dbModel != null)
                     {
-                        List<DbFieldInfo> dbColumnList = objModel.Configjson.ToObject<List<DbFieldInfo>>();
-                        foreach (DbFieldInfo item in colList)
+                        Sys_conf_detailsOutputDto model = await iService.GetOutDtoAsync(paramsObj.id);
+                        DbTools bll = new DbTools(dbModel.Sdconnectionstr, dbModel.Sdtype);
+                        List<DbFieldInfo> colList = bll.GetAllColumns(dbModel.dbName, model.Tbname);
+                        if (colList != null && colList.Count > 0)
                         {
-                            DbFieldInfo tmpModel = dbColumnList.Find(x => x.FieldName == item.FieldName);
-                            if (tmpModel!=null)
+                            #region 获取列获取方式参数
+                            Sys_conf_obj objModel = ISysconfobjService.GetWhere(string.Format(" sys_conf_detail_id='{0}'", paramsObj.id));
+                            if (objModel != null)
                             {
-                                item.DataGetType = tmpModel.DataGetType;
-                                item.HasPage = tmpModel.HasPage;
-                                item.ConfigUri = tmpModel.ConfigUri;
-                                item.Is_SingleDataKey = tmpModel.Is_SingleDataKey;
-                                item.Is_Visible = tmpModel.Is_Visible;
-                                item.Is_KeyColumn = tmpModel.Is_KeyColumn;
-                                item.Is_NotNull = tmpModel.Is_NotNull;
-                                item.Is_NoUpdate = tmpModel.Is_NoUpdate;
-                                item.Is_ChangeWhite = tmpModel.Is_ChangeWhite;
-                                item.GetFunctionParamter = tmpModel.GetFunctionParamter;
+                                List<DbFieldInfo> dbColumnList = objModel.Configjson.ToObject<List<DbFieldInfo>>();
+                                foreach (DbFieldInfo item in colList)
+                                {
+                                    DbFieldInfo tmpModel = dbColumnList.Find(x => x.FieldName == item.FieldName);
+                                    if (tmpModel != null)
+                                    {
+                                        item.DataGetType = tmpModel.DataGetType;
+                                        item.HasPage = tmpModel.HasPage;
+                                        item.ConfigUri = tmpModel.ConfigUri;
+                                        item.Is_SingleDataKey = tmpModel.Is_SingleDataKey;
+                                        item.Is_Visible = tmpModel.Is_Visible;
+                                        item.Is_KeyColumn = tmpModel.Is_KeyColumn;
+                                        item.Is_NotNull = tmpModel.Is_NotNull;
+                                        item.Is_NoUpdate = tmpModel.Is_NoUpdate;
+                                        item.Is_ChangeWhite = tmpModel.Is_ChangeWhite;
+                                        item.GetFunctionParamter = tmpModel.GetFunctionParamter;
+                                    }
+                                }
                             }
+                            model.configjson = colList.ToJson();
+                            #endregion
+                            result.ResData = model;
+                            result.ErrCode = ErrCode.successCode;
+                            result.ErrMsg = ErrCode.err0;
+                        }
+                        else
+                        {
+                            result.ErrCode = ErrCode.err80012;
+                            result.ErrMsg = ErrCode.err80012;
                         }
                     }
-                    model.configjson = colList.ToJson();
-                    #endregion
-                    result.ResData = model;
-                    result.ErrCode = ErrCode.successCode;
-                    result.ErrMsg = ErrCode.err0;
+                    else
+                    {
+                        result.ErrCode = ErrCode.err80406;
+                        result.ErrMsg = ErrCode.err80406;
+                    }
                 }
                 else
                 {
-                    result.ErrCode = ErrCode.err80012;
-                    result.ErrMsg = ErrCode.err80012;
+                    result.ErrCode = ErrCode.err80405;
+                    result.ErrMsg = ErrCode.err80405;
                 }
-
             }
             else
             {
-                result.ErrCode = ErrCode.err80010;
-                result.ErrMsg = ErrCode.err80010;
+                result.ErrCode = ErrCode.err1;
+                result.ErrMsg = "未获取到所选系统参数";
             }
             return result;
         }

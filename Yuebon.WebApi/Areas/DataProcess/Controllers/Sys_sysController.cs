@@ -128,29 +128,14 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             CommonResult result = new CommonResult();
             try
             {
-                var aa = formData;
-                string dataStr = formData.ToString();
-                var paramsObj = new { sysId = "" };
-                paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
-                Sys_sys model = iService.Get(paramsObj.sysId);
-                CurrentUser.SysId = model.Id;
-                CurrentUser.SysName = model.Sysname;
-                #region 获取主数据库信息并写入
-                if (!string.IsNullOrEmpty(model.MdbId))
-                {
-                    CurrentUser.MDbId = model.MdbId;
-                    Sd_sysdb mDBModel = sysdbService.Get(model.MdbId);
-                    if (mDBModel != null)
-                    {
-                        CurrentUser.MDbName = mDBModel.dbName;
-                        CurrentUser.MDbType = mDBModel.Sdtype;
-                        CurrentUser.MDbConnectionstr = mDBModel.Sdconnectionstr;
-                    }
-                }
-                #endregion
+                //var aa = formData;
+                //string dataStr = formData.ToString();
+                //var paramsObj = new { sysId = "" };
+                //paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
+                //Sys_sys model = iService.Get(paramsObj.sysId);
 
-                YuebonCacheHelper yuebonCacheHelper = new YuebonCacheHelper();
-                yuebonCacheHelper.Replace("login_user_" + CurrentUser.UserId, CurrentUser);
+                //YuebonCacheHelper yuebonCacheHelper = new YuebonCacheHelper();
+                //yuebonCacheHelper.Replace("login_user_" + CurrentUser.UserId, CurrentUser);
                 result.Success = true;
                 result.ErrCode = ErrCode.successCode;
 

@@ -138,7 +138,7 @@
 import {
   getSys_conf_classifyDetail,
   saveSys_conf_classify, setSys_conf_classifyEnable, deleteSoftSys_conf_classify,
-  deleteSys_conf_classify, getAllClassifyTreeTable
+    deleteSys_conf_classify, getAllSysConfClassifyTreeTable
 } from '@/api/dataprocess/sys_conf_classify'
 
 export default {
@@ -196,7 +196,10 @@ export default {
      */
     loadTableData: function() {
       this.tableloading = true
-      getAllClassifyTreeTable().then(res => {
+      var seachdata = {
+        
+      }
+      getAllSysConfClassifyTreeTable(seachdata).then(res => {
         this.tableData = res.ResData
         this.selectclasses = res.ResData
         this.tableloading = false

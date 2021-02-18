@@ -27,11 +27,47 @@
                     stripe
                     highlight-current-row
                     style="width: 100%">
-            <el-table-column prop="FieldName" label="字段名称" sortable="custom" width="120"></el-table-column>
-            <el-table-column prop="Description" label="描述" sortable="custom" width="120"></el-table-column>
-            <el-table-column prop="FieldType" label="类型" sortable="custom" width="120"></el-table-column>
-            <el-table-column prop="IsIdentity" label="是否主键" sortable="custom" width="120"></el-table-column>
-            <el-table-column prop="IsNullable" label="是否可空" sortable="custom" width="120"></el-table-column>
+            <el-table-column type="expand" label="详情" width="50">
+              <template slot-scope="props">
+                <el-form label-position="left" inline class="demo-table-expand">
+                  <el-form-item label="名称">
+                    <span>{{ props.row.FieldName }}</span>
+                  </el-form-item>
+                  <el-form-item label="描述">
+                    <span>{{ props.row.Description }}</span>
+                  </el-form-item>
+                  <el-form-item label="数据类型">
+                    <span>{{ props.row.DataType }}</span>
+                  </el-form-item>
+                  <el-form-item label="小数位精度">
+                    <span>{{ props.row.FieldScale }}</span>
+                  </el-form-item>
+                  <el-form-item label="字段长度">
+                    <span>{{ props.row.FieldMaxLength }}</span>
+                  </el-form-item>
+                  <el-form-item label="默认值">
+                    <span>{{ props.row.FieldDefaultValue }}</span>
+                  </el-form-item>
+                  <el-form-item label="是否可空">
+                    {{ props.row.IsNullable === true ? "是" : "否" }}
+                  </el-form-item>
+                  <el-form-item label="是否主键">
+                    {{ props.row.IsIdentity === true ? "是" : "否" }}
+                  </el-form-item>
+                  <el-form-item label="是否自增">
+                    {{ props.row.Increment === true ? "是" : "否" }}
+                  </el-form-item>
+                </el-form>
+              </template>
+            </el-table-column>
+            <el-table-column prop="FieldName" label="字段名称" sortable="custom" min-width='25%'></el-table-column>
+            <el-table-column prop="Description" label="描述" sortable="custom" min-width='25%'></el-table-column>
+            <el-table-column label="是否配置" sortable="custom" min-width='25%'></el-table-column>
+            <el-table-column label="配置" min-width='25%' align="center">
+              <template slot-scope="scope">
+                <el-button type="text" >配置</el-button>
+              </template>
+            </el-table-column>
           </el-table>
         </el-card>
       </el-col>

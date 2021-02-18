@@ -13,6 +13,7 @@ using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 using Yuebon.DataProcess.IServices;
 using Yuebon.AspNetCore.Mvc;
+using Yuebon.Commons.Dtos;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -223,14 +224,14 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// 获取功能菜单适用于Vue 树形列表
         /// </summary>
         /// <returns></returns>
-        [HttpGet("GetAllClassifyTreeTable")]
+        [HttpPost("GetAllClassifyTreeTable")]
         [YuebonAuthorize("List")]
-        public async Task<IActionResult> GetAllClassifyTreeTable()
+        public async Task<IActionResult> GetAllClassifyTreeTable(SearchInputDto<Sys_conf_classify> search)
         {
             CommonResult result = new CommonResult();
             try
             {
-                List<Sys_conf_classifyOutputDto> list = await iService.GetAllClassifyTreeTable(CurrentUser.SysId);
+                List<Sys_conf_classifyOutputDto> list = await iService.GetAllClassifyTreeTable(search);
                 result.Success = true;
                 result.ErrCode = ErrCode.successCode;
                 result.ResData = list;

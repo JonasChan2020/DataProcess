@@ -1,184 +1,177 @@
 <template>
   <div class="app-container">
 
-    <el-card>
+    
       <el-row :gutter="24">
         <el-col :span="10">
-          <div class="grid-content bg-purple">
+          <el-card>
+            <div class="grid-content bg-purple">
+              <div class="grid-content bg-purple">
+                <el-card>
+                  <el-cascader v-model="sysselectedclass"placeholder="请选择系统分类" :key="cascaderkey" style="width:500px;" :options="sysselectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSysSelectClassChange" />
+                  <el-select v-model="selectedSys" placeholder="请选择系统" @change="handleSelectSysChange()">
+                    <el-option v-for="item in selectSyses"
+                               :key="item.Id"
+                               :label="item.Sysname"
+                               :value="item.Id" />
+                  </el-select>
+                </el-card>
+                <el-card>
+                  <div class="list-btn-container">
+                    <el-button-group>
+                      <el-button v-hasPermi="['Sys_conf/Add']"
+                                 type="primary"
+                                 icon="el-icon-plus"
+                                 size="small"
+                                 @click="ShowEditOrViewDialog()">新增</el-button>
+                      <el-button v-hasPermi="['Sys_conf/Edit']"
+                                 type="primary"
+                                 icon="el-icon-edit"
+                                 class="el-button-modify"
+                                 size="small"
+                                 @click="ShowEditOrViewDialog('edit')">修改</el-button>
+                      <el-button v-hasPermi="['Sys_conf/Enable']"
+                                 type="info"
+                                 icon="el-icon-video-pause"
+                                 size="small"
+                                 @click="setEnable('0')">禁用</el-button>
+                      <el-button v-hasPermi="['Sys_conf/Enable']"
+                                 type="success"
+                                 icon="el-icon-video-play"
+                                 size="small"
+                                 @click="setEnable('1')">启用</el-button>
+                      <el-button v-hasPermi="['Sys_conf/DeleteSoft']"
+                                 type="warning"
+                                 icon="el-icon-delete"
+                                 size="small"
+                                 @click="deleteSoft('0')">软删除</el-button>
+                      <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableData()">刷新</el-button>
+                    </el-button-group>
+                  </div>
+                  <el-table ref="gridtable"
+                            :data="tableData"
+                            row-key="Id"
+                            :height="500"
+                            border
+                            stripe
+                            highlight-current-row
+                            style="width: 100%;margin-bottom: 20px;"
+                            :default-sort="{prop: 'SortCode', order: 'ascending'}"
+                            @row-click="handleClickRow"
+                            @select="handleSelectChange"
+                            @select-all="handleSelectAllChange"
+                            @sort-change="handleSortChange">
+                    <el-table-column type="selection" width="30" />
+                    <el-table-column prop="Confcode" label="编码" sortable="custom" width="120" />
+                    <el-table-column prop="Confname" label="名称" sortable="custom" width="120" />
+                    <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
+                    <el-table-column prop="Classify_id" label="分类" sortable="custom" width="260" align="center">
+                      <template slot-scope="scope">
+                        {{ scope.row.Classify_Name }}
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
+                      <template slot-scope="scope">
+                        <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                  <div class="pagination-container">
+                    <el-pagination background
+                                   :current-page="pagination.currentPage"
+                                   :page-sizes="[5,10,20,50,100, 200, 300, 400]"
+                                   :page-size="pagination.pagesize"
+                                   layout="total, sizes, prev, pager, next, jumper"
+                                   :total="pagination.pageTotal"
+                                   @size-change="handleSizeChange"
+                                   @current-change="handleCurrentChange" />
+                  </div>
+                </el-card>
+              </div>
+            </div>
+          </el-card>
+            </el-col>
+        <el-col :span="14">
+          <el-card>
             <div class="grid-content bg-purple">
               <div class="list-btn-container">
                 <el-button-group>
-                  <el-button
-                    v-hasPermi="['Sys_conf/Add']"
-                    type="primary"
-                    icon="el-icon-plus"
-                    size="small"
-                    @click="ShowEditOrViewDialog()"
-                  >新增</el-button>
-                  <el-button
-                    v-hasPermi="['Sys_conf/Edit']"
-                    type="primary"
-                    icon="el-icon-edit"
-                    class="el-button-modify"
-                    size="small"
-                    @click="ShowEditOrViewDialog('edit')"
-                  >修改</el-button>
-                  <el-button
-                    v-hasPermi="['Sys_conf/Enable']"
-                    type="info"
-                    icon="el-icon-video-pause"
-                    size="small"
-                    @click="setEnable('0')"
-                  >禁用</el-button>
-                  <el-button
-                    v-hasPermi="['Sys_conf/Enable']"
-                    type="success"
-                    icon="el-icon-video-play"
-                    size="small"
-                    @click="setEnable('1')"
-                  >启用</el-button>
-                  <el-button
-                    v-hasPermi="['Sys_conf/DeleteSoft']"
-                    type="warning"
-                    icon="el-icon-delete"
-                    size="small"
-                    @click="deleteSoft('0')"
-                  >软删除</el-button>
-                  <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableData()">刷新</el-button>
+                  <el-button v-hasPermi="['Sys_conf_details/Add']"
+                             type="primary"
+                             icon="el-icon-plus"
+                             size="small"
+                             @click="ShowEditOrViewDetailDialog('add')">新增</el-button>
+                  <el-button v-hasPermi="['Sys_conf_details/Edit']"
+                             type="primary"
+                             icon="el-icon-edit"
+                             class="el-button-modify"
+                             size="small"
+                             @click="ShowEditOrViewDetailDialog('edit')">修改</el-button>
+                  <el-button v-hasPermi="['Sys_conf_details/DeleteSoft']"
+                             type="warning"
+                             icon="el-icon-delete"
+                             size="small"
+                             @click="deleteDetailSoft('0')">删除</el-button>
+                  <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableDetailData()">刷新</el-button>
+                  <el-button v-hasPermi="['Sys_conf_details/Edit']"
+                             type="primary"
+                             icon="el-icon-edit"
+                             size="small"
+                             @click="changeLevelNum('up')">上移</el-button>
+                  <el-button v-hasPermi="['Sys_conf_details/Edit']"
+                             type="primary"
+                             icon="el-icon-edit"
+                             size="small"
+                             @click="changeLevelNum('down')">下移</el-button>
+                  <el-button v-hasPermi="['Sys_conf_details/Edit']"
+                             type="primary"
+                             icon="el-icon-edit"
+                             size="small"
+                             @click="changeLevelNum('top')">置顶</el-button>
+                  <el-button v-hasPermi="['Sys_conf_details/Edit']"
+                             type="primary"
+                             icon="el-icon-edit"
+                             size="small"
+                             @click="changeLevelNum('buttom')">置底</el-button>
                 </el-button-group>
               </div>
-              <el-table
-                ref="gridtable"
-                :data="tableData"
-                row-key="Id"
-                border
-                stripe
-                highlight-current-row
-                style="width: 100%;margin-bottom: 20px;"
-                :default-sort="{prop: 'SortCode', order: 'ascending'}"
-                @row-click="handleClickRow"
-                @select="handleSelectChange"
-                @select-all="handleSelectAllChange"
-                @sort-change="handleSortChange"
-              >
+              <el-table ref="gridtable"
+                        :data="tableDetailData"
+                        row-key="Id"
+                        :height="700"
+                        border
+                        max-height="850"
+                        stripe
+                        highlight-current-row
+                        style="width: 100%;margin-bottom: 20px;"
+                        :default-sort="{prop: 'Levelnum', order: 'ascending'}"
+                        @select="handleDetailSelectChange"
+                        @select-all="handleDetailSelectAllChange">
                 <el-table-column type="selection" width="30" />
-                <el-table-column prop="Confcode" label="编码" sortable="custom" width="120" />
-                <el-table-column prop="Confname" label="名称" sortable="custom" width="120" />
-                <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
-                <el-table-column prop="Classify_id" label="分类" sortable="custom" width="260" align="center">
+                <el-table-column prop="Levelnum" label="顺序" sortable="custom" width="80" />
+                <el-table-column prop="Tbname" label="表名" sortable="custom" width="120" />
+                <el-table-column label="动态表" sortable="custom" width="100" prop="Is_dynamic" align="center">
                   <template slot-scope="scope">
-                    {{ scope.row.Classify_Name }}
+                    <el-tag :type="scope.row.Is_dynamic === true ? 'success' : 'info'" disable-transitions>{{ scope.row.Is_dynamic === true ? "是" : "否" }}</el-tag>
                   </template>
                 </el-table-column>
-                <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
+                <el-table-column label="标识表" sortable="custom" width="100" prop="Is_flag" align="center">
+                  <template slot-scope="scope">
+                    <el-tag :type="scope.row.Is_flag === true ? 'success' : 'info'" disable-transitions>{{ scope.row.Is_flag === true ? "是" : "否" }}</el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column label="启用" sortable="custom" width="100" prop="EnabledMark" align="center">
                   <template slot-scope="scope">
                     <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
                   </template>
                 </el-table-column>
+
               </el-table>
-              <div class="pagination-container">
-                <el-pagination
-                  background
-                  :current-page="pagination.currentPage"
-                  :page-sizes="[5,10,20,50,100, 200, 300, 400]"
-                  :page-size="pagination.pagesize"
-                  layout="total, sizes, prev, pager, next, jumper"
-                  :total="pagination.pageTotal"
-                  @size-change="handleSizeChange"
-                  @current-change="handleCurrentChange"
-                />
-              </div>
             </div>
-          </div>
-        </el-col>
-        <el-col :span="14">
-          <div class="grid-content bg-purple">
-            <div class="list-btn-container">
-              <el-button-group>
-                <el-button
-                           v-hasPermi="['Sys_conf_details/Add']"
-                           type="primary"
-                           icon="el-icon-plus"
-                           size="small"
-                           @click="ShowEditOrViewDetailDialog('add')">新增</el-button>
-                <el-button
-                           v-hasPermi="['Sys_conf_details/Edit']"
-                           type="primary"
-                           icon="el-icon-edit"
-                           class="el-button-modify"
-                           size="small"
-                           @click="ShowEditOrViewDetailDialog('edit')">修改</el-button>
-                <el-button
-                           v-hasPermi="['Sys_conf_details/DeleteSoft']"
-                           type="warning"
-                           icon="el-icon-delete"
-                           size="small"
-                           @click="deleteDetailSoft('0')">删除</el-button>
-                <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableDetailData()">刷新</el-button>
-                <el-button
-                           v-hasPermi="['Sys_conf_details/Edit']"
-                           type="primary"
-                           icon="el-icon-edit"
-                           size="small"
-                           @click="changeLevelNum('up')">上移</el-button>
-                <el-button
-                           v-hasPermi="['Sys_conf_details/Edit']"
-                           type="primary"
-                           icon="el-icon-edit"
-                           size="small"
-                           @click="changeLevelNum('down')">下移</el-button>
-                <el-button
-                           v-hasPermi="['Sys_conf_details/Edit']"
-                           type="primary"
-                           icon="el-icon-edit"
-                           size="small"
-                           @click="changeLevelNum('top')">置顶</el-button>
-                <el-button
-                           v-hasPermi="['Sys_conf_details/Edit']"
-                           type="primary"
-                           icon="el-icon-edit"
-                           size="small"
-                           @click="changeLevelNum('buttom')">置底</el-button>
-              </el-button-group>
-            </div>
-            <el-table
-              ref="gridtable"
-              :data="tableDetailData"
-              row-key="Id"
-              border
-              max-height="850"
-              stripe
-              highlight-current-row
-              style="width: 100%;margin-bottom: 20px;"
-              :default-sort="{prop: 'Levelnum', order: 'ascending'}"
-              @select="handleDetailSelectChange"
-              @select-all="handleDetailSelectAllChange"
-            >
-              <el-table-column type="selection" width="30" />
-              <el-table-column prop="Levelnum" label="顺序" sortable="custom" width="80" />
-              <el-table-column prop="Tbname" label="表名" sortable="custom" width="120" />
-              <el-table-column label="动态表" sortable="custom" width="100" prop="Is_dynamic" align="center">
-                <template slot-scope="scope">
-                  <el-tag :type="scope.row.Is_dynamic === true ? 'success' : 'info'" disable-transitions>{{ scope.row.Is_dynamic === true ? "是" : "否" }}</el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column label="标识表" sortable="custom" width="100" prop="Is_flag" align="center">
-                <template slot-scope="scope">
-                  <el-tag :type="scope.row.Is_flag === true ? 'success' : 'info'" disable-transitions>{{ scope.row.Is_flag === true ? "是" : "否" }}</el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column label="启用" sortable="custom" width="100" prop="EnabledMark" align="center">
-                <template slot-scope="scope">
-                  <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
-                </template>
-              </el-table-column>
-
-            </el-table>
-          </div>
-
+          </el-card>
         </el-col>
       </el-row>
-    </el-card>
+    
 
     <el-dialog
       ref="dialogEditForm"
@@ -200,6 +193,9 @@
         </el-form-item>
         <el-form-item label="所属分类" :label-width="formLabelWidth" prop="Classify_id">
           <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
+        </el-form-item>
+        <el-form-item label="所属系统" :label-width="formLabelWidth" prop="Sys_id">
+          <el-cascader v-model="formselectedsys" style="width:500px;" :options="formselectsyses" filterable :props="{label:'Sysname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleFromSelectSysChange" />
         </el-form-item>
         <el-form-item label="排序" :label-width="formLabelWidth" prop="SortCode">
           <el-input v-model.number="editFrom.SortCode" placeholder="请输入排序,默认为99" autocomplete="off" clearable />
@@ -224,14 +220,21 @@ import {
   deleteSys_conf
 } from '@/api/dataprocess/sys_conf'
 import {
-  getAllClassifyTreeTable
+  getAllSysConfClassifyTreeTable
 } from '@/api/dataprocess/sys_conf_classify'
 import {
     getAllEnableByConfId, deleteSys_conf_details,
    changeLevelNumAsync
-} from '@/api/dataprocess/sys_conf_details'
+  } from '@/api/dataprocess/sys_conf_details'
+  import {
+    getAllClassifyTreeTable
+  } from '@/api/dataprocess/sys_classify'
+  import {
+    getSys_sysListWithPager
+  } from '@/api/dataprocess/sys_sys'
 
-export default {
+  export default {
+    name:'sysconfcontrol',
   data() {
     return {
       searchform: {
@@ -248,12 +251,20 @@ export default {
         order: 'desc',
         sort: 'CreatorTime'
       },
+      formselectedsys: '',
+      formselectsyses: [],
+      selectedSys: '',
+      selectSyses: [],
+      cascaderkey: 1,
+      sysselectedclass: '',
+      sysselectclasses: [],
       selectedclass: '',
       selectclasses: [],
       dialogEditFormVisible: false,
       editFormTitle: '',
       editFrom: {
         Classify_id: '',
+        Sysid:'',
         Confcode: '',
         Confdes: '',
         Confname: '',
@@ -267,7 +278,7 @@ export default {
       },
       formLabelWidth: '80px',
       currentId: '', // 当前操作对象的ID值，主要用于修改
-      currentSelectId: '',
+      currentSysId: '',
       currentSelected: [],
 
       sortableDetailData: {
@@ -290,6 +301,18 @@ export default {
        * 初始化数据
        */
     InitDictItem() {
+      
+      getAllClassifyTreeTable().then(res => {
+        this.sysselectclasses = res.ResData
+      })
+
+      var formsysseachdata = {
+        CurrenetPageIndex: 1,
+        PageSize: 999999999,
+      }
+      getSys_sysListWithPager(formsysseachdata).then(res => {
+        this.formselectsyses = res.ResData.Items
+      })
     },
     /**
        * 加载页面table数据
@@ -300,13 +323,16 @@ export default {
         PageSize: this.pagination.pagesize,
         Keywords: this.searchform.keywords,
         Order: this.sortableData.order,
-        Sort: this.sortableData.sort
+        Sort: this.sortableData.sort,
+        Filter: {
+          Sysid: this.selectedSys
+        }
       }
       getSys_confListWithPager(seachdata).then(res => {
         this.tableData = res.ResData.Items
         this.pagination.pageTotal = res.ResData.TotalItems
       })
-      getAllClassifyTreeTable('').then(res => {
+      getAllSysConfClassifyTreeTable(seachdata).then(res => {
         this.selectclasses = res.ResData
       })
     },
@@ -316,7 +342,7 @@ export default {
     loadTableDetailData: function() {
       var seachdata = {
         Filter: {
-          Sys_conf_id: this.currentSelectId
+          Sys_conf_id: this.currentId
         }
       }
       getAllEnableByConfId(seachdata).then(res => {
@@ -331,8 +357,38 @@ export default {
       this.loadTableData()
     },
     handleClickRow(row) {
-      this.currentSelectId = row.Id
+      this.currentId = row.Id
+      this.currentSysId = row.Sysid
       this.loadTableDetailData()
+    },
+    /**
+      *系统分类选择 
+      */
+    handleSysSelectClassChange: function (value) {
+      this.sysselectedclass = value
+      var seachdata = {
+        CurrenetPageIndex: 1,
+        PageSize: 999999999,
+        Filter: {
+          Classify_id: this.sysselectedclass,
+        }
+      }
+      getSys_sysListWithPager(seachdata).then(res => {
+        this.selectSyses = res.ResData.Items
+      })
+      
+    },
+    /**
+     *系统选择 
+     */
+    handleSelectSysChange: function () {
+      this.loadTableData()
+    },
+    /**
+    *表单内系统选择 
+    */
+    handleFromSelectSysChange: function () {
+      this.editFrom.Sysid = this.formselectedsys
     },
 
     /**
@@ -358,6 +414,7 @@ export default {
     bindEditInfo: function() {
       getSys_confDetail(this.currentId).then(res => {
         this.editFrom.Classify_id = res.ResData.Classify_id
+        this.editFrom.Sysid = res.ResData.Sysid
         this.editFrom.Confcode = res.ResData.Confcode
         this.editFrom.Confdes = res.ResData.Confdes
         this.editFrom.Confname = res.ResData.Confname
@@ -375,6 +432,7 @@ export default {
         if (valid) {
           const data = {
             'Classify_id': this.editFrom.Classify_id,
+            'Sysid': this.editFrom.Sysid,
             'Confcode': this.editFrom.Confcode,
             'Confdes': this.editFrom.Confdes,
             'Confname': this.editFrom.Confname,
@@ -523,7 +581,6 @@ export default {
        */
     handleSelectChange: function(selection, row) {
       this.currentSelected = selection
-      this.loadTableData()
     },
     /**
        * 当用户手动勾选全选checkbox事件
@@ -556,12 +613,12 @@ export default {
           this.$alert('请选择一条数据进行编辑/修改', '提示')
         } else {
           this.currentDetailId = this.currentDetailSelected[0].Id
-          this.$router.push({ name: 'EditConfDetail', params: { id: this.currentDetailId, showtype: view, Sys_conf_id: this.currentSelectId }})
+          this.$router.push({ name: 'EditConfDetail', params: { id: this.currentDetailId, showtype: view, Sys_conf_id: this.currentId, SysId: this.currentSysId }})
         }
       } else {
         this.currentDetailId = ''
         this.selectedDetailclass = ''
-        this.$router.push({ name: 'EditConfDetail', params: { id: this.currentDetailId, showtype: view, Sys_conf_id: this.currentSelectId }})
+        this.$router.push({ name: 'EditConfDetail', params: { id: this.currentDetailId, showtype: view, Sys_conf_id: this.currentId, SysId: this.currentSysId }})
       }
     },
     deleteDetailSoft: function(val) {

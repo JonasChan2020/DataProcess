@@ -206,7 +206,8 @@ import { getConf_confListWithPager,
   deleteConf_conf
 } from '@/api/dataprocess/conf_conf'
 
-export default {
+  export default {
+    name: 'confcontrol',
   data() {
     return {
       selectedSysDb:'',

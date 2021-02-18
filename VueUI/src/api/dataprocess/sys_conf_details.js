@@ -16,10 +16,11 @@ export function getSys_conf_detailsListWithPager(data) {
 /**
  * 获取所有表
  */
-export function getTbNameList() {
+export function getTbNameList(data) {
   return http.request({
     url: 'Sys_conf_details/GetTbNameList',
     method: 'post',
+    data: data,
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
 }
@@ -40,7 +41,7 @@ export function GetColumnListsByDetailId(data) {
 export function GetColumnListsBytbName(data) {
   return http.request({
     url: 'Sys_conf_details/GetColumnListsBytbName',
-    data: { tbName: data },
+    data: data,
     method: 'post',
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
@@ -48,10 +49,11 @@ export function GetColumnListsBytbName(data) {
 /**
   * 获取数据获取方式下拉框数据集
   */
-export function getDataGetTypeLists() {
+export function getDataGetTypeLists(data) {
   return http.request({
     url: 'Sys_conf_details/GetDataGetTypeLists',
     method: 'post',
+    data: data,
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
 }
@@ -93,9 +95,10 @@ export function saveSys_conf_details(data, url) {
    * 获取详情
    * @param {Id} Id
    */
-export function getSys_conf_detailsDetail(id) {
+export function getSys_conf_detailsDetail(data) {
   return http({
-    url: 'Sys_conf_details/GetByConfDetailId?id=' + id,
+    url: 'Sys_conf_details/GetByConfDetailId',
+    data: data,
     method: 'post',
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })

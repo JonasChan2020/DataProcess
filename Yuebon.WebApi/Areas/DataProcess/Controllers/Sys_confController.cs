@@ -37,7 +37,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         protected override void OnBeforeInsert(Sys_conf info)
         {
             info.Id = GuidUtils.CreateNo();
-            info.Sysid = CurrentUser.SysId;
             info.CreatorTime = DateTime.Now;
             info.CreatorUserId = CurrentUser.UserId;
             info.DeleteMark = false;
@@ -54,7 +53,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// <returns></returns>
         protected override void OnBeforeUpdate(Sys_conf info)
         {
-            info.Sysid = CurrentUser.SysId;
             info.LastModifyUserId = CurrentUser.UserId;
             info.LastModifyTime = DateTime.Now;
         }

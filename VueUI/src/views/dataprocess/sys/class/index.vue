@@ -189,6 +189,7 @@ export default {
      */
     loadTableData: function() {
       this.tableloading = true
+      
       getAllClassifyTreeTable().then(res => {
         this.tableData = res.ResData
         this.selectclasses = res.ResData

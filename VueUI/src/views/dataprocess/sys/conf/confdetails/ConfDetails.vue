@@ -2,7 +2,7 @@
   <div>
     <el-row>
       <el-col :span="10">
-        需配置的数据表：<el-select v-model="Tbname" placeholder="请选择" @change="handleSelectTbChange(Tbname)">
+        需配置的数据表：<el-select v-model="Tbname" placeholder="请选择" @change="handleSelectTbChange()">
 
           <el-option v-for="item in SelectTbnameList"
                      :key="item.TableName"
@@ -190,6 +190,7 @@ import {
         tableloading: true,
         tableData: [],
         Sys_conf_id: '',
+        SysId:'',
         Tbname: '',
         Is_dynamic: false,
         Is_flag: false,
@@ -232,14 +233,15 @@ import {
           //this.bindEditInfo()
         }
         this.Sys_conf_id = this.$route.params.Sys_conf_id
-        getTbNameList().then(res => {
+        this.SysId = this.$route.params.SysId
+        getTbNameList({ SysId:this.SysId }).then(res => {
           let SelectTbnameListInfo = [];
           for (let i in res.ResData) {
             SelectTbnameListInfo.push(res.ResData[i]);
           }
           this.SelectTbnameList = SelectTbnameListInfo
         })
-        getDataGetTypeLists().then(res => {
+        getDataGetTypeLists({ SysId: this.SysId }).then(res => {
           this.SelectDataGetTypeList = res.ResData
         })
       },
@@ -247,7 +249,7 @@ import {
           * 加载页面table数据
           */
       loadTableDataByTbName: function (tb) {
-        GetColumnListsBytbName(tb).then(res => {
+        GetColumnListsBytbName({ SysId: this.SysId, tbName: tb }).then(res => {
           this.tableData = res.ResData
         })
       },
@@ -255,7 +257,7 @@ import {
        * 读取详情
        */
       bindEditInfo: function () {
-        getSys_conf_detailsDetail(this.currentId).then(res => {
+        getSys_conf_detailsDetail({ SysId: this.SysId, id: this.currentId }).then(res => {
           this.Tbname = res.ResData.Tbname
           this.Sys_conf_id = res.ResData.Sys_conf_id
           this.Is_dynamic = res.ResData.Is_dynamic
@@ -351,9 +353,7 @@ import {
       /**
            *选择表
            */
-      handleSelectTbChange: function (value) {
-        this.SelectedTbName = value
-        this.Tbname = this.SelectedTbName
+      handleSelectTbChange: function () {
         this.loadTableDataByTbName(this.Tbname)
       },
     /**

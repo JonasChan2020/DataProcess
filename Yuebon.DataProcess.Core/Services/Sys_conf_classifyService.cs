@@ -34,10 +34,20 @@ namespace Yuebon.DataProcess.Services
         /// 获取分类适用于Vue 树形列表
         /// </summary>
         /// <returns></returns>
-        public async Task<List<Sys_conf_classifyOutputDto>> GetAllClassifyTreeTable(string SysId)
+        public async Task<List<Sys_conf_classifyOutputDto>> GetAllClassifyTreeTable(SearchInputDto<Sys_conf_classify> search)
         {
             List<Sys_conf_classifyOutputDto> reslist = new List<Sys_conf_classifyOutputDto>();
-            IEnumerable<Sys_conf_classify> elist = _repository.GetListWhere("sysid='" + SysId + "'");
+            string where = GetDataPrivilege();
+            PagerInfo pagerInfo = new PagerInfo
+            {
+                CurrenetPageIndex = 1,
+                PageSize = 999999999
+            };
+            if (search.Filter != null && !string.IsNullOrEmpty(search.Filter.Sysid))
+            {
+                where += string.Format(" and sysid = '{0}'", search.Filter.Sysid);
+            }
+            IEnumerable<Sys_conf_classify> elist = await _repository.FindWithPagerAsync(where,pagerInfo);
             List<Sys_conf_classify> list = elist.OrderBy(t => t.SortCode).ToList();
             List<Sys_conf_classify> oneMenuList = list.FindAll(t => t.Parentid == "");
             foreach (Sys_conf_classify item in oneMenuList)
