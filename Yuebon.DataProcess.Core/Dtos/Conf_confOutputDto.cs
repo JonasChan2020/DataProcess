@@ -28,11 +28,18 @@ namespace Yuebon.DataProcess.Dtos
         /// </summary>
         [MaxLength(0)]
         public string ToName { get; set; }
-        /// <summary>
-        /// 设置或获取配置类型0：系统，1：数据库
+
+        /// <summary>
+        /// 起始方配置类型0：系统，1：数据库
         /// </summary>
         [MaxLength(1)]
-        public int? Conftype { get; set; }
+        public int? ConfFromType { get; set; }
+
+        /// <summary>
+        /// 终止方配置类型0：系统，1：数据库
+        /// </summary>
+        [MaxLength(1)]
+        public int? ConfToType { get; set; }
         /// <summary>
         /// 设置或获取创建时间
         /// </summary>

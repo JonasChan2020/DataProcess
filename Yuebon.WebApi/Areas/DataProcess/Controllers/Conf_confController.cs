@@ -105,7 +105,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             #endregion
 
             #region 被关联项的逻辑判断
-            if (tinfo.Conftype == 0) //系统，判断其有没有设置主数据库
+            if (tinfo.ConfToType == 0) //系统，判断其有没有设置主数据库
             {
                 #region 判断系统是否设置了主数据库
                 Sys_sys model = sysService.Get(tinfo.ToId);
@@ -128,7 +128,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                 }
                 #endregion
             }
-            else if(tinfo.Conftype==1) //数据库，判断其有没有加入系统，如果加入系统则通知前台变更为相应系统关联
+            else if(tinfo.ConfToType == 1) //数据库，判断其有没有加入系统，如果加入系统则通知前台变更为相应系统关联
             {
                 #region
                 Sd_sysdb model = sdService.Get(tinfo.ToId);

@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-card>
-      <VerifyConfigDetailtab v-if="VerifyFormVisible" />
+      <VerifyConfigDetailtab v-if="VerifyFormVisible" :cid="confId" />
       <DataSyncConfigDetailtab v-if="DataSyncFormVisible" />
     </el-card>
   </div>
@@ -35,8 +35,8 @@ export default {
         if (this.$route.params && this.$route.params.id && this.$route.params.id !== 'null') {
           this.confId = this.$route.params.id
           this.viewstr = this.$route.params.viewstr
-          alert(this.viewstr)
           if (this.viewstr == "VerifyConfig") {
+
             this.VerifyFormVisible = true
           } else if (this.viewstr == "DataSyncConfig") {
             this.DataSyncFormVisible = true

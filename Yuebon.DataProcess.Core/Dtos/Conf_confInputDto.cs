@@ -13,9 +13,14 @@ namespace Yuebon.DataProcess.Dtos
     public class Conf_confInputDto: IInputDto<string>
     {
         /// <summary>
-        /// 设置或获取配置类型0：系统，1：数据库
+        /// 起始方配置类型0：系统，1：数据库
         /// </summary>
-        public int? Conftype { get; set; }
+        public int? ConfFromType { get; set; }
+
+        /// <summary>
+        /// 终止方配置类型0：系统，1：数据库
+        /// </summary>
+        public int? ConfToType { get; set; }
         /// <summary>
         /// 设置或获取描述
         /// </summary>

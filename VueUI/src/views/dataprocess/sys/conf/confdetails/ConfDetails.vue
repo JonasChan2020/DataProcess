@@ -183,7 +183,7 @@ import {
   GetColumnListsBytbName, getDataGetTypeLists } from '@/api/dataprocess/sys_conf_details'
   export default {
     name: 'ConfDetails',
-    //props: ['cpname'],
+    props: ['cpname'],
     data() {
       return {
         tpl: '',

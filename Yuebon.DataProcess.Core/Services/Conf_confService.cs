@@ -59,11 +59,11 @@ namespace Yuebon.DataProcess.Services
             {
                 if (!string.IsNullOrEmpty(item.ToId))
                 {
-                    if (item.Conftype == 0)
+                    if (item.ConfToType == 0)
                     {
                         item.ToName = sysService.Get(item.ToId).Sysname;
                     }
-                    else if (item.Conftype == 1)
+                    else if (item.ConfToType == 1)
                     {
                         item.ToName = sdService.Get(item.ToId).SdName;
                     }

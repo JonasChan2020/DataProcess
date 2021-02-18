@@ -13,10 +13,16 @@ namespace Yuebon.DataProcess.Models
     [Table("dp_conf_conf")]
     [Serializable]
     public class Conf_conf:BaseEntity<string>, ICreationAudited, IModificationAudited, IDeleteAudited
-    {        /// <summary>
-        /// 设置或获取配置类型0：系统，1：数据库
+    {
+        /// <summary>
+        /// 起始方配置类型0：系统，1：数据库
         /// </summary>
-        public int? Conftype { get; set; }
+        public int? ConfFromType { get; set; }
+
+        /// <summary>
+        /// 终止方配置类型0：系统，1：数据库
+        /// </summary>
+        public int? ConfToType { get; set; }
 
         /// <summary>
         /// 设置或获取关联库或系统ID

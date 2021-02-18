@@ -23,6 +23,17 @@ export function getAllConf_detailList () {
   })
 }
 /**
+   * 获取所有可用的
+   */
+export function getConfTbContent(data) {
+  return http.request({
+    url: 'Conf_detail/GetConfTbContent',
+    method: 'post',
+    data: data,
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
+/**
    * 新增或修改保存
    * @param data
    */

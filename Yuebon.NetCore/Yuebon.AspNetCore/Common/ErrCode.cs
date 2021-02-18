@@ -170,6 +170,16 @@ namespace Yuebon.AspNetCore.Models
         /// </summary>
         public static string err80405= "所选数据库已加入系统，但找不到对应系统";
 
+        /// <summary>
+        /// 未找到该数据库或该系统主数据库的表格信息
+        /// </summary>
+        public static string err80406 = "未找到该数据库或该系统主数据库的表格信息";
+
+        /// <summary>
+        /// 未找到该数据项
+        /// </summary>
+        public static string err80407 = "未找到该数据项";
+
 
         #endregion
 

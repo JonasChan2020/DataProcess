@@ -21,6 +21,7 @@
               <el-table ref="gridfromtable"
                         v-loading="fromtableloading"
                         :data="fromtableData"
+                        :height="700"
                         border
                         stripe
                         highlight-current-row
@@ -75,6 +76,7 @@
             <el-table ref="gridtotable"
                       v-loading="totableloading"
                       :data="totableData"
+                      :height="700"
                       border
                       stripe
                       highlight-current-row
@@ -535,7 +537,8 @@ export default {
             'FromId': this.fromcurrentSelectId,
             'ToId': this.dialogcurrentSelectId,
             'EnabledMark': true,
-            'ConfType': this.dialogselectedSysDb,
+            'ConfFromType': this.selectedSysDb,
+            'ConfToType': this.dialogselectedSysDb,
             'Id': this.currentId
           }
           var url = 'Conf_conf/Insert'
@@ -681,5 +684,5 @@ export default {
   }
 </script>
 
-<style>
+<style lang="scss" scoped>
 </style>
