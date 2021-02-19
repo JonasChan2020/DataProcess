@@ -101,9 +101,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                     if (dbDetailModel != null)
                     {
                         List<DbTableInfo> tbModelList = dbDetailModel.Tbs.ToObject<List<DbTableInfo>>();
-                        #region
-
-                        #endregion
 
                         result.ResData = tbModelList;
                         result.ErrCode = ErrCode.successCode;
