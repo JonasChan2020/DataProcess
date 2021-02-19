@@ -36,28 +36,6 @@ export function GetColumnListsByDetailId(data) {
   })
 }
 /**
-  * 获取指定表名的表字段
-  */
-export function GetColumnListsBytbName(data) {
-  return http.request({
-    url: 'Sys_conf_details/GetColumnListsBytbName',
-    data: data,
-    method: 'post',
-    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
-  })
-}
-/**
-  * 获取数据获取方式下拉框数据集
-  */
-export function getDataGetTypeLists(data) {
-  return http.request({
-    url: 'Sys_conf_details/GetDataGetTypeLists',
-    method: 'post',
-    data: data,
-    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
-  })
-}
-/**
    * 获取所有可用的
    */
 export function getAllEnableByConfId(data) {

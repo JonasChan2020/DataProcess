@@ -117,6 +117,10 @@
         /// <summary>
         /// 获取方法参数
         /// </summary>
+        public string VerifyFunctionParamter { get; set; }
+        /// <summary>
+        /// 获取方法参数
+        /// </summary>
         public string GetFunctionParamter { get; set; }
         #endregion
 

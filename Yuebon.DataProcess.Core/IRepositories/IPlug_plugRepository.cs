@@ -18,6 +18,6 @@ namespace Yuebon.DataProcess.IRepositories
         /// <param name="where">查询条件</param>
         /// <param name="trans">事务对象</param>
         /// <returns></returns>
-        Task<IEnumerable<Plug_plug>> GetEnableListWithSysIdAsync(string sysId, IDbTransaction trans = null);
+        Task<IEnumerable<Plug_plug>> GetEnableListWithSysIdAsync(string sysId, string ptype, IDbTransaction trans = null);
     }
 }

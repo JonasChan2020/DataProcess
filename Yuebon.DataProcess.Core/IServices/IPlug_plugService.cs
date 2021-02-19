@@ -12,6 +12,6 @@ namespace Yuebon.DataProcess.IServices
     /// </summary>
     public interface IPlug_plugService:IService<Plug_plug,Plug_plugOutputDto, string>
     {
-        Task<List<Plug_plugOutputDto>> GetEnableListWithSys(string SysId);
+        Task<List<Plug_plugOutputDto>> GetEnableListWithSys(string SysId, string ptype);
     }
 }

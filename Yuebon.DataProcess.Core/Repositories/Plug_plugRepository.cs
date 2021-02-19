@@ -28,13 +28,14 @@ namespace Yuebon.DataProcess.Repositories
         /// 根据查询条件获取数据集合
         /// </summary>
         /// <param name="where">查询条件</param>
+        /// <param name="ptype">插件类型</param>
         /// <param name="trans">事务对象</param>
         /// <returns></returns>
-        public async Task<IEnumerable<Plug_plug>> GetEnableListWithSysIdAsync(string sysId, IDbTransaction trans = null)
+        public async Task<IEnumerable<Plug_plug>> GetEnableListWithSysIdAsync(string sysId, string ptype, IDbTransaction trans = null)
         {
             string sql = $"select pg.*  from dp_plug_plug pg "
                 + " left join dp_plug_sysrelation pgrela on pg.id=pgrela.plug_id"
-                + " where pgrela.sys_id='" + sysId + "' or is_public='1' ";
+                + " where (pg.ptag='" + ptype + "' and pgrela.sys_id='" + sysId + "') or is_public='1' ";
             return await DapperConn.QueryAsync<Plug_plug>(sql, trans);
         }
     }

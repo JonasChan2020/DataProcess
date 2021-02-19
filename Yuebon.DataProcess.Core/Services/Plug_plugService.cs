@@ -77,9 +77,9 @@ namespace Yuebon.DataProcess.Services
         /// </summary>
         /// <param name="SysId"></param>
         /// <returns></returns>
-        public async Task<List<Plug_plugOutputDto>> GetEnableListWithSys(string SysId)
+        public async Task<List<Plug_plugOutputDto>> GetEnableListWithSys(string SysId, string ptype)
         {
-            IEnumerable<Plug_plug> list = await _repository.GetEnableListWithSysIdAsync(SysId);
+            IEnumerable<Plug_plug> list = await _repository.GetEnableListWithSysIdAsync(SysId, ptype);
             List<Plug_plugOutputDto> resultList = list.MapTo<Plug_plugOutputDto>();
             return resultList;
         }

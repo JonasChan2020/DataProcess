@@ -14,7 +14,9 @@ namespace Yuebon.DataProcess.Dtos
            CreateMap<Conf_confInputDto, Conf_conf>();
            CreateMap<Conf_detail, Conf_detailOutputDto>();
            CreateMap<Conf_detailInputDto, Conf_detail>();
-           CreateMap<Plug_plug, Plug_plugOutputDto>();
+            CreateMap<Plug_ConfDetail, Plug_ConfDetailOutputDto>();
+            CreateMap<Plug_ConfDetailInputDto, Plug_ConfDetail>();
+            CreateMap<Plug_plug, Plug_plugOutputDto>();
            CreateMap<Plug_plugInputDto, Plug_plug>();
            CreateMap<Plug_sysrelation, Plug_sysrelationOutputDto>();
            CreateMap<Plug_sysrelationInputDto, Plug_sysrelation>();

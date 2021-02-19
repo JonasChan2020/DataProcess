@@ -23,6 +23,17 @@ export function getAllPlug_plugList () {
   })
 }
 /**
+  * 获取数据获取方式下拉框数据集
+  */
+export function getDataGetTypeLists(data) {
+  return http.request({
+    url: 'Plug_plug/GetDataGetTypeLists',
+    method: 'post',
+    data: data,
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
+/**
    * 上传插件
    * @param data
    */

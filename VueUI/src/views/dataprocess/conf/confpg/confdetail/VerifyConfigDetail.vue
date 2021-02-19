@@ -155,7 +155,7 @@
     return {
       lefttableloading: false,
       lefttableData: [],
-      leftcurrentSelectId:'',
+      leftcurrentSelectId: '',
       righttableloading: false,
       righttableData: [],
       rightcurrentSelectId: '',
@@ -168,7 +168,6 @@
       dialogVerifyEditFormVisible: false,
       showVerifyDetailConfig: false,
       VerifyConfig: '', //所选记录中的获取值详细配置信息
-
     }
     },
     computed: {
@@ -180,6 +179,7 @@
           require([`@/views/dataprocess/${self.tpl}`], resolve)
         };
       }
+    },
   created() {
     this.loadLeftTableData()
     this.loadBtnFunc = JSON.parse(localStorage.getItem('yueboncurrentfuns'))
@@ -308,14 +308,23 @@
     /**
         * 打开配置页面
         */
-    OpenConfigPage: function () {
+    OpenConfigPage: function (type) {
       if (row.GetFunctionParamter.length > 0) {
         let Base64 = require('js-base64').Base64
-        this.detailConfig = Base64.decode(row.GetFunctionParamter)
+        if (type = 'verify') {
+          this.detailConfig = Base64.decode(row.VerifyFunctionParamter)
+        } else if (type = 'verify') {
+          this.detailConfig = Base64.decode(row.GetFunctionParamter)
+        }
+        
       } else {
         this.detailConfig = ''
       }
-      this.tpl = "uploadplug/test1/index.vue"
+      if (type = 'verify') {
+        this.tpl = "uploadplug/verifytest/index.vue"
+      } else if (type = 'verify') {
+        this.tpl = "uploadplug/test1/index.vue"
+      }
       this.currentOpenIndex = index
       this.showDetailConfig = true
       this.dialogEditFormVisible = true

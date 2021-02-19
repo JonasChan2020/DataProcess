@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using System.Reflection;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -199,6 +201,25 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                 result.ErrMsg = ErrCode.err43002;
                 result.ErrCode = "43002";
             }
+            return ToJsonContent(result);
+        }
+
+        /// <summary>
+        ///  获取数据获取方式下拉框数据集
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("GetDataGetTypeLists")]
+        [YuebonAuthorize("List")]
+        public async Task<IActionResult> GetDataGetTypeLists([FromBody] dynamic formData)
+        {
+            CommonResult result = new CommonResult();
+            string dataStr = formData.ToString();
+            var paramsObj = new { SysId = "", ptype = "" };
+            paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
+            List<Plug_plugOutputDto> plugList = await iService.GetEnableListWithSys(paramsObj.SysId, paramsObj.ptype);
+            result.ResData = plugList;
+            result.ErrCode = ErrCode.successCode;
+            result.ErrMsg = ErrCode.err0;
             return ToJsonContent(result);
         }
 
