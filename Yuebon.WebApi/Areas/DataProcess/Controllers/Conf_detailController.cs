@@ -1,14 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Yuebon.AspNetCore.Controllers;
 using Yuebon.AspNetCore.Models;
 using Yuebon.Commons.Helpers;
-using Yuebon.Commons.Log;
-using Yuebon.Commons.Mapping;
 using Yuebon.Commons.Models;
-using Yuebon.Commons.Pages;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 using Yuebon.DataProcess.IServices;
@@ -104,7 +100,12 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                     Sd_detail dbDetailModel = await detailService.GetWhereAsync(string.Format(" sd_id = '{0}'", dbId));
                     if (dbDetailModel != null)
                     {
-                        result.ResData = dbDetailModel.Tbs.ToObject<List<DbTableInfo>>();
+                        List<DbTableInfo> tbModelList = dbDetailModel.Tbs.ToObject<List<DbTableInfo>>();
+                        #region
+
+                        #endregion
+
+                        result.ResData = tbModelList;
                         result.ErrCode = ErrCode.successCode;
                         result.ErrMsg = ErrCode.err0;
                     }

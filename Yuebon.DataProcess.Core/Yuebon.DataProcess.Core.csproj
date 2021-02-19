@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="common\Enity\**" />
+    <EmbeddedResource Remove="common\Enity\**" />
+    <None Remove="common\Enity\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="5.0.2" />
     <PackageReference Include="System.Data.OleDb" Version="5.0.0" />
@@ -13,10 +19,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Yuebon.NetCore\Yuebon.Commons\Yuebon.Commons.csproj" />
     <ProjectReference Include="..\Yuebon.NetCore\Yuebon.Security.Core\Yuebon.Security.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="common\Enity\" />
   </ItemGroup>
 
 </Project>
