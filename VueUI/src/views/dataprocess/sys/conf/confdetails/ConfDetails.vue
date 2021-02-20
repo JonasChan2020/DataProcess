@@ -125,7 +125,7 @@
       </el-table-column>
       <el-table-column label="验证配置" width="100" align="center">
         <template slot-scope="scope">
-          <el-button type="text" @click="ShowDialogVerifyEditOrViewDialog(scope.row,scope.$index)">验证配置</el-button>
+          <el-button type="text" @click="ShowDialogVerifyEditOrViewDialog(scope.$index)">验证配置</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="DataGetType" label="获取方式" sortable="custom" width="200" align="center">
@@ -210,11 +210,30 @@
                 @select="handleVerifyDialogSelectChange"
                 @select-all="handleVerifyDialogSelectAllChange">
         <el-table-column type="selection" width="30" />
-        <el-table-column prop="SdName" label="编码" sortable="custom" min-width='40%' />
-        <el-table-column prop="SdName" label="名称" sortable="custom" min-width='60%' />
+        <el-table-column prop="levelNum" label="执行顺序" sortable="custom" width="200" align="center"></el-table-column>
+          <el-table-column prop="PlugType" label="组件方式" sortable="custom" width="200" align="center">
+            <template slot-scope="scope">
+              <el-select v-model="scope.row.OperaType"
+                         placeholder="请选择类型"
+                         @change="handleVerifyDataGetTypeChange">
+                <el-option v-for="item in SelectVerifyGetTypeList"
+                           :key="item.Id"
+                           :label="item.Pname"
+                           :value="{value:item.Id,btnvisib:item.HasPage,index:scope.$index,configuri:item.ConfigUri}" />
+              </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column label="配置" sortable="custom" width="120" align="center">
+            <template slot-scope="scope">
+              <el-button type="primary"
+                         icon="el-icon-plus"
+                         size="small"
+                         :disabled="scope.row.HasPage==false"
+                         @click="GetDataOpenParamPage(scope.row,scope.$index,'verify')">配置</el-button>
+            </template>
       </el-table>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogVerifyEditFormVisible = false">取 消</el-button>
+        <el-button @click="cancleVerifyEditForm()">取 消</el-button>
         <el-button type="primary" @click="saveVerifyEditForm()">确 定</el-button>
       </div>
     </el-dialog>
@@ -262,7 +281,8 @@ import {
         currentVerifyDialogSelected: [],
         paramPageRowInfo: [],
         paramPageIndexInfo: '',
-        verifyTableDataIndex:'', //用于记录当打开验证配置列表时字段表的行号
+        verifyTableDataIndex: '', //用于记录当打开验证配置列表时字段表的行号
+        verifyFormOpenType:'',
       }
     },
     computed: {
@@ -314,7 +334,7 @@ import {
             return item
           }
         })
-        this.tableData = res
+        this.tableData = res[0].Fileds
       },
       /**
        * 读取详情
@@ -332,36 +352,34 @@ import {
 
       GetDataOpenParamPage: function (row, index, type) {
         this.PlugType = type
-        if (this.PlugType == 'verify') {
-          this.OpenConfigPage()
-        } else if (this.PlugType == 'getdata') {
-          this.paramPageRowInfo = row
-          this.paramPageIndexInfo = index
-          this.OpenConfigPage()
-        }
+        this.paramPageRowInfo = row
+        this.paramPageIndexInfo = index
+        this.OpenConfigPage()
       },
       /**
         * 打开配置页面
         */
       OpenConfigPage: function () {
         let Base64 = require('js-base64').Base64
-        if (this.PlugType = 'verify') {
-          if (this.paramPageRowInfo.OperaParamers.length > 0) {
+        if (this.PlugType == 'verify') {
+          if (this.paramPageRowInfo && this.paramPageRowInfo.OperaParamers && this.paramPageRowInfo.OperaParamers.length > 0) {
             this.detailConfig = this.paramPageRowInfo.OperaParamers
           } else {
             this.detailConfig = ''
           }
-        } else if (this.PlugType = 'getdata') {
-          if (this.paramPageRowInfo.GetFunctionParamter.length > 0) {
+
+         
+        } else if (this.PlugType == 'getdata') {
+          if (this.paramPageRowInfo.GetFunctionParamter !==null&&this.paramPageRowInfo.GetFunctionParamter.length > 0) {
             this.detailConfig = Base64.decode(this.paramPageRowInfo.GetFunctionParamter)
           } else {
             this.detailConfig = ''
           }
           
         }
-        if (this.PlugType = 'verify') {
+        if (this.PlugType == 'verify') {
           this.tpl = "uploadplug/verifytest/index.vue"
-        } else if (this.PlugType = 'getdata') {
+        } else if (this.PlugType == 'getdata') {
           this.tpl = "uploadplug/test1/index.vue"
         }
         this.currentOpenIndex = this.paramPageIndexInfo
@@ -371,9 +389,19 @@ import {
       saveDetailConfig(data) {
         if (data !== null) {
           let Base64 = require('js-base64').Base64
-          if (this.PlugType = 'verify') {
-            this.dialogVerifytableData[this.currentOpenIndex].OperaParamers = data
-          } else if (this.PlugType = 'getdata') {
+          if (this.PlugType == 'verify') {
+            if (this.verifyFormOpenType == 'add') {
+              var objins = {
+                'FieldName': this.tableData[this.verifyTableDataIndex].FieldName,
+                'OperaType': '',
+                'OperaParamers': data,
+              }
+              this.dialogVerifytableData.push(objins)
+            } else if (this.verifyFormOpenType == 'edit') {
+              this.dialogVerifytableData[this.currentOpenIndex].OperaParamers = data
+            }
+            
+          } else if (this.PlugType == 'getdata') {
             this.tableData[this.currentOpenIndex].GetFunctionParamter = Base64.encode(JSON.stringify(data))
           }
         }
@@ -477,7 +505,9 @@ import {
       loadVerifyDialogTableData: function () {
         this.dialogVerifytableloading = true
         let Base64 = require('js-base64').Base64
-        this.dialogVerifytableData = Base64.decode(this.tableData[this.verifyTableDataIndex].VerifyFunctionParamter) 
+        if (this.tableData[this.verifyTableDataIndex].VerifyFunctionParamter!==null&&this.tableData[this.verifyTableDataIndex].VerifyFunctionParamter.length > 0) {
+          this.dialogVerifytableData = Base64.decode(this.tableData[this.verifyTableDataIndex].VerifyFunctionParamter) 
+        }
         this.dialogVerifytableloading = false
       },
       /**
@@ -488,9 +518,27 @@ import {
         this.dialogVerifyEditFormVisible = true
         this.loadVerifyDialogTableData()
       },
+      AddEditPlugConf: function (view) {
+        if (view == 'add') {
+          var objins = {
+            'levelNum': '',
+            'PlugType': [],
+            'confJson': '',
+          }
+          this.dialogVerifytableData.push(objins)
+        } else if (view == 'edit') {
+          this.dialogVerifytableData[this.currentOpenIndex].OperaParamers = data
+        }
+        this.loadVerifyDialogTableData()
+      },
       saveVerifyEditForm() {
         let Base64 = require('js-base64').Base64
         this.tableData[this.verifyTableDataIndex].VerifyFunctionParamter = Base64.encode(JSON.stringify(this.dialogVerifytableData))
+        this.dialogVerifyEditFormVisible = false
+        this.dialogVerifytableData = []
+        this.verifyTableDataIndex = ''
+      },
+      cancleVerifyEditForm() {
         this.dialogVerifyEditFormVisible = false
         this.dialogVerifytableData = []
         this.verifyTableDataIndex = ''
@@ -572,6 +620,15 @@ import {
        */
       handleVerifyDialogSelectAllChange: function (selection) {
         this.currentVerifyDialogSelected = selection
+      },
+      /**
+         *当验证方式下拉框发生变化时
+         */
+      handleVerifyTypeChange: function (params) {
+        const { value, btnvisib, index, configuri } = params
+        this.tableData[index].GetFunctionParamter = ''
+        this.tableData[index].HasPage = btnvisib
+        this.tableData[index].ConfigUri = configuri
       },
     },
   }
