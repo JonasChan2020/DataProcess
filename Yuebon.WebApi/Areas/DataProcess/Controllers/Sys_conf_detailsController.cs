@@ -332,7 +332,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                         #region 获取配置字符串信息
                         List<DbTableOperaInfo> verifyConfs = null; //字段验证插件配置信息
                         List<DbTableOperaInfo> getDataConfs = null;//字段导入插件配置信息
-                        IEnumerable<Plug_ConfDetail> pcModelList = await PcdService.GetListWhereAsync(string.Format(" obj_id = '{0}'", sdDetailModel.Id));
+                        IEnumerable<Plug_ConfDetail> pcModelList = await PcdService.GetListWhereAsync(string.Format(" obj_id = '{0}'", model.Id));
                         if (pcModelList != null&&pcModelList.Count()>0)
                         {
                             List<Plug_ConfDetail> pcdModelList = pcModelList.ToList();
@@ -481,7 +481,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                 {
                     DbTableOperaInfo getDataDtoModel = new DbTableOperaInfo();
                     getDataDtoModel.FieldName = item.FieldName;
-                    getDataDtoModel.OperaType = item.DataGetType.value;
                     getDataDtoModel.OperaParamers = item.GetFunctionParamter;
                     getDataDtoModelList.Add(getDataDtoModel);
                     item.GetFunctionParamter = null; //置空，详情中不做存储

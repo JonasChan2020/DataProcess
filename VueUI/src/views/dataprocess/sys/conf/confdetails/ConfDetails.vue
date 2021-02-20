@@ -20,6 +20,7 @@
       </el-col>
     </el-row>
     <el-table ref="gridtable"
+               v-loading="tableloading"
               :data="tableData"
               row-key="FieldName"
               height="500"
@@ -123,30 +124,24 @@
           </el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="验证配置" width="100" align="center">
+      <el-table-column label="验证配置" sortable="custom" width="120" prop="EnableMark" align="center">
         <template slot-scope="scope">
-          <el-button type="text" @click="ShowDialogVerifyEditOrViewDialog(scope.$index)">验证配置</el-button>
+          <el-tag :type="scope.row.VerifyFunctionParamter!=undefined&&scope.row.VerifyFunctionParamter!=null&&scope.row.VerifyFunctionParamter.length>5 ? 'success' : 'info'" disable-transitions>{{ scope.row.VerifyFunctionParamter!=undefined&&scope.row.VerifyFunctionParamter!=null&&scope.row.VerifyFunctionParamter.length>5 ? "是" : "否" }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="DataGetType" label="获取方式" sortable="custom" width="200" align="center">
+      <el-table-column label="数据获取配置" sortable="custom" width="120" prop="EnableMark" align="center">
         <template slot-scope="scope">
-          <el-select v-model="scope.row.DataGetType"
-                     placeholder="请选择类型"
-                     @change="handleDataGetTypeChange">
-            <el-option v-for="item in SelectDataGetTypeList"
-                       :key="item.Id"
-                       :label="item.Pname"
-                       :value="{value:item.Id,btnvisib:item.HasPage,index:scope.$index,configuri:item.ConfigUri}" />
-          </el-select>
+          <el-tag :type="scope.row.GetFunctionParamter!=undefined&&scope.row.GetFunctionParamter!=null&&scope.row.GetFunctionParamter.length>5 ? 'success' : 'info'" disable-transitions>{{ scope.row.GetFunctionParamter!=undefined&&scope.row.GetFunctionParamter!=null&&scope.row.GetFunctionParamter.length>5 ? "是" : "否" }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="获取配置" sortable="custom" width="120" align="center">
+      <el-table-column label="" width="100" align="center">
         <template slot-scope="scope">
-          <el-button type="primary"
-                     icon="el-icon-plus"
-                     size="small"
-                     :disabled="scope.row.HasPage==false"
-                     @click="GetDataOpenParamPage(scope.row,scope.$index,'getdata')">获取配置</el-button>
+          <el-button type="text" @click="ShowDialogVerifyEditOrViewDialog('verify',scope.$index)">验证配置</el-button>
+        </template>
+      </el-table-column>
+      <el-table-column label="" width="100" align="center">
+        <template slot-scope="scope">
+          <el-button type="text" @click="ShowDialogVerifyEditOrViewDialog('getData',scope.$index)">数据获取配置</el-button>
         </template>
       </el-table-column>
 
@@ -156,48 +151,53 @@
       <el-button @click="reset">重置</el-button>
       <el-button v-preventReClick type="primary" @click="saveEditForm">保存</el-button>
     </div>
-    <el-dialog ref="dialogPlugEditForm"
-               :close-on-click-modal="false"
-               :show-close="false"
-               :title="'插件'"
-               :visible.sync="dialogPlugEditFormVisible"
-               width="640px">
-      <component v-if="showDetailConfig" v-bind:is="loadertpl" :detailConfig="detailConfig" v-on:listenTochildEvent="saveDetailConfig"></component>
-    </el-dialog>
     <el-dialog ref="dialogVerifyEditForm"
                :close-on-click-modal="false"
-               :title="'验证配置'"
+               :title="dialogFormOpenTitle+'配置'"
                :visible.sync="dialogVerifyEditFormVisible"
                width="640px">
       <div class="list-btn-container">
         <el-button-group>
-          <el-button v-hasPermi="['Sd_sysdb/Add']"
+          <el-button v-hasPermi="['Sys_conf_details/Add']"
                      type="primary"
                      icon="el-icon-plus"
                      size="small"
-                     @click="GetDataOpenParamPage('','','verify')">新增</el-button>
-          <el-button v-hasPermi="['Sd_sysdb/Edit']"
-                     type="primary"
-                     icon="el-icon-edit"
-                     class="el-button-modify"
-                     size="small"
-                     @click="GetDataOpenParamPage('','','verify')">修改</el-button>
-          <el-button v-hasPermi="['Sd_sysdb/Enable']"
+                     @click="AddEditPlugConf()">新增</el-button>
+          <el-button v-hasPermi="['Sys_conf_details/Enable']"
                      type="info"
                      icon="el-icon-video-pause"
                      size="small"
                      @click="setVerifyDialogEnable('0')">禁用</el-button>
-          <el-button v-hasPermi="['Sd_sysdb/Enable']"
+          <el-button v-hasPermi="['Sys_conf_details/Enable']"
                      type="success"
                      icon="el-icon-video-play"
                      size="small"
                      @click="setVerifyDialogEnable('1')">启用</el-button>
-          <el-button v-hasPermi="['Sd_sysdb/Delete']"
+          <el-button v-hasPermi="['Sys_conf_details/Delete']"
                      type="danger"
                      icon="el-icon-delete"
                      size="small"
-                     @click="deleteVerifyPhysics()">删除</el-button>
-          <el-button type="default" icon="el-icon-refresh" size="small" @click="loadVerifyDialogTableData()">刷新</el-button>
+                     @click="deleteEditPlugConf()">删除</el-button>
+          <el-button v-hasPermi="['Sys_conf_details/Edit']"
+                     type="primary"
+                     icon="el-icon-edit"
+                     size="small"
+                     @click="changeLevelNum('up')">上移</el-button>
+          <el-button v-hasPermi="['Sys_conf_details/Edit']"
+                     type="primary"
+                     icon="el-icon-edit"
+                     size="small"
+                     @click="changeLevelNum('down')">下移</el-button>
+          <el-button v-hasPermi="['Sys_conf_details/Edit']"
+                     type="primary"
+                     icon="el-icon-edit"
+                     size="small"
+                     @click="changeLevelNum('top')">置顶</el-button>
+          <el-button v-hasPermi="['Sys_conf_details/Edit']"
+                     type="primary"
+                     icon="el-icon-edit"
+                     size="small"
+                     @click="changeLevelNum('buttom')">置底</el-button>
         </el-button-group>
       </div>
       <el-table ref="griddialogtable"
@@ -207,36 +207,52 @@
                 stripe
                 highlight-current-row
                 style="width: 100%"
+                :default-sort="{prop: 'levelNum', order: 'ascending'}"
                 @select="handleVerifyDialogSelectChange"
                 @select-all="handleVerifyDialogSelectAllChange">
         <el-table-column type="selection" width="30" />
         <el-table-column prop="levelNum" label="执行顺序" sortable="custom" width="200" align="center"></el-table-column>
-          <el-table-column prop="PlugType" label="组件方式" sortable="custom" width="200" align="center">
-            <template slot-scope="scope">
-              <el-select v-model="scope.row.OperaType"
-                         placeholder="请选择类型"
-                         @change="handleVerifyDataGetTypeChange">
-                <el-option v-for="item in SelectVerifyGetTypeList"
-                           :key="item.Id"
-                           :label="item.Pname"
-                           :value="{value:item.Id,btnvisib:item.HasPage,index:scope.$index,configuri:item.ConfigUri}" />
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="配置" sortable="custom" width="120" align="center">
-            <template slot-scope="scope">
-              <el-button type="primary"
-                         icon="el-icon-plus"
-                         size="small"
-                         :disabled="scope.row.HasPage==false"
-                         @click="GetDataOpenParamPage(scope.row,scope.$index,'verify')">配置</el-button>
-            </template>
+        <el-table-column prop="PlugType" label="组件方式" sortable="custom" width="200" align="center">
+          <template slot-scope="scope">
+            <el-select v-model="scope.row.PlugType"
+                       placeholder="请选择类型"
+                       @change="handleDataGetTypeChange">
+              <el-option v-for="item in SelectDataGetTypeList"
+                         :key="item.Id"
+                         :label="item.Pname"
+                         :value="{value:item.Id,btnvisib:item.HasPage,index:scope.$index,configuri:item.ConfigUri}" />
+            </el-select>
+          </template>
+        </el-table-column>
+        <el-table-column label="配置" sortable="custom" width="120" align="center">
+          <template slot-scope="scope">
+            <el-button type="primary"
+                       icon="el-icon-plus"
+                       size="small"
+                       :disabled="!scope.row.PlugType||scope.row.HasPage==false"
+                       @click="GetDataOpenParamPage(scope.$index)">配置</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column label="是否启用" sortable="custom" width="120" prop="EnableMark" align="center">
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.EnableMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnableMark === true ? "启用" : "禁用" }}</el-tag>
+          </template>
+        </el-table-column>
       </el-table>
       <div slot="footer" class="dialog-footer">
         <el-button @click="cancleVerifyEditForm()">取 消</el-button>
         <el-button type="primary" @click="saveVerifyEditForm()">确 定</el-button>
       </div>
     </el-dialog>
+    <el-dialog ref="dialogPlugEditForm"
+               :close-on-click-modal="false"
+               :show-close="false"
+               :title="'插件'"
+               :visible.sync="dialogPlugEditFormVisible"
+               width="640px">
+      <component v-if="showDetailConfig" v-bind:is="loadertpl" :detailConfig="detailConfig" v-on:listenTochildEvent="saveDetailConfig"></component>
+    </el-dialog>
+
   </div>
 </template>
 <script>
@@ -252,7 +268,7 @@ import {
     data() {
       return {
         tpl: '',
-        tableloading: true,
+        tableloading: false,
         tableData: [],
         Sys_conf_id: '',
         SysId:'',
@@ -264,25 +280,18 @@ import {
         showDetailConfig: false,
         PlugType:'', //调用插件编辑页面时区分是验证还是获取
         SelectTbnameList: [],
-        SelectedTbName: '',
-        SelectedDataGetType: '',
         SelectDataGetTypeList: [],
         currentId: '', // 当前操作对象的ID值，主要用于修改
         showType: 'edit', // 操作类型编辑、新增、查看
-        customplugpage: '',
         detailConfig: '', //所选记录中的获取值详细配置信息
-        currentOpenIndex: '', //记录当前开启获取方式详细配置的记录号
         dialogVerifyEditFormVisible: false,
         dialogVerifytableloading: false,
         dialogVerifytableData: [],
-        SelectVerifyGetTypeList:[],
         loadBtnFunc: [],
-        currentVerifyDialogId: '', // 当前操作对象的ID值，主要用于修改
         currentVerifyDialogSelected: [],
-        paramPageRowInfo: [],
-        paramPageIndexInfo: '',
+        paramPageIndexInfo: -1,
         verifyTableDataIndex: '', //用于记录当打开验证配置列表时字段表的行号
-        verifyFormOpenType:'',
+        dialogFormOpenTitle:'',
       }
     },
     computed: {
@@ -318,23 +327,20 @@ import {
           }
           this.SelectTbnameList = SelectTbnameListInfo
         })
-        getDataGetTypeLists({ SysId: this.SysId, ptype:'DataModelPlug' }).then(res => {
-          this.SelectDataGetTypeList = res.ResData
-        })
-        getDataGetTypeLists({ SysId: this.SysId, ptype: 'DataModelPlug' }).then(res => {
-          this.SelectVerifyGetTypeList = res.ResData
-        })
+        
       },
       /**
           * 加载页面table数据
           */
       loadTableDataByTbName: function (tb) {
+        this.tableloading=true
         var res = this.SelectTbnameList.filter(item => {
           if (item.TableName.includes(tb)) {
             return item
           }
         })
         this.tableData = res[0].Fileds
+        this.tableloading = false
       },
       /**
        * 读取详情
@@ -350,9 +356,7 @@ import {
         })
       },
 
-      GetDataOpenParamPage: function (row, index, type) {
-        this.PlugType = type
-        this.paramPageRowInfo = row
+      GetDataOpenParamPage: function (index) {
         this.paramPageIndexInfo = index
         this.OpenConfigPage()
       },
@@ -360,60 +364,20 @@ import {
         * 打开配置页面
         */
       OpenConfigPage: function () {
-        let Base64 = require('js-base64').Base64
-        if (this.PlugType == 'verify') {
-          if (this.paramPageRowInfo && this.paramPageRowInfo.OperaParamers && this.paramPageRowInfo.OperaParamers.length > 0) {
-            this.detailConfig = this.paramPageRowInfo.OperaParamers
-          } else {
-            this.detailConfig = ''
-          }
-
-         
-        } else if (this.PlugType == 'getdata') {
-          if (this.paramPageRowInfo.GetFunctionParamter !==null&&this.paramPageRowInfo.GetFunctionParamter.length > 0) {
-            this.detailConfig = Base64.decode(this.paramPageRowInfo.GetFunctionParamter)
-          } else {
-            this.detailConfig = ''
-          }
-          
+        if ( this.paramPageIndexInfo > -1) {
+          this.detailConfig = this.dialogVerifytableData[this.paramPageIndexInfo].confJson
+        } else {
+          this.detailConfig = ''
         }
         if (this.PlugType == 'verify') {
           this.tpl = "uploadplug/verifytest/index.vue"
-        } else if (this.PlugType == 'getdata') {
+        } else if (this.PlugType == 'getData') {
           this.tpl = "uploadplug/test1/index.vue"
         }
-        this.currentOpenIndex = this.paramPageIndexInfo
         this.showDetailConfig = true
         this.dialogPlugEditFormVisible = true
       },
-      saveDetailConfig(data) {
-        if (data !== null) {
-          let Base64 = require('js-base64').Base64
-          if (this.PlugType == 'verify') {
-            if (this.verifyFormOpenType == 'add') {
-              var objins = {
-                'FieldName': this.tableData[this.verifyTableDataIndex].FieldName,
-                'OperaType': '',
-                'OperaParamers': data,
-              }
-              this.dialogVerifytableData.push(objins)
-            } else if (this.verifyFormOpenType == 'edit') {
-              this.dialogVerifytableData[this.currentOpenIndex].OperaParamers = data
-            }
-            
-          } else if (this.PlugType == 'getdata') {
-            this.tableData[this.currentOpenIndex].GetFunctionParamter = Base64.encode(JSON.stringify(data))
-          }
-        }
-        this.tpl = ''
-        this.currentOpenIndex = -1
-        this.detailConfig = ''
-        this.PlugType = ''
-        this.paramPageRowInfo = []
-        this.paramPageIndexInfo = ''
-        this.dialogPlugEditFormVisible = false
-        this.showDetailConfig=false
-      },
+      
       /**
          * 新增/修改保存
          */
@@ -478,136 +442,186 @@ import {
       handleSelectTbChange: function () {
         this.loadTableDataByTbName(this.Tbname)
       },
-    /**
-         *展开详细表
-         */
-      toogleExpand(row) {
-        const $table = this.$refs.gridtable
-        this.tableData.map((item) => {
-          if (row.FieldName !== item.FieldName) {
-            $table.toggleRowExpansion(item, false)
-          }
-        })
-        $table.toggleRowExpansion(row)
+      LoadTablePlugList: function () {
+        this.dialogVerifytableloading=true
+        let array = [];
+        for (let i = 0; i < this.dialogVerifytableData.length; i++) {
+          let obj = this.dialogVerifytableData[i];
+          array.push(obj);
+        }
+        this.dialogVerifytableData = [];
+        this.dialogVerifytableData = this.sortByKey(array,'levelNum')
+        this.dialogVerifytableloading = false
       },
-    /**
+      // 数组对象方法排序：
+      sortByKey:function(array, key){
+    return array.sort(function (a, b) {
+      var x = a[key];
+      var y = b[key];
+      return ((x < y) ? -1 : ((x < y) ? 1 : 0));
+    });
+  },
+      /**
+   * 新增、修改或查看验证明细信息     *
+   */
+      ShowDialogVerifyEditOrViewDialog: function (view, index) {
+        this.PlugType = view
+        let Base64 = require('js-base64').Base64
+        if (this.PlugType == 'verify') {
+          this.dialogFormOpenTitle="验证"
+          getDataGetTypeLists({ SysId: this.SysId, ptype: 'DataModelPlug' }).then(res => {
+            this.SelectDataGetTypeList = res.ResData
+          })
+          if (this.tableData[index].VerifyFunctionParamter && this.tableData[index].VerifyFunctionParamter !== null && this.tableData[index].VerifyFunctionParamter.length > 0) {
+            this.dialogVerifytableData = JSON.parse(Base64.decode(this.tableData[index].VerifyFunctionParamter))
+          }
+        } else if (this.PlugType == 'getData') {
+          this.dialogFormOpenTitle = "数据获取"
+          getDataGetTypeLists({ SysId: this.SysId, ptype: 'DataModelPlug' }).then(res => {
+            this.SelectDataGetTypeList = res.ResData
+          })
+          if (this.tableData[index].GetFunctionParamter && this.tableData[index].GetFunctionParamter !== null && this.tableData[index].GetFunctionParamter.length > 0) {
+            this.dialogVerifytableData = JSON.parse(Base64.decode(this.tableData[index].GetFunctionParamter))
+          }
+        }
+        this.verifyTableDataIndex = index
+        this.dialogVerifyEditFormVisible = true
+      },
+      /**
          *当获取方式下拉框发生变化时
          */
       handleDataGetTypeChange: function (params) {
         const { value, btnvisib, index, configuri } = params
-        this.tableData[index].GetFunctionParamter=''
-        this.tableData[index].HasPage = btnvisib
-        this.tableData[index].ConfigUri = configuri
+        this.dialogVerifytableData[index].confJson = ''
+        this.dialogVerifytableData[index].HasPage = btnvisib
+        this.dialogVerifytableData[index].ConfigUri = configuri
       },
-      /**
-    * 加载页面table数据
-    */
-      loadVerifyDialogTableData: function () {
-        this.dialogVerifytableloading = true
-        let Base64 = require('js-base64').Base64
-        if (this.tableData[this.verifyTableDataIndex].VerifyFunctionParamter!==null&&this.tableData[this.verifyTableDataIndex].VerifyFunctionParamter.length > 0) {
-          this.dialogVerifytableData = Base64.decode(this.tableData[this.verifyTableDataIndex].VerifyFunctionParamter) 
+      AddEditPlugConf: function () {
+        var objins = {
+          'levelNum': this.dialogVerifytableData.length+1,
+          'PlugType': '',
+          'confJson': '',
+          'EnableMark': true,
         }
-        this.dialogVerifytableloading = false
+        this.dialogVerifytableData.push(objins)
       },
-      /**
-   * 新增、修改或查看验证明细信息     *
-   */
-      ShowDialogVerifyEditOrViewDialog: function ( index) {
-        this.verifyTableDataIndex = index
-        this.dialogVerifyEditFormVisible = true
-        this.loadVerifyDialogTableData()
-      },
-      AddEditPlugConf: function (view) {
-        if (view == 'add') {
-          var objins = {
-            'levelNum': '',
-            'PlugType': [],
-            'confJson': '',
-          }
-          this.dialogVerifytableData.push(objins)
-        } else if (view == 'edit') {
-          this.dialogVerifytableData[this.currentOpenIndex].OperaParamers = data
+      deleteEditPlugConf: function () {
+        if (this.currentVerifyDialogSelected.length === 0) {
+          this.$alert('请先选择要操作的数据', '提示')
+          return false
+        } else {
+          var arr = this.dialogVerifytableData.filter(item => this.currentVerifyDialogSelected.findIndex(tmp => tmp.Id === item.Id) > 0);
+          arr.forEach(item => {
+            this.dialogVerifytableData.splice(item)
+          })
         }
-        this.loadVerifyDialogTableData()
-      },
-      saveVerifyEditForm() {
-        let Base64 = require('js-base64').Base64
-        this.tableData[this.verifyTableDataIndex].VerifyFunctionParamter = Base64.encode(JSON.stringify(this.dialogVerifytableData))
-        this.dialogVerifyEditFormVisible = false
-        this.dialogVerifytableData = []
-        this.verifyTableDataIndex = ''
-      },
-      cancleVerifyEditForm() {
-        this.dialogVerifyEditFormVisible = false
-        this.dialogVerifytableData = []
-        this.verifyTableDataIndex = ''
       },
       setVerifyDialogEnable: function (val) {
         if (this.currentVerifyDialogSelected.length === 0) {
           this.$alert('请先选择要操作的数据', '提示')
           return false
         } else {
-          var currentVerifyDialogIds = []
-          this.currentVerifyDialogSelected.forEach(element => {
-            currentVerifyDialogIds.push(element.Id)
+          this.currentVerifyDialogSelected.forEach(item => {
+            this.dialogVerifytableData.forEach(tmp => {
+              if (item.levelNum == tmp.levelNum) {
+                tmp.EnableMark = val == '0' ? false : true
+              }
+            })
           })
-          const data = {
-            Ids: currentVerifyDialogIds,
-            Flag: val
-          }
-          //setSd_sysdbEnable(data).then(res => {
-          //  if (res.Success) {
-          //    this.$message({
-          //      message: '恭喜你，操作成功',
-          //      type: 'success'
-          //    })
-          //    this.currentDialogSelected = ''
-          //    this.loadDialogTableData()
-          //  } else {
-          //    this.$message({
-          //      message: res.ErrMsg,
-          //      type: 'error'
-          //    })
-          //  }
-          //})
         }
       },
-      deleteVerifyPhysics: function () {
-        if (this.currentVerifyDialogSelected.length === 0) {
-          this.$alert('请先选择要操作的数据', '提示')
-          return false
+      changeLevelNum: function (actionStr) {
+        if (this.currentVerifyDialogSelected.length > 1 || this.currentVerifyDialogSelected.length === 0) {
+          this.$alert('请选择一条数据进行编辑/修改', '提示')
         } else {
-          var currentVerifyDialogIds = []
-          this.currentVerifyDialogSelected.forEach(element => {
-            currentVerifyDialogIds.push(element.Id)
+          var selectedLevelNum = this.currentVerifyDialogSelected[0].levelNum //没变更之前的数字
+          var selectedIndex = -1; //所选的序号
+          this.dialogVerifytableData.forEach((v, i) => {
+            if (this.currentVerifyDialogSelected[0].levelNum == v.levelNum) {
+              selectedIndex = i;
+            }
           })
-          const data = {
-            Ids: currentVerifyDialogIds
+          if (actionStr == 'up') {
+            if (selectedLevelNum == 1) {
+              this.$alert('已经是第一个，无法移动', '提示')
+            } else {
+              this.dialogVerifytableData[selectedIndex].levelNum--
+              this.dialogVerifytableData[selectedIndex - 1].levelNum++
+            }
+          } else if (actionStr == 'down') {
+            if (selectedLevelNum == this.dialogVerifytableData.length) {
+              this.$alert('已经是最后一个，无法移动', '提示')
+            } else {
+              this.dialogVerifytableData[selectedIndex].levelNum++
+              this.dialogVerifytableData[selectedIndex + 1].levelNum--
+            }
           }
-          //deleteSd_sysdb(data).then(res => {
-          //  if (res.Success) {
-          //    this.$message({
-          //      message: '恭喜你，操作成功',
-          //      type: 'success'
-          //    })
-          //    this.currentDialogSelected = ''
-          //    this.loadDialogTableData()
-          //  } else {
-          //    this.$message({
-          //      message: res.ErrMsg,
-          //      type: 'error'
-          //    })
-          //  }
-          //})
+          else if (actionStr == 'top') {
+            if (selectedLevelNum == 1) {
+              this.$alert('已经是第一个，无法移动', '提示')
+            } else {
+              this.dialogVerifytableData.forEach(item => {
+                if (item.levelNum != selectedLevelNum && item.levelNum < selectedLevelNum) {
+                  item.levelNum++
+                }
+              })
+              this.dialogVerifytableData[selectedIndex].levelNum=1
+            }
+          }
+          else if (actionStr == 'buttom') {
+            if (selectedLevelNum == this.dialogVerifytableData.length) {
+              this.$alert('已经是最后一个，无法移动', '提示')
+            } else {
+              this.dialogVerifytableData.forEach(item => {
+                if (item.levelNum != selectedLevelNum && item.levelNum > selectedLevelNum) {
+                  item.levelNum--
+                }
+              })
+              this.dialogVerifytableData[selectedIndex].levelNum = this.dialogVerifytableData.length
+            }
+          }
+
+          this.LoadTablePlugList()
         }
       },
+      saveDetailConfig(data) {
+        if (data !== null) {
+          this.dialogVerifytableData[this.paramPageIndexInfo].confJson = data
+        }
+        this.tpl = ''
+        this.detailConfig = ''
+        this.paramPageIndexInfo = -1
+        this.dialogPlugEditFormVisible = false
+        this.showDetailConfig = false
+      },
+      saveVerifyEditForm() {
+        let Base64 = require('js-base64').Base64
+        if (this.PlugType == 'verify') {
+          if (this.dialogVerifytableData != [] && this.dialogVerifytableData.length > 0) {
+            this.tableData[this.verifyTableDataIndex].VerifyFunctionParamter = Base64.encode(JSON.stringify(this.dialogVerifytableData))
+          }
+        } else if (this.PlugType == 'getData') {
+          if (this.dialogVerifytableData != [] && this.dialogVerifytableData.length > 0) {
+            this.tableData[this.verifyTableDataIndex].GetFunctionParamter = Base64.encode(JSON.stringify(this.dialogVerifytableData))
+          }
+        }
+        this.dialogVerifyEditFormVisible = false
+        this.PlugType = ''
+        this.dialogVerifytableData = []
+        this.verifyTableDataIndex = ''
+      },
+      cancleVerifyEditForm() {
+        this.dialogVerifyEditFormVisible = false
+        this.dialogVerifytableData = []
+        this.PlugType = ''
+        this.verifyTableDataIndex = ''
+      },
+      
       /**
        * 当用户手动勾选checkbox数据行事件
        */
       handleVerifyDialogSelectChange: function (selection, row) {
         this.currentVerifyDialogSelected = selection
-        this.paramPageRowInfo = row
         this.dialogVerifytableData.forEach((v, i) => {
           if (row.Id == v.id) {
             this.paramPageIndexInfo = i;
@@ -620,15 +634,6 @@ import {
        */
       handleVerifyDialogSelectAllChange: function (selection) {
         this.currentVerifyDialogSelected = selection
-      },
-      /**
-         *当验证方式下拉框发生变化时
-         */
-      handleVerifyTypeChange: function (params) {
-        const { value, btnvisib, index, configuri } = params
-        this.tableData[index].GetFunctionParamter = ''
-        this.tableData[index].HasPage = btnvisib
-        this.tableData[index].ConfigUri = configuri
       },
     },
   }

@@ -45,9 +45,8 @@
         this.$refs['editFrom'].resetFields()
       },
       bindEditInfo: function () {
-        if (this.detailConfig != null && this.detailConfig.length > 0) {
-          var val = JSON.parse(this.detailConfig)
-          this.editFrom.sqlstr = val.sqlstr
+        if (this.detailConfig != null) {
+          this.editFrom.sqlstr = this.detailConfig.sqlstr
         }
       },
     }
