@@ -8,7 +8,7 @@
         /// <summary>
         /// 执行顺序
         /// </summary>
-        public string levelNum { get; set; }
+        public int? levelNum { get; set; }
         /// <summary>
         /// 插件方式
         /// </summary>
@@ -21,5 +21,9 @@
         /// 是否启用
         /// </summary>
         public bool? EnableMark { get; set; }
+        /// <summary>
+        /// 是否具有页面
+        /// </summary>
+        public bool? HasPage { get; set; }
     }
 }

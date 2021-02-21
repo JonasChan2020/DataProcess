@@ -12,6 +12,9 @@ using Yuebon.AspNetCore.Mvc;
 using Yuebon.Commons.Dtos;
 using Yuebon.DataProcess.Core.common;
 using Yuebon.DataProcess.Core.OutSideDbService.Entity;
+using Yuebon.Commons.Mapping;
+using Yuebon.DataProcess.Core.common.Entity;
+using System.Linq;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -25,6 +28,8 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         private readonly ISd_sysdbService sdService;
         private readonly ISd_detailService detailService;
         private readonly ISys_sysService sysService;
+        private readonly ISys_confService sysconfService;
+        private readonly ISys_conf_finalconfService scfService;
         private readonly IConf_confService confService;
         /// <summary>
         /// 构造函数
@@ -32,13 +37,17 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// <param name="_iService"></param>
         /// <param name="_confService"></param>
         /// <param name="_sdService"></param>
+        /// <param name="_detailService"></param>
+        /// <param name="_sysconfService"></param>
         /// <param name="_sysService"></param>
-        public Conf_detailController(IConf_detailService _iService, IConf_confService _confService, ISd_sysdbService _sdService, ISd_detailService _detailService, ISys_sysService _sysService) : base(_iService)
+        public Conf_detailController(IConf_detailService _iService, IConf_confService _confService, ISd_sysdbService _sdService, ISd_detailService _detailService, ISys_confService _sysconfService, ISys_conf_finalconfService _scfService, ISys_sysService _sysService) : base(_iService)
         {
             iService = _iService;
             sdService = _sdService;
             detailService = _detailService;
             sysService = _sysService;
+            sysconfService = _sysconfService;
+            scfService = _scfService;
             confService = _confService;
             AuthorizeKey.ListKey = "Conf_detail/List";
             AuthorizeKey.InsertKey = "Conf_detail/Add";
@@ -91,26 +100,66 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                 Conf_conf confModel = confService.Get(search.Pkey);
                 if (confModel != null)
                 {
-                    string dbId = confModel.FromId; //所选系统主数据库或数据库ID
-                    if (confModel.ConfFromType == 0) //系统
+                    string dbId = confModel.ToId; //所选系统主数据库或数据库ID
+                    if (confModel.ConfToType == 0) //系统
                     {
-                        Sys_sys sysModel = sysService.Get(confModel.FromId);
-                        dbId = sysModel.MdbId;
-                    }
-                    Sd_detail dbDetailModel = await detailService.GetWhereAsync(string.Format(" sd_id = '{0}'", dbId));
-                    if (dbDetailModel != null)
-                    {
-                        List<DbTableInfo> tbModelList = dbDetailModel.Tbs.ToObject<List<DbTableInfo>>();
+                        Sys_sys sysModel = sysService.Get(confModel.ToId);
+                        string where = " EnabledMark=1 ";
+                        where += string.Format(" and sysid = '{0}' ", sysModel.Id);
+                        IEnumerable<Sys_conf> list = await sysconfService.GetListWhereAsync(where);
+                        List<Sys_confOutputDto> resultList = list.MapTo<Sys_confOutputDto>();
+                        IEnumerable<Sys_conf_finalconf> scfList = await scfService.GetListWhereAsync(string.Format("sys_id='{0}'", sysModel.Id));
+                        List<Sys_conf_finalconfOutputDto> scfModelList = scfList.MapTo<Sys_conf_finalconfOutputDto>();
+                        if (resultList != null && resultList.Count > 0)
+                        {
+                            foreach (Sys_confOutputDto item in resultList)
+                            {
+                                List<DbFieldInfo> fields = new List<DbFieldInfo>();
+                                Sys_conf_finalconfOutputDto scfModel = scfModelList.Find(x => x.Sys_Conf_Id == item.Id);
+                                if (scfModel != null)
+                                {
+                                    List<SysConfDetailFinalInfo> scdfModelList = scfModel.ConfJson.ToObject<List<SysConfDetailFinalInfo>>();
+                                    if (scdfModelList != null && scdfModelList.Count > 0)
+                                    {
+                                        scdfModelList = scdfModelList.OrderBy(x => x.LevelNum).ToList();
+                                        foreach (SysConfDetailFinalInfo tmp in scdfModelList)
+                                        {
+                                            foreach (DbFieldInfo fieldItem in tmp.FieldList)
+                                            {
+                                                if (fieldItem.Is_Visible==true)
+                                                {
+                                                    string fieldName = tmp.LevelNum + "!" + tmp.SysConfDetailInfo.Tbname + "_" + fieldItem.FieldName;
+                                                    string desc = fieldItem.Description;
 
-                        result.ResData = tbModelList;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        result.ResData = resultList;
                         result.ErrCode = ErrCode.successCode;
                         result.ErrMsg = ErrCode.err0;
                     }
-                    else
+                    else if (confModel.ConfToType == 1)
                     {
-                        result.ErrCode = ErrCode.err1;
-                        result.ErrMsg = ErrCode.err80406;
+                        Sd_detail dbDetailModel = await detailService.GetWhereAsync(string.Format(" sd_id = '{0}'", confModel.ToId));
+                        if (dbDetailModel != null)
+                        {
+                            List<DbTableInfo> tbModelList = dbDetailModel.Tbs.ToObject<List<DbTableInfo>>();
+
+                            result.ResData = tbModelList;
+                            result.ErrCode = ErrCode.successCode;
+                            result.ErrMsg = ErrCode.err0;
+                        }
+                        else
+                        {
+                            result.ErrCode = ErrCode.err1;
+                            result.ErrMsg = ErrCode.err80406;
+                        }
                     }
+                    
                 }
                 else
                 {

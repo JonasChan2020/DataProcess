@@ -12,7 +12,19 @@ export function getSys_confListWithPager (data) {
     data: data,
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
-}/**
+}
+/**
+   * 根据条件获取可用的
+   */
+export function getSys_confList(data) {
+  return http.request({
+    url: 'Sys_conf/GetEnableList',
+    method: 'post',
+    data: data,
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
+/**
    * 获取所有可用的
    */
 export function getAllSys_confList () {

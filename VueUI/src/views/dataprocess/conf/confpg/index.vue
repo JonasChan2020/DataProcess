@@ -17,7 +17,7 @@
         <el-row :gutter="24">
           <el-col :span="24">
             <el-card>
-              <el-cascader v-model="selectedclass" :key="cascaderkey" style="width:500px;" :options="selectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleFromSelectClassChange" />
+              <el-cascader v-model="selectedclass" :key="cascaderkey" style="width: 100%;" :options="selectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleFromSelectClassChange" />
               <el-table ref="gridfromtable"
                         v-loading="fromtableloading"
                         :data="fromtableData"
@@ -30,7 +30,7 @@
                         @row-click="handlefromClickRow"
                         @sort-change="handlefromSortChange">
                 <template v-for="(item,index) in fromtableHead">
-                  <el-table-column :prop="item.column_name" :label="item.column_comment" :key="index" sortable="custom" width="120"></el-table-column>
+                  <el-table-column :prop="item.column_name" :label="item.column_comment" :key="index" sortable="custom" min-width="item.column_minWidth"></el-table-column>
                 </template>
               </el-table>
               <div class="pagination-container">
@@ -86,32 +86,24 @@
                       @select="handleToSelectChange"
                       @select-all="handleToSelectAllChange"
                       @sort-change="handletoSortChange">
-              <el-table-column type="selection" width="30" />
-              <el-table-column prop="Conftype" label="类型" sortable="custom" width="120">
+              <el-table-column type="selection" min-width="10%" />
+              <el-table-column prop="ConfToType" label="类型" sortable="custom" min-width="20%">
                 <template slot-scope="scope">
-                  <el-tag :type="scope.row.Conftype === 1 ? 'success' : 'info'" disable-transitions>{{ scope.row.Conftype === 1 ? "数据库" : "系统" }}</el-tag>
+                  <el-tag :type="scope.row.ConfToType === 1 ? 'success' : 'info'" disable-transitions>{{ scope.row.ConfToType === 1 ? "数据库" : "系统" }}</el-tag>
                 </template>
               </el-table-column>
-              <el-table-column prop="ToName" label="名称" sortable="custom" width="120" />
-              <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
+              <el-table-column prop="ToName" label="名称" sortable="custom" min-width="40%" />
+              <el-table-column label="是否启用" sortable="custom" min-width="10%" prop="EnabledMark" align="center">
                 <template slot-scope="scope">
                   <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
                 </template>
               </el-table-column>
-              <el-table-column label="验证配置" sortable="custom" width="120" align="center">
+              <el-table-column label="同步配置" sortable="custom" min-width="20%" align="center">
                 <template slot-scope="scope">
                   <el-button type="primary"
                              icon="el-icon-plus"
                              size="small"
-                             @click="HandleToConfig(scope.row.Id,'VerifyConfig')">验证配置</el-button>
-                </template>
-              </el-table-column>
-              <el-table-column label="同步配置" sortable="custom" width="120" align="center">
-                <template slot-scope="scope">
-                  <el-button type="primary"
-                             icon="el-icon-plus"
-                             size="small"
-                             @click="HandleToConfig(scope.row.Id,'DataSyncConfig')">同步配置</el-button>
+                             @click="HandleToConfig(scope.row.Id,scope.row.ConfToType,'DataSyncConfig')">同步配置</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -132,6 +124,7 @@
     </el-row>
     <el-dialog ref="dialogEditForm"
                :close-on-click-modal="false"
+               :show-close="false"
                :title="editFormTitle+'关联'"
                :visible.sync="dialogEditFormVisible"
                width="640px">
@@ -162,9 +155,10 @@
                       @select="handleDialogSelectChange"
                       @select-all="handleDialogSelectAllChange"
                       @sort-change="handledialogSortChange">
-              <el-table-column type="selection" width="30" />
+              <el-table-column type="selection" min-width="10%" />
+              <el-table-column  min-width="90%" v-if="dialogtableHead.length<1" />
               <template v-for="(item,index) in dialogtableHead">
-                <el-table-column :prop="item.column_name" :label="item.column_comment" :key="index" sortable="custom" width="120"></el-table-column>
+                <el-table-column :prop="item.column_name" :label="item.column_comment" :key="index" sortable="custom" min-width="item.column_minWidth"></el-table-column>
               </template>
             </el-table>
             <div class="pagination-container">
@@ -181,7 +175,7 @@
         </el-col>
       </el-row>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogEditFormVisible = false">取 消</el-button>
+        <el-button @click="closeEditForm()">取 消</el-button>
         <el-button type="primary" @click="saveEditForm()">确 定</el-button>
       </div>
     </el-dialog>
@@ -286,15 +280,15 @@ import { getConf_confListWithPager,
         this.cascaderkey++
         if (this.selectedSysDb == '0') {
           this.fromtableHead = [
-            { column_name: "Syscode", column_comment: "编码" },
-            { column_name: "Sysname", column_comment: "名称" }
+            { column_name: "Syscode", column_comment: "编码", column_minWidth:"25%" },
+            { column_name: "Sysname", column_comment: "名称", column_minWidth: "75%" }
           ]
           getAllClassifyTreeTable().then(res => {
             this.selectclasses = res.ResData
           })
         } else if (this.selectedSysDb == '1') {
           this.fromtableHead = [
-            { column_name: "SdName", column_comment: "名称" }
+            { column_name: "SdName", column_comment: "名称", column_minWidth: "95%" }
           ]
           getAllSdClassifyTreeTable().then(res => {
             this.selectclasses = res.ResData
@@ -450,8 +444,8 @@ import { getConf_confListWithPager,
       /**
        * 点击表格按钮跳转配置页面
        */
-      HandleToConfig: function (id, viewstr) {
-        this.$router.push({ name: 'ConfigDetails', params: { id: id, viewstr: viewstr } })
+      HandleToConfig: function (id, dbtype, viewstr) {
+        this.$router.push({ name: 'ConfigDetails', params: { id: id, dtype: dbtype, viewstr: viewstr } })
       },
       /**
       * 新增、修改或查看明细信息（绑定显示数据）     *
@@ -533,7 +527,7 @@ import { getConf_confListWithPager,
           this.$alert('请选择一条数据进行编辑/修改', '提示')
         } else {
           this.dialogcurrentSelectId = this.dialogcurrentSelected[0].Id
-
+          alert(this.dialogselectedSysDb)
           const data = {
             'FromId': this.fromcurrentSelectId,
             'ToId': this.dialogcurrentSelectId,
@@ -561,8 +555,8 @@ import { getConf_confListWithPager,
               if (res.CustomCode == "err80404") {
                 this.dialogselectedSysDb = '0'
                 this.dialogtableHead = [
-                  { column_name: "Syscode", column_comment: "编码" },
-                  { column_name: "Sysname", column_comment: "名称" }
+                  { column_name: "Syscode", column_comment: "编码", column_minWidth: "25%" },
+                  { column_name: "Sysname", column_comment: "名称", column_minWidth: "65%" }
                 ]
                 getAllClassifyTreeTable().then(res => {
                   this.dialogselectclasses = res.ResData
@@ -577,6 +571,27 @@ import { getConf_confListWithPager,
           })
         }
       },
+    /**
+   * 关闭对话框
+   */
+      closeEditForm() {
+        this.dialogEditFormVisible = false
+        this.dialogcurrentSelected = ''
+        this.dialogselectedSysDb= ''
+        this.dialogselectedclass = ''
+        this.dialogselectclasses = []
+        this.dialogtableHead=[]
+        this.dialogtableData=[]
+          this.dialogpagination={
+          currentPage: 1,
+            pagesize: 20,
+              pageTotal: 0
+        }
+        this.dialogsortableData={
+          order: 'desc',
+            sort: 'CreatorTime'
+        }
+      },
 
       /**
     *弹出框系统或数据库选择
@@ -588,15 +603,15 @@ import { getConf_confListWithPager,
         this.cascaderkey++
         if (this.dialogselectedSysDb == '0') {
           this.dialogtableHead = [
-            { column_name: "Syscode", column_comment: "编码" },
-            { column_name: "Sysname", column_comment: "名称" }
+            { column_name: "Syscode", column_comment: "编码", column_minWidth: "25%" },
+            { column_name: "Sysname", column_comment: "名称", column_minWidth: "65%" }
           ]
           getAllClassifyTreeTable().then(res => {
             this.dialogselectclasses = res.ResData
           })
         } else if (this.dialogselectedSysDb == '1') {
           this.dialogtableHead = [
-            { column_name: "SdName", column_comment: "名称" }
+            { column_name: "SdName", column_comment: "名称", column_minWidth: "90%" }
           ]
           getAllSdClassifyTreeTable().then(res => {
             this.dialogselectclasses = res.ResData

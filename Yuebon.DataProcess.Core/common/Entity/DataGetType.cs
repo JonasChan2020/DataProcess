@@ -13,6 +13,6 @@
         /// <summary>
         /// 顺序
         /// </summary>
-        public int index { get; set; }
+        public int? index { get; set; }
     }
 }

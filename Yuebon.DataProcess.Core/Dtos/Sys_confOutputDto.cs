@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Yuebon.DataProcess.Core.OutSideDbService.Entity;
 
 namespace Yuebon.DataProcess.Dtos
 {
@@ -11,6 +12,10 @@ namespace Yuebon.DataProcess.Dtos
     [Serializable]
     public class Sys_confOutputDto
     {
+        public Sys_confOutputDto()
+        {
+            Fileds = new List<DbFieldInfo>();
+        }
         /// <summary>
         /// 设置或获取配置分类ID
         /// </summary>
@@ -102,6 +107,10 @@ namespace Yuebon.DataProcess.Dtos
         /// </summary>
         [MaxLength(0)]
         public string Sys_Name { get; set; }
-
+        /// <summary>
+        /// 设置或获取所属系统名称
+        /// </summary>
+        [MaxLength(0)]
+        public List<DbFieldInfo> Fileds { get; set; }
     }
 }

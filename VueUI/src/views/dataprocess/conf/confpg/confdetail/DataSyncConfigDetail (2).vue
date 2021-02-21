@@ -12,8 +12,9 @@
                     highlight-current-row
                     style="width: 100%"
                     @row-click="handleLeftClickRow">
-            <el-table-column prop="TableName" label="表名" sortable="custom" width="150"></el-table-column>
-            <el-table-column prop="Description" label="描述" sortable="custom" width="204"></el-table-column>
+            <template v-for="(item,index) in lefttableHead">
+              <el-table-column :prop="item.column_name" :label="item.column_comment" :key="index" sortable="custom" min-width="item.column_minWidth"></el-table-column>
+            </template>
           </el-table>
         </el-card>
       </el-col>
@@ -128,16 +129,16 @@
       </el-table>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogEditFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="saveVerifyEditForm()">确 定</el-button>
+        <el-button type="primary" @click="saveDataSyncEditForm()">确 定</el-button>
       </div>
     </el-dialog>
-    <el-dialog ref="dialogVerifyEditForm"
+    <el-dialog ref="dialogDataSyncEditForm"
                :close-on-click-modal="false"
                :show-close="false"
                :title="'插件'"
-               :visible.sync="dialogVerifyEditFormVisible"
+               :visible.sync="dialogDataSyncEditFormVisible"
                width="640px">
-      <component v-if="showVerifyDetailConfig" v-bind:is="loadertpl" :VerifyConfig="VerifyConfig" v-on:listenTochildEvent="saveVerifyDetailConfig"></component>
+      <component v-if="showDataSyncDetailConfig" v-bind:is="loadertpl" :DataSyncConfig="DataSyncConfig" v-on:listenTochildEvent="saveDataSyncDetailConfig"></component>
     </el-dialog>
   </div>
 </template>
@@ -146,15 +147,16 @@
 
   import {
     getConfTbContent
-} from '@/api/dataprocess/conf_detail'
+  } from '@/api/dataprocess/conf_detail'
 
   export default {
-    name: 'VerifyConfigDetail',
-    props: ['cid'], //父页面传过来的配置ID
+    name:  'DataSyncConfigDetail ',
+    props: ['cid','dbtype'], //父页面传过来的配置ID
   data() {
     return {
       lefttableloading: false,
       lefttableData: [],
+      lefttableHead:[],
       leftcurrentSelectId: '',
       righttableloading: false,
       righttableData: [],
@@ -165,9 +167,9 @@
       loadBtnFunc: [],
       currentDialogId: '', // 当前操作对象的ID值，主要用于修改
       currentDialogSelected: [],
-      dialogVerifyEditFormVisible: false,
-      showVerifyDetailConfig: false,
-      VerifyConfig: '', //所选记录中的获取值详细配置信息
+      dialogDataSyncEditFormVisible: false,
+      showDataSyncDetailConfig: false,
+      DataSyncConfig: '', //所选记录中的获取值详细配置信息
     }
     },
     computed: {
@@ -193,17 +195,34 @@
       var seachdata = {
         Pkey: this.cid
       }
+      if (this.dbtype == '0') { //系统
+        this.lefttableHead = [
+          { column_name: "Confcode", column_comment: "模型编码", column_minWidth: "25%" },
+          { column_name: "Confname", column_comment: "模型名称", column_minWidth: "25%" },
+          { column_name: "Description", column_comment: "描述", column_minWidth: "50%" }
+        ]
+      } else if (this.dbtype == '1') { //数据库
+        this.lefttableHead = [
+          { column_name: "TableName", column_comment: "表名", column_minWidth: "25%" },
+          { column_name: "Description", column_comment: "描述", column_minWidth: "75%" }
+        ]
+      }
       getConfTbContent(seachdata).then(res => {
         this.lefttableData = res.ResData
         this.lefttableloading = false
       })
+      
     },
     /**
     * 点击一条记录
     */
     handleLeftClickRow(row) {
       this.leftcurrentSelectId = row.Id
-      this.loadRightTableData(row.Fileds)
+      if (this.dbtype == '0') { //系统
+       
+      } else if (this.dbtype == '1') { //数据库
+        this.loadRightTableData(row.Fileds)
+      }
     },
 
     /**
@@ -311,18 +330,18 @@
     OpenConfigPage: function (type) {
       if (row.GetFunctionParamter.length > 0) {
         let Base64 = require('js-base64').Base64
-        if (type = 'verify') {
-          this.detailConfig = Base64.decode(row.VerifyFunctionParamter)
-        } else if (type = 'verify') {
+        if (type = 'DataSync') {
+          this.detailConfig = Base64.decode(row.DataSyncFunctionParamter)
+        } else if (type = 'DataSync') {
           this.detailConfig = Base64.decode(row.GetFunctionParamter)
         }
         
       } else {
         this.detailConfig = ''
       }
-      if (type = 'verify') {
-        this.tpl = "uploadplug/verifytest/index.vue"
-      } else if (type = 'verify') {
+      if (type = 'DataSync') {
+        this.tpl = "uploadplug/DataSynctest/index.vue"
+      } else if (type = 'DataSync') {
         this.tpl = "uploadplug/test1/index.vue"
       }
       this.currentOpenIndex = index
@@ -330,7 +349,7 @@
       this.dialogEditFormVisible = true
     },
 
-    saveVerifyDetailConfig(data) {
+    saveDataSyncDetailConfig(data) {
       if (data !== null) {
         let Base64 = require('js-base64').Base64
         this.tableData[this.currentOpenIndex].GetFunctionParamter = Base64.encode(JSON.stringify(data))
@@ -345,7 +364,7 @@
     /**
        * 新增/修改保存
        */
-    saveVerifyEditForm() {
+    saveDataSyncEditForm() {
       this.configjson = this.tableData
       const data = {
         'Sys_conf_id': this.Sys_conf_id,

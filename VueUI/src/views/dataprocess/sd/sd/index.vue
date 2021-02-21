@@ -251,7 +251,14 @@ export default {
         this.selectclasses = res.ResData
       })
       getAllSys_sysList().then(res => {
-        this.selectsyses = res.ResData
+        var arr = res.ResData
+        var whiltselect = {
+          'Sysname': '无',
+          'Id': '',
+          'Children':[],
+        }
+        arr.unshift(whiltselect)
+        this.selectsyses = arr
       })
       
     },

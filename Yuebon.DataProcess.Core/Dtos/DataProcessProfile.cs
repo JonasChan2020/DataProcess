@@ -38,7 +38,9 @@ namespace Yuebon.DataProcess.Dtos
            CreateMap<Sys_conf_detailsInputDto, Sys_conf_details>();
            CreateMap<Sys_conf_obj, Sys_conf_objOutputDto>();
            CreateMap<Sys_conf_objInputDto, Sys_conf_obj>();
-           CreateMap<Sys_sys, Sys_sysOutputDto>();
+            CreateMap<Sys_conf_finalconf, Sys_conf_finalconfOutputDto>();
+            CreateMap<Sys_conf_finalconfInputDto, Sys_conf_finalconf>();
+            CreateMap<Sys_sys, Sys_sysOutputDto>();
            CreateMap<Sys_sysInputDto, Sys_sys>();
            CreateMap<Work_work, Work_workOutputDto>();
            CreateMap<Work_workInputDto, Work_work>();

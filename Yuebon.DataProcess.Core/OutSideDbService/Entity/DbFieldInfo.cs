@@ -1,4 +1,5 @@
-﻿using Yuebon.DataProcess.Core.common.Entity;
+﻿using System.Collections.Generic;
+using Yuebon.DataProcess.Core.common.Entity;
 
 namespace Yuebon.DataProcess.Core.OutSideDbService.Entity
 {
@@ -26,11 +27,7 @@ namespace Yuebon.DataProcess.Core.OutSideDbService.Entity
         /// <summary>
         /// 系统数据类型，如 int
         /// </summary>
-        public string DataType
-        {
-            get;
-            set;
-        }
+        public string DataType { get; set; }
 
         /// <summary>
         /// 数据库里面存放的类型。
@@ -124,6 +121,16 @@ namespace Yuebon.DataProcess.Core.OutSideDbService.Entity
         /// 获取方法参数
         /// </summary>
         public string GetFunctionParamter { get; set; }
+
+        /// <summary>
+        /// 获取方法参数
+        /// </summary>
+        public List<FieldPlugConfigInfo> VerifyFunctionParamterList { get; set; }
+
+        /// <summary>
+        /// 获取方法参数
+        /// </summary>
+        public List<FieldPlugConfigInfo> GetFunctionParamterList { get; set; }
         #endregion
 
     }

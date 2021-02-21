@@ -22,6 +22,7 @@ using Yuebon.DataProcess.Core.OutSideDbService;
 using Yuebon.DataProcess.Core.OutSideDbService.Entity;
 using Yuebon.DataProcess.Core.common;
 using Yuebon.DataProcess.Core.common.Entity;
+using Dapper;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -34,6 +35,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
     {
         private ISys_confService SysconfService;
         private ISys_conf_objService ISysconfobjService;
+        private ISys_conf_finalconfService SysConfFinalService;
         private IPlug_plugService IPlugService;
         private ISys_sysService SysService;
         private ISd_sysdbService SdService;
@@ -44,16 +46,19 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// </summary>
         /// <param name="_iService"></param>
         /// <param name="_ISysconfobjService"></param>
+        /// <param name="_SysConfFinalService"></param>
         /// <param name="_SysconfService"></param>
         /// <param name="_IPlugService"></param>
         /// <param name="_SysService"></param>
         /// <param name="_SdService"></param>
         /// <param name="_SdDetailService"></param>
-        public Sys_conf_detailsController(ISys_conf_detailsService _iService, ISys_conf_objService _ISysconfobjService, ISys_confService _SysconfService, IPlug_plugService _IPlugService, ISys_sysService _SysService, ISd_sysdbService _SdService, ISd_detailService _SdDetailService, IPlug_ConfDetailService _PcdService) : base(_iService)
+        /// <param name="_PcdService"></param>
+        public Sys_conf_detailsController(ISys_conf_detailsService _iService, ISys_conf_objService _ISysconfobjService, ISys_conf_finalconfService _SysConfFinalService, ISys_confService _SysconfService, IPlug_plugService _IPlugService, ISys_sysService _SysService, ISd_sysdbService _SdService, ISd_detailService _SdDetailService, IPlug_ConfDetailService _PcdService) : base(_iService)
         {
             iService = _iService;
             SysconfService = _SysconfService;
             ISysconfobjService = _ISysconfobjService;
+            SysConfFinalService = _SysConfFinalService;
             IPlugService = _IPlugService;
             SysService = _SysService;
             SdService = _SdService;
@@ -449,9 +454,9 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         public override async Task<IActionResult> InsertAsync(Sys_conf_detailsInputDto tinfo)
         {
             CommonResult result = new CommonResult();
-
             Sys_conf_details info = tinfo.MapTo<Sys_conf_details>();
             OnBeforeInsert(info);
+
             #region 补充执行顺序
             IEnumerable<Sys_conf_details> modelList = iService.GetListWhere(string.Format(" sys_conf_id='{0}'", info.Sys_conf_id));
             List<Sys_conf_details> confModelList = new List<Sys_conf_details>(modelList);
@@ -518,6 +523,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             result.Success = await iService.InsertAsync(info) > 0;
             if (result.Success)
             {
+                await SysConfFinalService.UpdateDetailConfig(info.Sys_conf_id);
                 result.ErrCode = ErrCode.successCode;
                 result.ErrMsg = ErrCode.err0;
             }
@@ -571,7 +577,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                 {
                     DbTableOperaInfo getDataDtoModel = new DbTableOperaInfo();
                     getDataDtoModel.FieldName = item.FieldName;
-                    getDataDtoModel.OperaType = item.DataGetType.value;
                     getDataDtoModel.OperaParamers = item.GetFunctionParamter;
                     getDataDtoModelList.Add(getDataDtoModel);
                     item.GetFunctionParamter = null; //置空，详情中不做存储
@@ -630,6 +635,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             }
             else
             {
+                
                 objInfo = objNewInfo;
                 objInfo.Id= GuidUtils.CreateNo();
                 objResult = await ISysconfobjService.InsertAsync(objInfo) > 0;
@@ -639,6 +645,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             bool bl = await iService.UpdateAsync(info, id).ConfigureAwait(false);
             if (bl)
             {
+                await SysConfFinalService.UpdateDetailConfig(info.Sys_conf_id);
                 result.ErrCode = ErrCode.successCode;
                 result.ErrMsg = ErrCode.err0;
             }
@@ -660,6 +667,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         public override async Task<IActionResult> DeleteSoftBatchAsync(UpdateEnableViewModel info)
         {
             CommonResult result = new CommonResult();
+            Sys_conf_details model = iService.Get(info.Ids[0]);
             string where = "id in ('" + info.Ids.Join(",").Trim(',').Replace(",", "','") + "')";
             string objWhere= "sys_conf_detail_id in ('" + info.Ids.Join(",").Trim(',').Replace(",", "','") + "')";
             if (!string.IsNullOrEmpty(where))
@@ -673,6 +681,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                 bool ObjblResult = await ISysconfobjService.DeleteSoftBatchAsync(bl, where, CurrentUser.UserId);
                 if (blResult)
                 {
+                    await SysConfFinalService.UpdateDetailConfig(model.Sys_conf_id);
                     result.ErrCode = ErrCode.successCode;
                     result.ErrMsg = ErrCode.err0;
                 }
@@ -694,6 +703,8 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         public override async Task<IActionResult> DeleteBatchAsync(DeletesInputDto info)
         {
             CommonResult result = new CommonResult();
+            string id = info.Ids[0].ToString();
+            Sys_conf_details model = iService.Get(id);
             string where = "id in ('" + info.Ids.Join(",").Trim(',').Replace(",", "','") + "')";
             string objWhere = "sys_conf_detail_id in ('" + info.Ids.Join(",").Trim(',').Replace(",", "','") + "')";
             if (!string.IsNullOrEmpty(where))
@@ -702,6 +713,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                 bool ObjblResult = await ISysconfobjService.DeleteBatchWhereAsync(objWhere).ConfigureAwait(false);
                 if (bl)
                 {
+                    await SysConfFinalService.UpdateDetailConfig(model.Sys_conf_id);
                     result.ErrCode = ErrCode.successCode;
                     result.ErrMsg = ErrCode.err0;
                 }
@@ -709,6 +721,44 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                 {
                     result.ErrMsg = ErrCode.err43003;
                     result.ErrCode = "43003";
+                }
+            }
+            return ToJsonContent(result);
+        }
+
+        /// <summary>
+        /// 异步批量设为数据有效性
+        /// </summary>
+        /// <param name="info"></param>
+        [HttpPost("SetEnabledMarktBatchAsync")]
+        [YuebonAuthorize("Enable")]
+        public override async Task<IActionResult> SetEnabledMarktBatchAsync(UpdateEnableViewModel info)
+        {
+            CommonResult result = new CommonResult();
+            string id = info.Ids[0];
+            Sys_conf_details model = iService.Get(id);
+            bool bl = false;
+            if (info.Flag == "1")
+            {
+                bl = true;
+            }
+            string where = string.Empty;
+            var sb = new SqlBuilder();
+
+            where = "id in ('" + info.Ids.Join(",").Replace(",", "','") + "')";
+            if (!string.IsNullOrEmpty(where))
+            {
+                bool blresut = await iService.SetEnabledMarkByWhereAsync(bl, where, CurrentUser.UserId);
+                if (blresut)
+                {
+                    await SysConfFinalService.UpdateDetailConfig(model.Sys_conf_id);
+                    result.ErrCode = ErrCode.successCode;
+                    result.ErrMsg = ErrCode.err0;
+                }
+                else
+                {
+                    result.ErrMsg = ErrCode.err43002;
+                    result.ErrCode = "43002";
                 }
             }
             return ToJsonContent(result);
@@ -733,7 +783,9 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                 string dataStr = formData.ToString();
                 var paramsObj = new { Id = "", actionStr="" };
                 paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
+                Sys_conf_details model = iService.Get(paramsObj.Id);
                 await iService.ChangeLevelNumAsync(paramsObj.Id, paramsObj.actionStr);
+                await SysConfFinalService.UpdateDetailConfig(model.Sys_conf_id);
                 result.ErrCode = ErrCode.successCode;
                 result.ErrMsg = ErrCode.err0;
             }

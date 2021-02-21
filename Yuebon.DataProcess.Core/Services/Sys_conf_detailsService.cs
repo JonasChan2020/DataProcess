@@ -20,7 +20,7 @@ namespace Yuebon.DataProcess.Services
         public Sys_conf_detailsService(ISys_conf_detailsRepository repository,ILogService logService) : base(repository)
         {
 			_repository=repository;
-			_logService=logService;
+            _logService =logService;
             //_repository.OnOperationLog += _logService.OnOperationLog;
         }
 
@@ -36,10 +36,8 @@ namespace Yuebon.DataProcess.Services
         public async Task<bool> ChangeLevelNumAsync(string id, string actionStr)
         {
             Sys_conf_details model = _repository.Get(id);
-            
             if (model != null && !string.IsNullOrEmpty(model.Id))
             {
-                
                 IEnumerable<Sys_conf_details> confModelList = _repository.GetListWhere(string.Format(" sys_conf_id='{0}'", model.Sys_conf_id));
                 List<Sys_conf_details> modelList = new List<Sys_conf_details>(confModelList);
                 List<Sys_conf_details> updateModelList = new List<Sys_conf_details>();
@@ -155,5 +153,8 @@ namespace Yuebon.DataProcess.Services
             return true;
         }
         #endregion
+
+
+
     }
 }

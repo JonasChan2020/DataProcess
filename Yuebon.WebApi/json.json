@@ -11,53 +11,25 @@
     "IsIdentity": true,
     "Increment": false,
     "FieldDefaultValue": "",
-    "DataGetType": {
-      "value": "2021020514354981671540",
-      "btnvisib": true,
-      "index": 0
-    },
-    "HasPage": true,
-    "Is_SingleDataKey": false,
-    "Is_Visible": null,
+    "DataGetType": null,
+    "HasPage": false,
+    "ConfigUri": null,
+    "Is_SingleDataKey": null,
+    "Is_Visible": false,
     "Is_KeyColumn": true,
     "Is_NotNull": null,
     "Is_NoUpdate": null,
     "Is_ChangeWhite": null,
-    "GetFunctionParamter": "eyJzcWxzdHIiOiJhYWFkZnNhZCJ9",
-    "Is_SingleDataKey === true": false,
+    "VerifyFunctionParamter": null,
+    "GetFunctionParamter": null,
+    "VerifyFunctionParamterList": "[{\"levelNum\":1,\"PlugType\":{\"value\":\"2021020514354981671540\",\"btnvisib\":true,\"index\":0},\"confJson\":\"eyJzcWxzdHIiOiIxMjMxMjMifQ==\",\"EnableMark\":true,\"HasPage\":true},{\"levelNum\":2,\"PlugType\":{\"value\":\"2021020514342857831571\",\"btnvisib\":false,\"index\":2},\"confJson\":\"\",\"EnableMark\":true,\"HasPage\":false},{\"levelNum\":3,\"PlugType\":{\"value\":\"2021020514463287276467\",\"btnvisib\":true,\"index\":1},\"confJson\":\"eyJzcWxzdHIiOiJhc2RmYXNkZmFzIn0=\",\"EnableMark\":true,\"HasPage\":true}]",
+    "GetFunctionParamterList": null,
+    "Is_Visible === true": false,
     "Is_KeyColumn === true": true
   },
   {
-    "FieldName": "dscode",
-    "Description": "数据源编码",
-    "DataType": "string",
-    "FieldType": "varchar",
-    "FieldScale": 0,
-    "FieldPrecision": 0,
-    "FieldMaxLength": 300,
-    "IsNullable": true,
-    "IsIdentity": false,
-    "Increment": false,
-    "FieldDefaultValue": "",
-    "DataGetType": {
-      "value": "2021020514463287276467",
-      "btnvisib": true,
-      "index": 1
-    },
-    "HasPage": true,
-    "Is_SingleDataKey": false,
-    "Is_Visible": true,
-    "Is_KeyColumn": false,
-    "Is_NotNull": null,
-    "Is_NoUpdate": null,
-    "Is_ChangeWhite": null,
-    "GetFunctionParamter": "eyJzcWxzdHIiOiJ3ZXJxd2VyIn0=",
-    "Is_SingleDataKey === true": false,
-    "Is_Visible === true": true
-  },
-  {
-    "FieldName": "dsname",
-    "Description": "数据源名称",
+    "FieldName": "dtcode",
+    "Description": "类型编码",
     "DataType": "string",
     "FieldType": "varchar",
     "FieldScale": 0,
@@ -76,13 +48,43 @@
     "Is_NotNull": null,
     "Is_NoUpdate": null,
     "Is_ChangeWhite": null,
+    "VerifyFunctionParamter": null,
     "GetFunctionParamter": null,
-    "Is_SingleDataKey === true": true,
+    "VerifyFunctionParamterList": null,
+    "GetFunctionParamterList": null,
+    "Is_Visible === true": true,
+    "Is_SingleDataKey === true": true
+  },
+  {
+    "FieldName": "dtname",
+    "Description": "类型名称",
+    "DataType": "string",
+    "FieldType": "varchar",
+    "FieldScale": 0,
+    "FieldPrecision": 0,
+    "FieldMaxLength": 300,
+    "IsNullable": true,
+    "IsIdentity": false,
+    "Increment": false,
+    "FieldDefaultValue": "",
+    "DataGetType": null,
+    "HasPage": false,
+    "ConfigUri": null,
+    "Is_SingleDataKey": null,
+    "Is_Visible": true,
+    "Is_KeyColumn": false,
+    "Is_NotNull": null,
+    "Is_NoUpdate": null,
+    "Is_ChangeWhite": null,
+    "VerifyFunctionParamter": null,
+    "GetFunctionParamter": null,
+    "VerifyFunctionParamterList": null,
+    "GetFunctionParamterList": null,
     "Is_Visible === true": true
   },
   {
-    "FieldName": "dsdesc",
-    "Description": "数据源描述",
+    "FieldName": "dtdesc",
+    "Description": "类型描述",
     "DataType": "string",
     "FieldType": "varchar",
     "FieldScale": 0,
@@ -95,19 +97,21 @@
     "DataGetType": null,
     "HasPage": false,
     "ConfigUri": null,
-    "Is_SingleDataKey": true,
+    "Is_SingleDataKey": null,
     "Is_Visible": true,
     "Is_KeyColumn": false,
     "Is_NotNull": null,
     "Is_NoUpdate": null,
     "Is_ChangeWhite": null,
+    "VerifyFunctionParamter": null,
     "GetFunctionParamter": null,
-    "Is_Visible === true": true,
-    "Is_SingleDataKey === true": true
+    "VerifyFunctionParamterList": null,
+    "GetFunctionParamterList": null,
+    "Is_Visible === true": true
   },
   {
-    "FieldName": "dsclassify",
-    "Description": "数据源分类",
+    "FieldName": "parentid",
+    "Description": "父ID",
     "DataType": "string",
     "FieldType": "varchar",
     "FieldScale": 0,
@@ -126,16 +130,19 @@
     "Is_NotNull": null,
     "Is_NoUpdate": null,
     "Is_ChangeWhite": null,
-    "GetFunctionParamter": null
+    "VerifyFunctionParamter": null,
+    "GetFunctionParamter": null,
+    "VerifyFunctionParamterList": null,
+    "GetFunctionParamterList": null
   },
   {
-    "FieldName": "dstype",
-    "Description": "数据源类型",
+    "FieldName": "levelpath",
+    "Description": "层级路径",
     "DataType": "string",
     "FieldType": "varchar",
     "FieldScale": 0,
     "FieldPrecision": 0,
-    "FieldMaxLength": 100,
+    "FieldMaxLength": 4000,
     "IsNullable": true,
     "IsIdentity": false,
     "Increment": false,
@@ -149,7 +156,10 @@
     "Is_NotNull": null,
     "Is_NoUpdate": null,
     "Is_ChangeWhite": null,
-    "GetFunctionParamter": null
+    "VerifyFunctionParamter": null,
+    "GetFunctionParamter": null,
+    "VerifyFunctionParamterList": null,
+    "GetFunctionParamterList": null
   },
   {
     "FieldName": "orgid",
@@ -172,7 +182,10 @@
     "Is_NotNull": null,
     "Is_NoUpdate": null,
     "Is_ChangeWhite": null,
-    "GetFunctionParamter": null
+    "VerifyFunctionParamter": null,
+    "GetFunctionParamter": null,
+    "VerifyFunctionParamterList": null,
+    "GetFunctionParamterList": null
   },
   {
     "FieldName": "dsort",
@@ -195,7 +208,10 @@
     "Is_NotNull": null,
     "Is_NoUpdate": null,
     "Is_ChangeWhite": null,
-    "GetFunctionParamter": null
+    "VerifyFunctionParamter": null,
+    "GetFunctionParamter": null,
+    "VerifyFunctionParamterList": null,
+    "GetFunctionParamterList": null
   },
   {
     "FieldName": "state",
@@ -218,7 +234,10 @@
     "Is_NotNull": null,
     "Is_NoUpdate": null,
     "Is_ChangeWhite": null,
-    "GetFunctionParamter": null
+    "VerifyFunctionParamter": null,
+    "GetFunctionParamter": null,
+    "VerifyFunctionParamterList": null,
+    "GetFunctionParamterList": null
   },
   {
     "FieldName": "cuid",
@@ -241,7 +260,10 @@
     "Is_NotNull": null,
     "Is_NoUpdate": null,
     "Is_ChangeWhite": null,
-    "GetFunctionParamter": null
+    "VerifyFunctionParamter": null,
+    "GetFunctionParamter": null,
+    "VerifyFunctionParamterList": null,
+    "GetFunctionParamterList": null
   },
   {
     "FieldName": "ctime",
@@ -264,7 +286,10 @@
     "Is_NotNull": null,
     "Is_NoUpdate": null,
     "Is_ChangeWhite": null,
-    "GetFunctionParamter": null
+    "VerifyFunctionParamter": null,
+    "GetFunctionParamter": null,
+    "VerifyFunctionParamterList": null,
+    "GetFunctionParamterList": null
   },
   {
     "FieldName": "uuid",
@@ -287,7 +312,10 @@
     "Is_NotNull": null,
     "Is_NoUpdate": null,
     "Is_ChangeWhite": null,
-    "GetFunctionParamter": null
+    "VerifyFunctionParamter": null,
+    "GetFunctionParamter": null,
+    "VerifyFunctionParamterList": null,
+    "GetFunctionParamterList": null
   },
   {
     "FieldName": "utime",
@@ -310,6 +338,9 @@
     "Is_NotNull": null,
     "Is_NoUpdate": null,
     "Is_ChangeWhite": null,
-    "GetFunctionParamter": null
+    "VerifyFunctionParamter": null,
+    "GetFunctionParamter": null,
+    "VerifyFunctionParamterList": null,
+    "GetFunctionParamterList": null
   }
 ]

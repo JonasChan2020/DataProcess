@@ -5,6 +5,13 @@ using Yuebon.Commons.Helpers;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 using Yuebon.DataProcess.IServices;
+using Yuebon.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using Yuebon.Commons.Models;
+using System.Collections.Generic;
+using Yuebon.Commons.Mapping;
+using Yuebon.AspNetCore.Models;
+using Yuebon.Commons.Dtos;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -58,7 +65,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         }
 
         /// <summary>
-        /// 在软删除数据前对数据的修改操作
+        /// 在软删除数据前对数据的修改操作 
         /// </summary>
         /// <param name="info"></param>
         /// <returns></returns>
@@ -67,6 +74,29 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             info.DeleteMark = true;
             info.DeleteTime = DateTime.Now;
             info.DeleteUserId = CurrentUser.UserId;
+        }
+
+        /// <summary>
+        /// 获取所有可用的
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("GetEnableList")]
+        [YuebonAuthorize("List")]
+        public virtual async Task<CommonResult<List<Sys_confOutputDto>>> GetEnableList(SearchInputDto<Sys_conf> search)
+        {
+            CommonResult<List<Sys_confOutputDto>> result = new CommonResult<List<Sys_confOutputDto>>();
+            string where = " EnabledMark=1 ";
+            if (search.Filter != null && !string.IsNullOrEmpty(search.Filter.Sysid))
+            {
+                where += string.Format(" and sysid = '{0}' ", search.Filter.Sysid);
+            }
+            IEnumerable<Sys_conf> list = await iService.GetListWhereAsync(where);
+            List<Sys_confOutputDto> resultList = list.MapTo<Sys_confOutputDto>();
+            result.ResData = resultList;
+            result.ErrCode = ErrCode.successCode;
+            result.ErrMsg = ErrCode.err0;
+
+            return result;
         }
 
 
