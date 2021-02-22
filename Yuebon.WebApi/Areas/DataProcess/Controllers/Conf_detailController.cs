@@ -114,28 +114,18 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                         {
                             foreach (Sys_confOutputDto item in resultList)
                             {
-                                List<DbFieldInfo> fields = new List<DbFieldInfo>();
-                                Sys_conf_finalconfOutputDto scfModel = scfModelList.Find(x => x.Sys_Conf_Id == item.Id);
+                                Sys_conf_finalconfOutputDto scfModel= scfModelList.Find(x => x.Sys_Conf_Id == item.Id && x.ConfType == 1);
                                 if (scfModel != null)
                                 {
-                                    List<SysConfDetailFinalInfo> scdfModelList = scfModel.ConfJson.ToObject<List<SysConfDetailFinalInfo>>();
-                                    if (scdfModelList != null && scdfModelList.Count > 0)
-                                    {
-                                        scdfModelList = scdfModelList.OrderBy(x => x.LevelNum).ToList();
-                                        foreach (SysConfDetailFinalInfo tmp in scdfModelList)
-                                        {
-                                            foreach (DbFieldInfo fieldItem in tmp.FieldList)
-                                            {
-                                                if (fieldItem.Is_Visible==true)
-                                                {
-                                                    string fieldName = tmp.LevelNum + "!" + tmp.SysConfDetailInfo.Tbname + "_" + fieldItem.FieldName;
-                                                    string desc = fieldItem.Description;
-
-                                                }
-                                            }
-                                        }
-                                    }
+                                    item.Fileds = scfModel.ConfJson.ToObject<List<DbFieldInfo>>();
                                 }
+                                else
+                                {
+                                    result.ErrMsg = ErrCode.err1;
+                                    result.ErrMsg = "数据模型未配置";
+                                    return result;
+                                }
+                                
                             }
                         }
                         result.ResData = resultList;

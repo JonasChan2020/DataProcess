@@ -122,6 +122,7 @@ namespace Yuebon.DataProcess.Core.OutSideDbService.Entity
         /// </summary>
         public string GetFunctionParamter { get; set; }
 
+       
         /// <summary>
         /// 获取方法参数
         /// </summary>
@@ -131,6 +132,62 @@ namespace Yuebon.DataProcess.Core.OutSideDbService.Entity
         /// 获取方法参数
         /// </summary>
         public List<FieldPlugConfigInfo> GetFunctionParamterList { get; set; }
+
+
+
+        #region 数据同步页面所用字段
+        /// <summary>
+        /// 表执行步骤
+        /// </summary>
+        public int? TableLevelNum { get; set; }
+        /// <summary>
+        /// 写入表名称
+        /// </summary>
+        public string WriteTableName { get; set; }
+        /// <summary>
+        /// 写入字段
+        /// </summary>
+        public string WriteFieldName { get; set; }
+        /// <summary>
+        /// 写入字段描述
+        /// </summary>
+        public string WriteDescription { get; set; }
+        /// <summary>
+        /// 读取表名称
+        /// </summary>
+        public string ReadTableName { get; set; }
+        /// <summary>
+        /// 读取字段
+        /// </summary>
+        public string ReadFieldName { get; set; }
+        /// <summary>
+        /// 读取字段描述
+        /// </summary>
+        public string ReadDescription { get; set; }
+        /// <summary>
+        /// 对应字段
+        /// </summary>
+        public string CorField { get; set; }
+        /// <summary>
+        /// 默认值
+        /// </summary>
+        public string DefaultValue { get; set; }
+        /// <summary>
+        /// 动态表唯一判定字段
+        /// </summary>
+        public string Is_DynamicSingle { get; set; }
+        /// <summary>
+        /// 数据同步页面时其他方式的
+        /// </summary>
+        public string SyncDataConfParamter { get; set; }
+        /// <summary>
+        /// 数据同步页面时其他方式的
+        /// </summary>
+        public List<FieldPlugConfigInfo> SyncDataConfParamterList { get; set; }
+
+
+        #endregion
+
         #endregion
 
     }

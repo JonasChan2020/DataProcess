@@ -31,10 +31,16 @@
             <el-table-column type="expand" label="详情" width="50">
               <template slot-scope="props">
                 <el-form label-position="left" inline class="demo-table-expand">
-                  <el-form-item label="名称">
-                    <span>{{ props.row.FieldName }}</span>
+                  <el-form-item label="表顺序">
+                    <span>{{ props.row.TableLevelNum }}</span>
                   </el-form-item>
-                  <el-form-item label="描述">
+                  <el-form-item label="表名称">
+                    <span>{{ props.row.WriteTableName }}</span>
+                  </el-form-item>
+                  <el-form-item label="字段名称">
+                    <span>{{ props.row.WriteFieldName }}</span>
+                  </el-form-item>
+                  <el-form-item label="字段描述">
                     <span>{{ props.row.Description }}</span>
                   </el-form-item>
                   <el-form-item label="数据类型">
@@ -61,12 +67,16 @@
                 </el-form>
               </template>
             </el-table-column>
-            <el-table-column prop="FieldName" label="字段名称" sortable="custom" min-width='25%'></el-table-column>
-            <el-table-column prop="Description" label="描述" sortable="custom" min-width='25%'></el-table-column>
-            <el-table-column label="是否配置" sortable="custom" min-width='25%'></el-table-column>
-            <el-table-column label="配置" min-width='25%' align="center">
+            <el-table-column prop="WriteDescription" label="字段描述" min-width='20%'></el-table-column>
+            <el-table-column prop="ReadTableName" label="对应表名称" min-width='15%'></el-table-column>
+            <el-table-column prop="ReadFieldName" label="对应表字段" min-width='20%'></el-table-column>
+            <el-table-column prop="ReadDescription" label="对应字段描述" min-width='15%'></el-table-column>
+            <el-table-column prop="DefaultValue" label="默认值" min-width='10%'></el-table-column>
+            <el-table-column prop=" Is_DynamicSingle" label="动态表唯一判定字段" min-width='10%'></el-table-column>
+            <el-table-column label="配置" min-width='10%' align="center">
               <template slot-scope="scope">
                 <el-button type="text" @click="ShowDialogVerifyEditOrViewDialog('Verify',scope.$index)">配置</el-button>
+                <el-tag :type="scope.row.SyncDataConfParamter!=undefined&&scope.row.SyncDataConfParamter!=null&&scope.row.SyncDataConfParamter.length>5 ? 'success' : 'info'" disable-transitions>{{ scope.row.SyncDataConfParamter!=undefined&&scope.row.SyncDataConfParamter!=null&&scope.row.SyncDataConfParamter.length>5 ? "(已配置)" : "(未配置)" }}</el-tag>
               </template>
             </el-table-column>
           </el-table>
@@ -78,7 +88,7 @@
                :title="dialogFormOpenTitle+'配置'"
                :visible.sync="dialogVerifyEditFormVisible"
                width="640px">
-      <component v-if="showPlugConfig" v-bind:is="loadertpl" :SysId="SysId" :dbtype="dbtype" :formData="formData" v-on:returndata="savePlugConfig" v-on:exit="closePlugConfig"></component>
+      <component v-if="showPlugConfig" v-bind:is="loadertpl" :SysId="SysId" :dbtype="dtype" :formData="formData" v-on:returndata="savePlugConfig" v-on:exit="closePlugConfig"></component>
     </el-dialog>
   </div>
 </template>
@@ -94,6 +104,7 @@
     props: ['cid','dbtype'], //父页面传过来的配置ID
   data() {
     return {
+      dtype:'',
       lefttableloading: false,
       lefttableData: [],
       lefttableHead:[],
@@ -103,7 +114,6 @@
       rightcurrentSelectId: '',
       SysId: '',
       tpl: '',
-      dbtype: '',
       formData: [],
       showPlugConfig: false,
       PlugType: '', //调用插件编辑页面时区分是验证还是获取
@@ -122,7 +132,7 @@
         };
       }
     },
-  created() {
+    created() {
     this.loadLeftTableData()
     this.loadBtnFunc = JSON.parse(localStorage.getItem('yueboncurrentfuns'))
   },
@@ -158,11 +168,7 @@
     */
     handleLeftClickRow(row) {
       this.leftcurrentSelectId = row.Id
-      if (this.dbtype == '0') { //系统
-       
-      } else if (this.dbtype == '1') { //数据库
-        this.loadRightTableData(row.Fileds)
-      }
+      this.loadRightTableData(row.Fileds)
     },
 
     /**
@@ -210,18 +216,13 @@
  * 新增、修改或查看验证明细信息     *
  */
     ShowDialogVerifyEditOrViewDialog: function (view, index) {
-      this.dbtype = view
-      if (this.dbtype == 'Verify') {
+      this.dtype = view
+      if (this.dtype == 'Verify') {
         this.dialogFormOpenTitle = "验证"
-        if (this.tableData[index].VerifyFunctionParamter && this.tableData[index].VerifyFunctionParamter !== null && this.tableData[index].VerifyFunctionParamter.length > 0) {
-          this.formData = this.tableData[index].VerifyFunctionParamter
+        if (this.righttableData[index].SyncDataConfParamter != undefined && this.righttableData[index].SyncDataConfParamter !== null && this.righttableData[index].SyncDataConfParamter.length > 0) {
+          this.formData = this.righttableData[index].SyncDataConfParamter
         }
-      } else if (this.dbtype == 'DataSync') {
-        this.dialogFormOpenTitle = "数据获取"
-        if (this.tableData[index].GetFunctionParamter && this.tableData[index].GetFunctionParamter !== null && this.tableData[index].GetFunctionParamter.length > 0) {
-          this.formData = this.tableData[index].GetFunctionParamter
-        }
-      }
+      } 
       this.verifyTableDataIndex = index
       this.tpl = "components/PlugListComponent.vue"
       this.showPlugConfig = true
@@ -230,11 +231,9 @@
     },
     savePlugConfig: function (data) {
       if (data != null) {
-        if (this.dbtype == 'Verify') {
-          this.righttableData[this.verifyTableDataIndex].VerifyFunctionParamter = data
-        } else if (this.dbtype == 'DataSync') {
-          this.righttableData[this.verifyTableDataIndex].GetFunctionParamter = data
-        }
+        if (this.dtype == 'Verify') {
+          this.righttableData[this.verifyTableDataIndex].SyncDataConfParamter = data
+        } 
       }
       this.closePlugConfig()
     },

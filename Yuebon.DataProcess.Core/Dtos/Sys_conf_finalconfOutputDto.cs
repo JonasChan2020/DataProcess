@@ -26,6 +26,11 @@ namespace Yuebon.DataProcess.Dtos
         [MaxLength(0)]
         public string Sys_Id { get; set; }
         /// <summary>
+        /// 记录类型：0：完整记录；1：用于同步对应时的列表
+        /// </summary>
+        [MaxLength(1)]
+        public int? ConfType { get; set; }
+        /// <summary>
         /// 设置或获取配置json串
         /// </summary>
         [MaxLength(0)]

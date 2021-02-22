@@ -45,11 +45,12 @@ namespace Yuebon.DataProcess.Services
         public async Task<bool> UpdateDetailConfig(string sysConfId)
         {
             Sys_conf sysConfModel = sysConfService.Get(sysConfId);
-            List<SysConfDetailFinalInfo> modelList = new List<SysConfDetailFinalInfo>();
+            List<SysConfDetailFinalInfo> modelList = new List<SysConfDetailFinalInfo>(); //完整数据模型配置信息
+            List<DbFieldInfo> sfModelList = new List<DbFieldInfo>(); //用数据同步配置页面字段列表
             IEnumerable<Sys_conf_details> tmpconfDetailModelList = sysConfDetailService.GetListWhere(string.Format(" sys_conf_id='{0}' and EnabledMark=1", sysConfId));
             if (tmpconfDetailModelList != null)
             {
-                List<Sys_conf_details> confDetailModelList = tmpconfDetailModelList.OrderBy(x => x.Levelnum).ToList();
+                List<Sys_conf_details> confDetailModelList = tmpconfDetailModelList.OrderBy(x => x.Levelnum).ToList();  //数据模型包含表列表
                 for (int i = 0; i < confDetailModelList.Count; i++)
                 {
                     #region 获取插件配置信息
@@ -99,6 +100,18 @@ namespace Yuebon.DataProcess.Services
                                 }
                             }
                             #endregion
+
+                            #region 如果是配置时可见的列，则加入同步配置表内
+                            if (item.Is_Visible == true)
+                            {
+                                item.TableLevelNum = confDetailModelList[i].Levelnum;
+                                item.WriteTableName = confDetailModelList[i].Tbname;
+                                item.WriteFieldName = item.FieldName;
+                                item.WriteDescription = item.Description;
+                                sfModelList.Add(item);
+                            }
+                            #endregion
+
                         }
                     }
                     #endregion
@@ -111,8 +124,36 @@ namespace Yuebon.DataProcess.Services
                     modelList.Add(scdfModel);
                 }
             }
-            Sys_conf_finalconf model = _repository.GetWhere(string.Format("sys_conf_id='{0}'", sysConfId));
+
             bool result = true;
+            List<Sys_conf_finalconf> scfModelList = new List<Sys_conf_finalconf>();
+            IEnumerable<Sys_conf_finalconf> tmpscfModelList = _repository.GetListWhere(string.Format("sys_conf_id='{0}'", sysConfId));
+            if (tmpconfDetailModelList != null && tmpconfDetailModelList.Count() > 0)
+            {
+                scfModelList = tmpscfModelList.ToList();
+            }
+
+            #region 数据同步配置页面字段列表新增修改
+            Sys_conf_finalconf cmodel = scfModelList.Find(x => x.ConfType == 1);
+            if (cmodel != null)
+            {
+                cmodel.ConfJson = sfModelList.ToJson();
+                result = await _repository.UpdateAsync(cmodel, cmodel.Id);
+            }
+            else
+            {
+                cmodel = new Sys_conf_finalconf();
+                cmodel.Id = GuidUtils.CreateNo();
+                cmodel.Sys_Conf_Id = sysConfId;
+                cmodel.Sys_Id = sysConfModel.Sysid;
+                cmodel.ConfType = 1;
+                cmodel.ConfJson = sfModelList.ToJson();
+                result = await _repository.InsertAsync(cmodel) > 0;
+            }
+            #endregion
+
+            #region 完整数据模型配置信息新增修改
+            Sys_conf_finalconf model = scfModelList.Find(x => x.ConfType == 0);
             if (model != null)
             {
                 model.ConfJson = modelList.ToJson();
@@ -124,9 +165,11 @@ namespace Yuebon.DataProcess.Services
                 model.Id = GuidUtils.CreateNo();
                 model.Sys_Conf_Id = sysConfId;
                 model.Sys_Id = sysConfModel.Sysid;
+                model.ConfType = 0;
                 model.ConfJson = modelList.ToJson();
                 result = await _repository.InsertAsync(model) > 0;
             }
+            #endregion
             return result;
         }
     }
