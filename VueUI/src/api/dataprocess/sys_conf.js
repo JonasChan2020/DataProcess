@@ -25,6 +25,17 @@ export function getSys_confList(data) {
   })
 }
 /**
+   * 根据条件获取系统与模型的树列表
+   */
+export function getSysAndModelTree(data) {
+  return http.request({
+    url: 'Sys_conf/GetSysAndModelTree',
+    method: 'post',
+    data: data,
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
+/**
    * 获取所有可用的
    */
 export function getAllSys_confList () {

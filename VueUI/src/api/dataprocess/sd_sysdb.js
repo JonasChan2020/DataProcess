@@ -1,6 +1,19 @@
 import http from '@/utils/request'
 import defaultSettings from '@/settings'
 
+
+/**
+   *  获取 库与表的树形列表
+   * @param {查询条件} data
+   */
+export function getSdAndTbTree(data) {
+  return http.request({
+    url: 'Sd_sysdb/GetSdAndTbTree',
+    method: 'post',
+    data: data,
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
 /**
    * 分页查询
    * @param {查询条件} data

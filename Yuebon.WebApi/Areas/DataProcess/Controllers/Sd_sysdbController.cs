@@ -16,6 +16,11 @@ using Yuebon.AspNetCore.Mvc;
 using System.Reflection;
 using Newtonsoft.Json;
 using Yuebon.DataProcess.Core.OutSideDbService.Extension;
+using Yuebon.DataProcess.Core.common.Entity.TreeEntity;
+using System.Collections.Generic;
+using System.Linq;
+using Yuebon.DataProcess.Core.OutSideDbService.Entity;
+using Yuebon.DataProcess.Core.common;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -26,13 +31,15 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
     [Route("api/DataProcess/[controller]")]
     public class Sd_sysdbController : AreaApiController<Sd_sysdb, Sd_sysdbOutputDto,Sd_sysdbInputDto,ISd_sysdbService,string>
     {
+        private readonly ISd_detailService SdDetailService;
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="_iService"></param>
-        public Sd_sysdbController(ISd_sysdbService _iService) : base(_iService)
+        public Sd_sysdbController(ISd_sysdbService _iService, ISd_detailService _SdDetailService) : base(_iService)
         {
             iService = _iService;
+            SdDetailService = _SdDetailService;
             AuthorizeKey.ListKey = "Sd_sysdb/List";
             AuthorizeKey.InsertKey = "Sd_sysdb/Add";
             AuthorizeKey.UpdateKey = "Sd_sysdb/Edit";
@@ -211,23 +218,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 
         #endregion
 
-        ///// <summary>
-        ///// 根据条件查询数据库,并返回对象集合(用于分页数据显示)
-        ///// 
-        ///// </summary>
-        ///// <param name="search"></param>
-        ///// <returns></returns>
-        //[HttpPost("FindWithPagerAsync")]
-        //[YuebonAuthorize("List")]
-        //public override async Task<CommonResult<PageResult<Sd_sysdbOutputDto>>> FindWithPagerAsync(SearchInputDto<Sd_sysdb> search)
-        //{
-        //    CommonResult<PageResult<Sd_sysdbOutputDto>> result = new CommonResult<PageResult<Sd_sysdbOutputDto>>();
-        //    result.ResData = await iService.FindWithPagerAsync(search);
-        //    result.Success = true;
-        //    result.ErrCode = ErrCode.successCode;
-        //    return result;
-        //}
-
         /// <summary>
         /// 根据条件查询数据库,并返回对象集合(用于分页数据显示)
         /// </summary>
@@ -288,7 +278,72 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             return ToJsonContent(result);
         }
 
-      
+        /// <summary>
+        /// 获取 库与表的树形列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("GetSdAndTbTree")]
+        [YuebonAuthorize("List")]
+        public async Task<IActionResult> GetSdAndTbTree(SearchInputDto<Sd_sysdb> search)
+        {
+            CommonResult result = new CommonResult();
+            try
+            {
+                List<Sys_Db_TableTreeEntity> treeList = new List<Sys_Db_TableTreeEntity>();
+                string sysWhere = "(sys_id is null or trim(sys_id)='') and EnabledMark=1 ";
+                if (search.Filter != null && !string.IsNullOrEmpty(search.Filter.Classify_id))
+                {
+                    sysWhere += string.Format(" and classify_id = '{0}' ", search.Filter.Classify_id);
+                }
+                IEnumerable<Sd_sysdb> list = await iService.GetListWhereAsync(sysWhere);
+                if (list != null && list.Count() > 0)
+                {
+                    foreach (Sd_sysdb item in list)
+                    {
+                        Sys_Db_TableTreeEntity treeModel = new Sys_Db_TableTreeEntity();
+                        treeModel.Id = item.Id;
+                        treeModel.NodeName = item.SdName;
+                        treeModel.Description = item.Description;
+                        treeModel.NodeType = "sd";
+                        treeModel.ParentId = "0";
+                        Sd_detail detailModel = SdDetailService.GetWhere(string.Format(" sd_id = '{0}'", item.Id));
+                        List<DbTableInfo> childModelList = detailModel.Tbs.ToObject<List<DbTableInfo>>();
+                        if (childModelList != null && childModelList.Count > 0)
+                        {
+                            List<Sys_Db_TableTreeEntity> childtreeList = new List<Sys_Db_TableTreeEntity>();
+                            foreach (DbTableInfo childItem in childModelList)
+                            {
+                                Sys_Db_TableTreeEntity childTreeModel = new Sys_Db_TableTreeEntity();
+                                childTreeModel.Id = childItem.TableName;
+                                childTreeModel.NodeName = childItem.TableName;
+                                childTreeModel.Description = childItem.Description;
+                                childTreeModel.NodeType = "tb";
+                                childTreeModel.ParentId = item.Id;
+                                childtreeList.Add(childTreeModel);
+                            }
+                            treeModel.Children = childtreeList;
+                        }
+                        else
+                        {
+                            treeModel.Children = new List<Sys_Db_TableTreeEntity>();
+                        }
+                        treeList.Add(treeModel);
+                    }
+                }
+                result.Success = true;
+                result.ResData = treeList;
+                result.ErrCode = ErrCode.successCode;
+            }
+            catch (Exception ex)
+            {
+                Log4NetHelper.Error("获取组织结构异常", ex);
+                result.ErrMsg = ErrCode.err40110;
+                result.ErrCode = "40110";
+            }
+            return ToJsonContent(result);
+        }
+
+
 
         #region 辅助方法
 

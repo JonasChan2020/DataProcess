@@ -15,24 +15,37 @@ namespace Yuebon.DataProcess.Models
     public class Conf_conf:BaseEntity<string>, ICreationAudited, IModificationAudited, IDeleteAudited
     {
         /// <summary>
-        /// 起始方配置类型0：系统，1：数据库
+        /// 源上级ID
         /// </summary>
-        public int? ConfFromType { get; set; }
-
+        public string FromParentId { get; set; }
         /// <summary>
-        /// 终止方配置类型0：系统，1：数据库
-        /// </summary>
-        public int? ConfToType { get; set; }
-
-        /// <summary>
-        /// 设置或获取关联库或系统ID
+        /// 源表ID
         /// </summary>
         public string FromId { get; set; }
-
         /// <summary>
-        /// 设置或获取被关联库或系统ID
+        /// 源表名
+        /// </summary>
+        public string FromTbName { get; set; }
+        /// <summary>
+        /// 源配置类型0：系统，1：数据库
+        /// </summary>
+        public int? ConfFromType { get; set; }
+        /// <summary>
+        /// 目标上级ID
+        /// </summary>
+        public string ToParentId { get; set; }
+        /// <summary>
+        /// 目标表ID
         /// </summary>
         public string ToId { get; set; }
+        /// <summary>
+        /// 目标表名
+        /// </summary>
+        public string ToTbName { get; set; }
+        /// <summary>
+        /// 目标配置类型0：系统，1：数据库
+        /// </summary>
+        public int? ConfToType { get; set; }
         /// <summary>
         /// 设置或获取创建时间
         /// </summary>

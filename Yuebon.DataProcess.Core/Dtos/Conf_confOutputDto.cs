@@ -12,33 +12,64 @@ namespace Yuebon.DataProcess.Dtos
     public class Conf_confOutputDto
     {
         /// <summary>
-        /// 设置或获取关联库或系统ID
+        /// 源上级ID
+        /// </summary>
+        [MaxLength(0)]
+        public string FromParentId { get; set; }
+        /// <summary>
+        /// 源表ID
         /// </summary>
         [MaxLength(0)]
         public string FromId { get; set; }
-
         /// <summary>
-        /// 设置或获取被关联库或系统ID
+        /// 源表名
+        /// </summary>
+        [MaxLength(0)]
+        public string FromTbName { get; set; }
+        /// <summary>
+        /// 源表名
+        /// </summary>
+        [MaxLength(0)]
+        public string FromDescription { get; set; }
+        /// <summary>
+        /// 源配置类型0：系统，1：数据库
+        /// </summary>
+        [MaxLength(0)]
+        public int? ConfFromType { get; set; }
+        /// <summary>
+        /// 目标上级ID
+        /// </summary>
+        [MaxLength(0)]
+        public string ToParentId { get; set; }
+        /// <summary>
+        /// 目标上级ID
+        /// </summary>
+        [MaxLength(0)]
+        public string ToParentName { get; set; }
+        /// <summary>
+        /// 目标上级ID
+        /// </summary>
+        [MaxLength(0)]
+        public string ToParentDescription { get; set; }
+        /// <summary>
+        /// 目标表ID
         /// </summary>
         [MaxLength(0)]
         public string ToId { get; set; }
-
         /// <summary>
-        /// 设置或获取被关联库或系统名称
+        /// 目标表名
         /// </summary>
         [MaxLength(0)]
-        public string ToName { get; set; }
-
+        public string ToTbName { get; set; }
         /// <summary>
-        /// 起始方配置类型0：系统，1：数据库
+        /// 目标表名
         /// </summary>
-        [MaxLength(1)]
-        public int? ConfFromType { get; set; }
-
+        [MaxLength(0)]
+        public string ToDescription { get; set; }
         /// <summary>
-        /// 终止方配置类型0：系统，1：数据库
+        /// 目标配置类型0：系统，1：数据库
         /// </summary>
-        [MaxLength(1)]
+        [MaxLength(0)]
         public int? ConfToType { get; set; }
         /// <summary>
         /// 设置或获取创建时间

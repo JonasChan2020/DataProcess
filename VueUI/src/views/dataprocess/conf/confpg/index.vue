@@ -21,28 +21,19 @@
               <el-table ref="gridfromtable"
                         v-loading="fromtableloading"
                         :data="fromtableData"
-                        :height="700"
+                         style="width: 100%;margin-bottom: 20px;"
+                        row-key="Id"
                         border
-                        stripe
+                        size="mini"
+                        max-height="850"
+                        default-expand-all
                         highlight-current-row
-                        style="width: 100%"
-                        :default-sort="{prop: 'SortCode', order: 'ascending'}"
+                        :tree-props="{children: 'Children'}"
                         @row-click="handlefromClickRow"
-                        @sort-change="handlefromSortChange">
-                <template v-for="(item,index) in fromtableHead">
-                  <el-table-column :prop="item.column_name" :label="item.column_comment" :key="index" sortable="custom" min-width="item.column_minWidth"></el-table-column>
-                </template>
+                        >
+                <el-table-column prop="NodeName" label="名称"  min-width="30%" />
+                <el-table-column prop="Description" label="描述"  min-width="70%" />
               </el-table>
-              <div class="pagination-container">
-                <el-pagination background
-                               :current-page="frompagination.currentPage"
-                               :page-sizes="[5,10,20,50,100, 200, 300, 400]"
-                               :page-size="frompagination.pagesize"
-                               layout="total, sizes, prev, pager, next, jumper"
-                               :total="frompagination.pageTotal"
-                               @size-change="handlefromSizeChange"
-                               @current-change="handlefromCurrentChange" />
-              </div>
             </el-card>
           </el-col>
         </el-row>
@@ -73,40 +64,44 @@
                          @click="setEnable('1')">启用</el-button>
               <el-button type="default" icon="el-icon-refresh" size="small" @click="loadToTableData()">刷新</el-button>
             </el-button-group>
-            <el-table ref="gridtotable"
-                      v-loading="totableloading"
-                      :data="totableData"
-                      :height="700"
-                      border
-                      stripe
-                      highlight-current-row
-                      style="width: 100%"
-                      :default-sort="{prop: 'Conftype', order: 'ascending'}"
-                      @row-click="handletoClickRow"
-                      @select="handleToSelectChange"
-                      @select-all="handleToSelectAllChange"
-                      @sort-change="handletoSortChange">
-              <el-table-column type="selection" min-width="10%" />
-              <el-table-column prop="ConfToType" label="类型" sortable="custom" min-width="20%">
-                <template slot-scope="scope">
-                  <el-tag :type="scope.row.ConfToType === 1 ? 'success' : 'info'" disable-transitions>{{ scope.row.ConfToType === 1 ? "数据库" : "系统" }}</el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column prop="ToName" label="名称" sortable="custom" min-width="40%" />
-              <el-table-column label="是否启用" sortable="custom" min-width="10%" prop="EnabledMark" align="center">
-                <template slot-scope="scope">
-                  <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column label="同步配置" sortable="custom" min-width="20%" align="center">
-                <template slot-scope="scope">
-                  <el-button type="primary"
-                             icon="el-icon-plus"
-                             size="small"
-                             @click="HandleToConfig(scope.row.Id,scope.row.ConfToType,'DataSyncConfig')">同步配置</el-button>
-                </template>
-              </el-table-column>
-            </el-table>
+          </div>
+          <el-table ref="gridtotable"
+                    v-loading="totableloading"
+                    :data="totableData"
+                    :height="700"
+                    border
+                    stripe
+                    highlight-current-row
+                    style="width: 100%"
+                    :default-sort="{prop: 'Conftype', order: 'ascending'}"
+                    @row-click="handletoClickRow"
+                    @select="handleToSelectChange"
+                    @select-all="handleToSelectAllChange"
+                    @sort-change="handletoSortChange">
+            <el-table-column type="selection" min-width="5%" />
+            <el-table-column prop="ConfToType" label="类型" sortable="custom" min-width="10%">
+              <template slot-scope="scope">
+                <el-tag :type="scope.row.ConfToType === 1 ? 'success' : 'info'" disable-transitions>{{ scope.row.ConfToType === 1 ? "数据库" : "系统" }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="ToTbName" label="名称" sortable="custom" min-width="15%" />
+            <el-table-column prop="ToDescription" label="描述" sortable="custom" min-width="15%" />
+            <el-table-column prop="ToParentName" label="所属模型或库" sortable="custom" min-width="15%" />
+            <el-table-column prop="ToParentDescription" label="描述" sortable="custom" min-width="15%" />
+            <el-table-column label="是否启用" sortable="custom" min-width="10%" prop="EnabledMark" align="center">
+              <template slot-scope="scope">
+                <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="同步配置" sortable="custom" min-width="15%" align="center">
+              <template slot-scope="scope">
+                <el-button type="primary"
+                           icon="el-icon-plus"
+                           size="small"
+                           @click="HandleToConfig(scope.row.Id,scope.row.ConfToType,'DataSyncConfig')">同步配置</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
             <div class="pagination-container">
               <el-pagination background
                              :current-page="topagination.currentPage"
@@ -117,7 +112,7 @@
                              @size-change="handletoSizeChange"
                              @current-change="handletoCurrentChange" />
             </div>
-          </div>
+          
 
         </el-card>
       </el-col>
@@ -147,30 +142,20 @@
             <el-table ref="griddialogtable"
                       v-loading="dialogtableloading"
                       :data="dialogtableData"
+                      style="width: 100%;margin-bottom: 20px;"
+                      row-key="Id"
                       border
-                      stripe
+                      size="mini"
+                      max-height="850"
+                      default-expand-all
                       highlight-current-row
-                      style="width: 100%"
-                      :default-sort="{prop: 'SortCode', order: 'ascending'}"
+                      :tree-props="{children: 'Children'}"
                       @select="handleDialogSelectChange"
-                      @select-all="handleDialogSelectAllChange"
-                      @sort-change="handledialogSortChange">
+                      @select-all="handleDialogSelectAllChange">
               <el-table-column type="selection" min-width="10%" />
-              <el-table-column  min-width="90%" v-if="dialogtableHead.length<1" />
-              <template v-for="(item,index) in dialogtableHead">
-                <el-table-column :prop="item.column_name" :label="item.column_comment" :key="index" sortable="custom" min-width="item.column_minWidth"></el-table-column>
-              </template>
+              <el-table-column prop="NodeName" label="名称" min-width="30%" />
+              <el-table-column prop="Description" label="描述" min-width="70%" />
             </el-table>
-            <div class="pagination-container">
-              <el-pagination background
-                             :current-page="dialogpagination.currentPage"
-                             :page-sizes="[5,10,20,50,100, 200, 300, 400]"
-                             :page-size="dialogpagination.pagesize"
-                             layout="total, sizes, prev, pager, next, jumper"
-                             :total="dialogpagination.pageTotal"
-                             @size-change="handledialogSizeChange"
-                             @current-change="handledialogCurrentChange" />
-            </div>
           </el-card>
         </el-col>
       </el-row>
@@ -184,13 +169,13 @@
 
 <script>
   import {
-    getSys_sysListWithPager
-  } from '@/api/dataprocess/sys_sys'
+    getSysAndModelTree
+  } from '@/api/dataprocess/sys_conf'
   import {
     getAllClassifyTreeTable
   } from '@/api/dataprocess/sys_classify'
   import {
-    getSd_sysdbListWithPager
+     getSdAndTbTree
   } from '@/api/dataprocess/sd_sysdb'
   import {
     getAllSdClassifyTreeTable
@@ -220,11 +205,6 @@ import { getConf_confListWithPager,
       fromtableloading: false,
       fromtableHead: [],
       fromtableData: [],
-      frompagination: {
-        currentPage: 1,
-        pagesize: 20,
-        pageTotal: 0
-      },
       fromsortableData: {
         order: 'desc',
         sort: 'CreatorTime'
@@ -252,13 +232,7 @@ import { getConf_confListWithPager,
       dialogselectedclass: '',
       dialogselectclasses: [],
       dialogtableloading: false,
-      dialogtableHead: [],
       dialogtableData: [],
-      dialogpagination: {
-        currentPage: 1,
-        pagesize: 20,
-        pageTotal: 0
-      },
       dialogsortableData: {
         order: 'desc',
         sort: 'CreatorTime'
@@ -294,7 +268,6 @@ import { getConf_confListWithPager,
             this.selectclasses = res.ResData
           })
         }
-        this.frompagination.currentPage = 1
         this.loadFromTableData()
       },
       /**
@@ -310,10 +283,6 @@ import { getConf_confListWithPager,
       loadFromTableData: function () {
         this.fromtableloading = true
         var seachdata = {
-          CurrenetPageIndex: this.frompagination.currentPage,
-          PageSize: this.frompagination.pagesize,
-          Order: this.fromsortableData.order,
-          Sort: this.fromsortableData.sort,
           Filter: {
             Classify_id: this.selectedclass,
           }
@@ -321,17 +290,15 @@ import { getConf_confListWithPager,
         
         if (this.selectedSysDb == '0') {
           
-          getSys_sysListWithPager(seachdata).then(res => {
+          getSysAndModelTree(seachdata).then(res => {
             
-            this.fromtableData = res.ResData.Items
-            this.frompagination.pageTotal = res.ResData.TotalItems
+            this.fromtableData = res.ResData
             this.fromtableloading = false
           })
         } else if (this.selectedSysDb == '1') {
 
-          getSd_sysdbListWithPager(seachdata).then(res => {
-            this.fromtableData = res.ResData.Items
-            this.frompagination.pageTotal = res.ResData.TotalItems
+          getSdAndTbTree(seachdata).then(res => {
+            this.fromtableData = res.ResData
             this.fromtableloading = false
           })
         }
@@ -340,33 +307,6 @@ import { getConf_confListWithPager,
         //  this.pagination.pageTotal = res.ResData.TotalItems
         //  this.tableloading = false
         //})
-      },
-      /**
-       * 当表格的排序条件发生变化的时候会触发该事件
-       */
-      handlefromSortChange: function (column) {
-        this.fromsortableData.sort = column.prop
-        if (column.order === 'ascending') {
-          this.fromsortableData.order = 'asc'
-        } else {
-          this.fromsortableData.order = 'desc'
-        }
-        this.loadFromTableData()
-      },
-      /**
-      * 选择每页显示数量
-      */
-      handlefromSizeChange(val) {
-        this.frompagination.pagesize = val
-        this.frompagination.currentPage = 1
-        this.loadFromTableData()
-      },
-      /**
-       * 选择当页面
-       */
-      handlefromCurrentChange(val) {
-        this.frompagination.currentPage = val
-        this.loadFromTableData()
       },
       /**
        * 点击一条记录
@@ -454,7 +394,6 @@ import { getConf_confListWithPager,
         if (this.fromcurrentSelectId.length === 0) {
           this.$alert('请先选择左侧列表中的一条数据', '提示')
         } else {
-          this.dialogpagination.currentPage = 1
           this.editFormTitle = '新增'
           this.tocurrentId = ''
           this.dialogEditFormVisible = true
@@ -551,13 +490,8 @@ import { getConf_confListWithPager,
               this.loadToTableData()
 
             } else {
-              alert(res.CustomCode)
               if (res.CustomCode == "err80404") {
                 this.dialogselectedSysDb = '0'
-                this.dialogtableHead = [
-                  { column_name: "Syscode", column_comment: "编码", column_minWidth: "25%" },
-                  { column_name: "Sysname", column_comment: "名称", column_minWidth: "65%" }
-                ]
                 getAllClassifyTreeTable().then(res => {
                   this.dialogselectclasses = res.ResData
                 })
@@ -580,13 +514,8 @@ import { getConf_confListWithPager,
         this.dialogselectedSysDb= ''
         this.dialogselectedclass = ''
         this.dialogselectclasses = []
-        this.dialogtableHead=[]
         this.dialogtableData=[]
-          this.dialogpagination={
-          currentPage: 1,
-            pagesize: 20,
-              pageTotal: 0
-        }
+         
         this.dialogsortableData={
           order: 'desc',
             sort: 'CreatorTime'
@@ -602,17 +531,10 @@ import { getConf_confListWithPager,
         this.dialogtableData = []
         this.cascaderkey++
         if (this.dialogselectedSysDb == '0') {
-          this.dialogtableHead = [
-            { column_name: "Syscode", column_comment: "编码", column_minWidth: "25%" },
-            { column_name: "Sysname", column_comment: "名称", column_minWidth: "65%" }
-          ]
           getAllClassifyTreeTable().then(res => {
             this.dialogselectclasses = res.ResData
           })
         } else if (this.dialogselectedSysDb == '1') {
-          this.dialogtableHead = [
-            { column_name: "SdName", column_comment: "名称", column_minWidth: "90%" }
-          ]
           getAllSdClassifyTreeTable().then(res => {
             this.dialogselectclasses = res.ResData
           })
@@ -632,10 +554,6 @@ import { getConf_confListWithPager,
       loadDialogTableData: function (sysdbId) {
         this.dialogtableloading = true
         var seachdata = {
-          CurrenetPageIndex: this.dialogpagination.currentPage,
-          PageSize: this.dialogpagination.pagesize,
-          Order: this.dialogsortableData.order,
-          Sort: this.dialogsortableData.sort,
           Pkey: sysdbId,
           Filter: {
             Classify_id: this.dialogselectedclass,
@@ -643,47 +561,20 @@ import { getConf_confListWithPager,
         }
         if (this.dialogselectedSysDb == '0') {
 
-          getSys_sysListWithPager(seachdata).then(res => {
-            this.dialogtableData = res.ResData.Items
-            this.dialogpagination.pageTotal = res.ResData.TotalItems
+          getSysAndModelTree(seachdata).then(res => {
+            this.dialogtableData = res.ResData
             this.dialogtableloading = false
           })
         } else if (this.dialogselectedSysDb == '1') {
 
-          getSd_sysdbListWithPager(seachdata).then(res => {
-            this.dialogtableData = res.ResData.Items
-            this.dialogpagination.pageTotal = res.ResData.TotalItems
+          getAllClassifyTreeTable(seachdata).then(res => {
+            this.dialogtableData = res.ResData
             this.dialogtableloading = false
           })
         }
       },
-      /**
-       * 当表格的排序条件发生变化的时候会触发该事件
-       */
-      handledialogSortChange: function (column) {
-        this.dialogsortableData.sort = column.prop
-        if (column.order === 'ascending') {
-          this.dialogsortableData.order = 'asc'
-        } else {
-          this.dialogsortableData.order = 'desc'
-        }
-        this.loadDialogTableData('')
-      },
-      /**
-      * 选择每页显示数量
-      */
-      handledialogSizeChange(val) {
-        this.dialogpagination.pagesize = val
-        this.dialogpagination.currentPage = 1
-        this.loadDialogTableData('')
-      },
-      /**
-       * 选择当页面
-       */
-      handledialogCurrentChange(val) {
-        this.dialogpagination.currentPage = val
-        this.loadDialogTableData('')
-      },
+      
+     
       /**
      * 当用户手动勾选checkbox数据行事件
      */

@@ -8,10 +8,12 @@ using Yuebon.DataProcess.IServices;
 using Yuebon.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Yuebon.Commons.Models;
-using Yuebon.Commons.Pages;
-using Yuebon.Commons.Dtos;
 using Yuebon.AspNetCore.Models;
 using Yuebon.Commons.Mapping;
+using System.Collections.Generic;
+using Yuebon.Commons.Pages;
+using Yuebon.Commons.Dtos;
+using System.Linq;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -184,6 +186,16 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             }
             return ToJsonContent(result);
         }
+
+        
+
+        #region 辅助方法
+        private object GetPropertyValue(object obj, string property)
+        {
+            System.Reflection.PropertyInfo propertyInfo = obj.GetType().GetProperty(property);
+            return propertyInfo.GetValue(obj, null);
+        }
+        #endregion
 
     }
 }
