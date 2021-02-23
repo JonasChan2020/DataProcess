@@ -124,6 +124,7 @@
     <el-dialog
       ref="dialogEditForm"
                :close-on-click-modal="false"
+               :show-close="false"
       :title="editFormTitle+'连接'"
       :visible.sync="dialogEditFormVisible"
       width="640px"

@@ -153,6 +153,7 @@
     </div>
     <el-dialog ref="dialogVerifyEditForm"
                :close-on-click-modal="false"
+               :show-close="false"
                :title="dialogFormOpenTitle+'配置'"
                :visible.sync="dialogVerifyEditFormVisible"
                width="640px">

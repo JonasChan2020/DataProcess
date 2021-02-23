@@ -92,7 +92,7 @@ namespace Yuebon.DataProcess.Services
                     }
                     else if (item.ConfToType == 1)
                     {
-                        Sd_sysdb sdModel = sdService.Get(item.ToId);
+                        Sd_sysdb sdModel = sdService.Get(item.ToParentId);
                         Sd_detail detailModel = sdDetailService.GetWhere(string.Format(" sd_id = '{0}'", item.ToParentId));
                         if (sdModel != null && detailModel != null)
                         {

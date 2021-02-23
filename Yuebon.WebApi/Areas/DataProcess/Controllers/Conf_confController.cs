@@ -106,69 +106,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             }
             #endregion
 
-            #region 被关联项的逻辑判断
-            if (tinfo.ConfToType == 0) //系统，判断其有没有设置主数据库
-            {
-                #region 判断系统是否设置了主数据库
-                Sys_sys model = sysService.Get(tinfo.ToId);
-                if (model != null)
-                {
-                    if (string.IsNullOrEmpty(model.MdbId))
-                    {
-                        result.ErrCode = ErrCode.successCode;
-                        result.Success = false;
-                        result.ErrMsg = ErrCode.err80401;
-                        return ToJsonContent(result);
-                    }
-                }
-                else
-                {
-                    result.ErrCode = ErrCode.successCode;
-                    result.Success = false;
-                    result.ErrMsg = ErrCode.err80402;
-                    return ToJsonContent(result);
-                }
-                #endregion
-            }
-            else if(tinfo.ConfToType == 1) //数据库，判断其有没有加入系统，如果加入系统则通知前台变更为相应系统关联
-            {
-                #region
-                Sd_sysdb model = sdService.Get(tinfo.ToId);
-                if (model != null)
-                {
-                    if (!string.IsNullOrEmpty(model.Sys_id))
-                    {
-                        Sys_sys sysModel = sysService.Get(model.Sys_id);
-                        if (sysModel != null)
-                        {
-                            result.ErrCode = ErrCode.successCode;
-                            result.Success = false;
-                            result.ErrMsg = ErrCode.err80404;
-                            result.CustomCode = "err80404";
-                            result.ResData = model.Sys_id;
-                            return ToJsonContent(result);
-                        }
-                        else
-                        {
-                            result.ErrCode = ErrCode.successCode;
-                            result.Success = false;
-                            result.ErrMsg = ErrCode.err80405;
-                            return ToJsonContent(result);
-                        }
-                       
-                    }
-                }
-                else
-                {
-                    result.ErrCode = ErrCode.successCode;
-                    result.Success = false;
-                    result.ErrMsg = ErrCode.err80403;
-                    return ToJsonContent(result);
-                }
-                #endregion
-            }
-            #endregion
-
             Conf_conf info = tinfo.MapTo<Conf_conf>();
             OnBeforeInsert(info);
             long ln = await iService.InsertAsync(info).ConfigureAwait(false);

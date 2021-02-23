@@ -23,10 +23,6 @@ namespace Yuebon.DataProcess.Models
         /// </summary>
         public string FromId { get; set; }
         /// <summary>
-        /// 源表名
-        /// </summary>
-        public string FromTbName { get; set; }
-        /// <summary>
         /// 源配置类型0：系统，1：数据库
         /// </summary>
         public int? ConfFromType { get; set; }
@@ -38,10 +34,7 @@ namespace Yuebon.DataProcess.Models
         /// 目标表ID
         /// </summary>
         public string ToId { get; set; }
-        /// <summary>
-        /// 目标表名
-        /// </summary>
-        public string ToTbName { get; set; }
+
         /// <summary>
         /// 目标配置类型0：系统，1：数据库
         /// </summary>

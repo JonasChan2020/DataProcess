@@ -95,53 +95,49 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         public async Task<CommonResult<string>> GetConfTbContent(SearchInputDto<Conf_conf> search)
         {
             CommonResult<string> result = new CommonResult<string>();
+            List<DbFieldInfo> sourceFields = new List<DbFieldInfo>(); //源字段集合
+            List<DbFieldInfo> finFields = new List<DbFieldInfo>(); //目标字段集合
+            string sysid = "";
             if (!string.IsNullOrEmpty(search.Pkey))
             {
                 Conf_conf confModel = confService.Get(search.Pkey);
                 if (confModel != null)
                 {
-                    string dbId = confModel.ToId; //所选系统主数据库或数据库ID
-                    if (confModel.ConfToType == 0) //系统
+                    #region 获取源表信息
+                    if (confModel.ConfFromType == 0) //系统
                     {
-                        Sys_sys sysModel = sysService.Get(confModel.ToId);
-                        string where = " EnabledMark=1 ";
-                        where += string.Format(" and sysid = '{0}' ", sysModel.Id);
-                        IEnumerable<Sys_conf> list = await sysconfService.GetListWhereAsync(where);
-                        List<Sys_confOutputDto> resultList = list.MapTo<Sys_confOutputDto>();
-                        IEnumerable<Sys_conf_finalconf> scfList = await scfService.GetListWhereAsync(string.Format("sys_id='{0}'", sysModel.Id));
-                        List<Sys_conf_finalconfOutputDto> scfModelList = scfList.MapTo<Sys_conf_finalconfOutputDto>();
-                        if (resultList != null && resultList.Count > 0)
+                        Sys_sys sysModel = sysService.Get(confModel.FromParentId);
+                        Sys_conf sysconfModel = sysconfService.Get(confModel.FromId);
+                        Sys_confOutputDto outsysconfModel = sysconfModel.MapTo<Sys_confOutputDto>();
+                        Sys_conf_finalconf scfModel = scfService.GetWhere(string.Format("sys_conf_id='{0}'", sysconfModel.Id));
+                        if (outsysconfModel != null)
                         {
-                            foreach (Sys_confOutputDto item in resultList)
-                            {
-                                Sys_conf_finalconfOutputDto scfModel= scfModelList.Find(x => x.Sys_Conf_Id == item.Id && x.ConfType == 1);
-                                if (scfModel != null)
-                                {
-                                    item.Fileds = scfModel.ConfJson.ToObject<List<DbFieldInfo>>();
-                                }
-                                else
-                                {
-                                    result.ErrMsg = ErrCode.err1;
-                                    result.ErrMsg = "数据模型未配置";
-                                    return result;
-                                }
-                                
-                            }
+                            sourceFields = scfModel.ConfJson.ToObject<List<DbFieldInfo>>();
                         }
-                        result.ResData = resultList;
-                        result.ErrCode = ErrCode.successCode;
-                        result.ErrMsg = ErrCode.err0;
+                        else
+                        {
+                            result.ErrMsg = ErrCode.err1;
+                            result.ErrMsg = "数据模型未配置";
+                            return result;
+                        }
+
                     }
-                    else if (confModel.ConfToType == 1)
+                    else if (confModel.ConfFromType == 1)
                     {
-                        Sd_detail dbDetailModel = await detailService.GetWhereAsync(string.Format(" sd_id = '{0}'", confModel.ToId));
+                        Sd_detail dbDetailModel = await detailService.GetWhereAsync(string.Format(" sd_id = '{0}'", confModel.FromParentId));
                         if (dbDetailModel != null)
                         {
                             List<DbTableInfo> tbModelList = dbDetailModel.Tbs.ToObject<List<DbTableInfo>>();
-
-                            result.ResData = tbModelList;
-                            result.ErrCode = ErrCode.successCode;
-                            result.ErrMsg = ErrCode.err0;
+                            DbTableInfo tbModel = tbModelList.Find(x => x.TableName == confModel.FromId);
+                            if (tbModel != null)
+                            {
+                                sourceFields = tbModel.Fileds;
+                            }
+                            else
+                            {
+                                result.ErrCode = ErrCode.err1;
+                                result.ErrMsg = "未找到表信息";
+                            }
                         }
                         else
                         {
@@ -149,7 +145,54 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                             result.ErrMsg = ErrCode.err80406;
                         }
                     }
-                    
+                    #endregion
+
+
+                    #region 获取目标表信息
+                    if (confModel.ConfToType == 0) //系统
+                    {
+                        Sys_sys sysModel = sysService.Get(confModel.ToParentId);
+                        Sys_conf sysconfModel = sysconfService.Get(confModel.ToId);
+                        Sys_confOutputDto outsysconfModel = sysconfModel.MapTo<Sys_confOutputDto>();
+                        Sys_conf_finalconf scfModel = scfService.GetWhere(string.Format("sys_conf_id='{0}'",sysconfModel.Id));
+                        if (outsysconfModel != null)
+                        {
+                            finFields = scfModel.ConfJson.ToObject<List<DbFieldInfo>>();
+                        }
+                        else
+                        {
+                            result.ErrMsg = ErrCode.err1;
+                            result.ErrMsg = "数据模型未配置";
+                            return result;
+                        }
+                       
+                    }
+                    else if (confModel.ConfToType == 1)
+                    {
+                        Sd_detail dbDetailModel = await detailService.GetWhereAsync(string.Format(" sd_id = '{0}'", confModel.ToParentId));
+                        if (dbDetailModel != null)
+                        {
+                            List<DbTableInfo> tbModelList = dbDetailModel.Tbs.ToObject<List<DbTableInfo>>();
+                            DbTableInfo tbModel = tbModelList.Find(x => x.TableName == confModel.ToId);
+                            if (tbModel != null)
+                            {
+                                finFields = tbModel.Fileds;
+                            }
+                            else
+                            {
+                                result.ErrCode = ErrCode.err1;
+                                result.ErrMsg = "未找到表信息";
+                            }
+                        }
+                        else
+                        {
+                            result.ErrCode = ErrCode.err1;
+                            result.ErrMsg = ErrCode.err80406;
+                        }
+                    }
+                    sysid = confModel.ToParentId;
+                    #endregion
+
                 }
                 else
                 {
@@ -162,6 +205,15 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                 result.ErrCode = ErrCode.err1;
                 result.ErrMsg = "未接收到参数信息";
             }
+            var resultList = new
+            {
+                sourceFields=sourceFields,
+                finFields = finFields,
+                sysid= sysid
+            };
+            result.ResData = resultList;
+            result.ErrCode = ErrCode.successCode;
+            result.ErrMsg = ErrCode.err0;
             return result;
         }
     }

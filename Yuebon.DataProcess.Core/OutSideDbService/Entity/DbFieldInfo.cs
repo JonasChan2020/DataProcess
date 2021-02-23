@@ -153,21 +153,9 @@ namespace Yuebon.DataProcess.Core.OutSideDbService.Entity
         /// </summary>
         public string WriteDescription { get; set; }
         /// <summary>
-        /// 读取表名称
+        /// 读取字段信息
         /// </summary>
-        public string ReadTableName { get; set; }
-        /// <summary>
-        /// 读取字段
-        /// </summary>
-        public string ReadFieldName { get; set; }
-        /// <summary>
-        /// 读取字段描述
-        /// </summary>
-        public string ReadDescription { get; set; }
-        /// <summary>
-        /// 对应字段
-        /// </summary>
-        public string CorField { get; set; }
+        public DataGetType ReadFieldInfo { get; set; }
         /// <summary>
         /// 默认值
         /// </summary>

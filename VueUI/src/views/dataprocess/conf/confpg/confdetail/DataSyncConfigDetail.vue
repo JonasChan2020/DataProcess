@@ -1,90 +1,145 @@
 <template>
   <div>
-    <el-row :gutter="24">
-      <el-col :span="6">
-        <el-card>
-          <el-table ref="gridlefttable"
-                    v-loading="lefttableloading"
-                    :data="lefttableData"
-                    :height="700"
-                    border
-                    stripe
-                    highlight-current-row
-                    style="width: 100%"
-                    @row-click="handleLeftClickRow">
-            <template v-for="(item,index) in lefttableHead">
-              <el-table-column :prop="item.column_name" :label="item.column_comment" :key="index" sortable="custom" min-width="item.column_minWidth"></el-table-column>
+    <el-card>
+      <el-table ref="gridrighttable"
+                v-loading="righttableloading"
+                :data="righttableData"
+                :height="700"
+                border
+                stripe
+                highlight-current-row
+                @row-click="handleTableClickRow"
+                style="width: 100%">
+        <el-table-column type="expand" label="详情" width="50">
+          <template slot-scope="props">
+            <el-form label-position="left" inline class="demo-table-expand">
+              <el-form-item label="表顺序">
+                <span>{{ props.row.TableLevelNum }}</span>
+              </el-form-item>
+              <el-form-item label="表名称">
+                <span>{{ props.row.WriteTableName }}</span>
+              </el-form-item>
+              <el-form-item label="字段名称">
+                <span>{{ props.row.WriteFieldName }}</span>
+              </el-form-item>
+              <el-form-item label="字段描述">
+                <span>{{ props.row.Description }}</span>
+              </el-form-item>
+              <el-form-item label="数据类型">
+                <span>{{ props.row.DataType }}</span>
+              </el-form-item>
+              <el-form-item label="小数位精度">
+                <span>{{ props.row.FieldScale }}</span>
+              </el-form-item>
+              <el-form-item label="字段长度">
+                <span>{{ props.row.FieldMaxLength }}</span>
+              </el-form-item>
+              <el-form-item label="默认值">
+                <span>{{ props.row.FieldDefaultValue }}</span>
+              </el-form-item>
+              <el-form-item label="是否可空">
+                {{ props.row.IsNullable === true ? "是" : "否" }}
+              </el-form-item>
+              <el-form-item label="是否主键">
+                {{ props.row.IsIdentity === true ? "是" : "否" }}
+              </el-form-item>
+              <el-form-item label="是否自增">
+                {{ props.row.Increment === true ? "是" : "否" }}
+              </el-form-item>
+            </el-form>
+          </template>
+        </el-table-column>
+        <el-table-column prop="WriteDescription" label="字段描述" min-width='20%'></el-table-column>
+        <el-table-column prop="ReadFieldName" label="对应表字段" min-width='20%'>
+          <template slot-scope="scope">
+            {{ scope.row.ReadFieldInfo!=undefined&&scope.row.ReadFieldInfo!=null ? scope.row.ReadFieldInfo.TableLevelNum+'^'+scope.row.ReadFieldInfo.WriteTableName+'^'+scope.row.ReadFieldInfo.FieldName : "" }}
+            <el-button type="text" @click="ShowDialogReadFieldEditOrViewDialog('ReadField',scope.$index,scope.row)">配置</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column prop="DefaultValue" label="默认值" min-width='10%'></el-table-column>
+        <el-table-column prop=" Is_DynamicSingle" label="动态表唯一判定字段" min-width='15%'></el-table-column>
+        <el-table-column label="配置" min-width='15%' align="center">
+          <template slot-scope="scope">
+            <el-button type="text" @click="ShowDialogVerifyEditOrViewDialog('Verify',scope.$index)">配置</el-button>
+            <el-tag :type="scope.row.SyncDataConfParamter!=undefined&&scope.row.SyncDataConfParamter!=null&&scope.row.SyncDataConfParamter.length>5 ? 'success' : 'info'" disable-transitions>{{ scope.row.SyncDataConfParamter!=undefined&&scope.row.SyncDataConfParamter!=null&&scope.row.SyncDataConfParamter.length>5 ? "(已配置)" : "(未配置)" }}</el-tag>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="cancleEditForm()">取 消</el-button>
+      <el-button type="primary" @click="saveEditForm()">确 定</el-button>
+    </div>
+    <el-dialog ref="dialogReadFieldInfo"
+               :close-on-click-modal="false"
+               :show-close="false"
+               :title="'对应列'"
+               :visible.sync="dialogReadFieldFormVisible"
+               append-to-body
+               width="640px">
+      <el-card>
+        <el-table ref="gridreadfieldtable"
+                  v-loading="readFieldtableloading"
+                  :data="readFieldTableData"
+                  :height="400"
+                  border
+                  stripe
+                  highlight-current-row
+                  @row-click="handleReadFieldClickRow"
+                  style="width: 100%">
+          <el-table-column type="expand" label="详情" width="50">
+            <template slot-scope="props">
+              <el-form label-position="left" inline class="demo-table-expand">
+                <el-form-item label="表顺序">
+                  <span>{{ props.row.TableLevelNum }}</span>
+                </el-form-item>
+                <el-form-item label="表名称">
+                  <span>{{ props.row.WriteTableName }}</span>
+                </el-form-item>
+                <el-form-item label="字段名称">
+                  <span>{{ props.row.WriteFieldName }}</span>
+                </el-form-item>
+                <el-form-item label="字段描述">
+                  <span>{{ props.row.Description }}</span>
+                </el-form-item>
+                <el-form-item label="数据类型">
+                  <span>{{ props.row.DataType }}</span>
+                </el-form-item>
+                <el-form-item label="小数位精度">
+                  <span>{{ props.row.FieldScale }}</span>
+                </el-form-item>
+                <el-form-item label="字段长度">
+                  <span>{{ props.row.FieldMaxLength }}</span>
+                </el-form-item>
+                <el-form-item label="默认值">
+                  <span>{{ props.row.FieldDefaultValue }}</span>
+                </el-form-item>
+                <el-form-item label="是否可空">
+                  {{ props.row.IsNullable === true ? "是" : "否" }}
+                </el-form-item>
+                <el-form-item label="是否主键">
+                  {{ props.row.IsIdentity === true ? "是" : "否" }}
+                </el-form-item>
+                <el-form-item label="是否自增">
+                  {{ props.row.Increment === true ? "是" : "否" }}
+                </el-form-item>
+              </el-form>
             </template>
-          </el-table>
-        </el-card>
-      </el-col>
-      <el-col :span="18">
-        <el-card>
-          <el-table ref="gridrighttable"
-                    v-loading="righttableloading"
-                    :data="righttableData"
-                    :height="700"
-                    border
-                    stripe
-                    highlight-current-row
-                    style="width: 100%">
-            <el-table-column type="expand" label="详情" width="50">
-              <template slot-scope="props">
-                <el-form label-position="left" inline class="demo-table-expand">
-                  <el-form-item label="表顺序">
-                    <span>{{ props.row.TableLevelNum }}</span>
-                  </el-form-item>
-                  <el-form-item label="表名称">
-                    <span>{{ props.row.WriteTableName }}</span>
-                  </el-form-item>
-                  <el-form-item label="字段名称">
-                    <span>{{ props.row.WriteFieldName }}</span>
-                  </el-form-item>
-                  <el-form-item label="字段描述">
-                    <span>{{ props.row.Description }}</span>
-                  </el-form-item>
-                  <el-form-item label="数据类型">
-                    <span>{{ props.row.DataType }}</span>
-                  </el-form-item>
-                  <el-form-item label="小数位精度">
-                    <span>{{ props.row.FieldScale }}</span>
-                  </el-form-item>
-                  <el-form-item label="字段长度">
-                    <span>{{ props.row.FieldMaxLength }}</span>
-                  </el-form-item>
-                  <el-form-item label="默认值">
-                    <span>{{ props.row.FieldDefaultValue }}</span>
-                  </el-form-item>
-                  <el-form-item label="是否可空">
-                    {{ props.row.IsNullable === true ? "是" : "否" }}
-                  </el-form-item>
-                  <el-form-item label="是否主键">
-                    {{ props.row.IsIdentity === true ? "是" : "否" }}
-                  </el-form-item>
-                  <el-form-item label="是否自增">
-                    {{ props.row.Increment === true ? "是" : "否" }}
-                  </el-form-item>
-                </el-form>
-              </template>
-            </el-table-column>
-            <el-table-column prop="WriteDescription" label="字段描述" min-width='20%'></el-table-column>
-            <el-table-column prop="ReadTableName" label="对应表名称" min-width='15%'></el-table-column>
-            <el-table-column prop="ReadFieldName" label="对应表字段" min-width='20%'></el-table-column>
-            <el-table-column prop="ReadDescription" label="对应字段描述" min-width='15%'></el-table-column>
-            <el-table-column prop="DefaultValue" label="默认值" min-width='10%'></el-table-column>
-            <el-table-column prop=" Is_DynamicSingle" label="动态表唯一判定字段" min-width='10%'></el-table-column>
-            <el-table-column label="配置" min-width='10%' align="center">
-              <template slot-scope="scope">
-                <el-button type="text" @click="ShowDialogVerifyEditOrViewDialog('Verify',scope.$index)">配置</el-button>
-                <el-tag :type="scope.row.SyncDataConfParamter!=undefined&&scope.row.SyncDataConfParamter!=null&&scope.row.SyncDataConfParamter.length>5 ? 'success' : 'info'" disable-transitions>{{ scope.row.SyncDataConfParamter!=undefined&&scope.row.SyncDataConfParamter!=null&&scope.row.SyncDataConfParamter.length>5 ? "(已配置)" : "(未配置)" }}</el-tag>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-card>
-      </el-col>
-    </el-row>
+          </el-table-column>
+          <el-table-column prop="TableLevelNum" label="表顺序" min-width='10%'></el-table-column>
+          <el-table-column prop="WriteTableName" label="表名称" min-width='15%'></el-table-column>
+          <el-table-column prop="WriteFieldName" label="字段名称" min-width='15%'></el-table-column>
+          <el-table-column prop=" Description" label="字段描述" min-width='25%'></el-table-column>
+        </el-table>
+      </el-card>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="cancleReadFieldEditForm()">取 消</el-button>
+        <el-button type="primary" @click="saveReadFieldEditForm()">确 定</el-button>
+      </div>
+    </el-dialog>
     <el-dialog ref="dialogVerifyEditForm"
                :close-on-click-modal="false"
+               :show-close="false"
                :title="dialogFormOpenTitle+'配置'"
                :visible.sync="dialogVerifyEditFormVisible"
                width="640px">
@@ -105,13 +160,9 @@
   data() {
     return {
       dtype:'',
-      lefttableloading: false,
-      lefttableData: [],
-      lefttableHead:[],
-      leftcurrentSelectId: '',
       righttableloading: false,
       righttableData: [],
-      rightcurrentSelectId: '',
+      rightcurrentSelectId: [],
       SysId: '',
       tpl: '',
       formData: [],
@@ -120,6 +171,12 @@
       showType: 'edit', // 操作类型编辑、新增、查看
       dialogVerifyEditFormVisible: false,
       dialogFormOpenTitle: '',
+      dialogReadFieldFormVisible: false,
+      readFieldtableloading:false,
+      readFieldTableData: [],
+      readFieldSelected: [],
+
+
     }
     },
     computed: {
@@ -133,56 +190,36 @@
       }
     },
     created() {
-    this.loadLeftTableData()
-    this.loadBtnFunc = JSON.parse(localStorage.getItem('yueboncurrentfuns'))
+      this.loadRightTableData()
+      this.loadBtnFunc = JSON.parse(localStorage.getItem('yueboncurrentfuns'))
   },
   methods: {
-    /**
-      * 加载页面左侧table数据
-      */
-    loadLeftTableData: function () {
-      this.lefttableloading = true
-      var seachdata = {
-        Pkey: this.cid
-      }
-      if (this.dbtype == '0') { //系统
-        this.lefttableHead = [
-          { column_name: "Confcode", column_comment: "模型编码", column_minWidth: "25%" },
-          { column_name: "Confname", column_comment: "模型名称", column_minWidth: "25%" },
-          { column_name: "Description", column_comment: "描述", column_minWidth: "50%" }
-        ]
-      } else if (this.dbtype == '1') { //数据库
-        this.lefttableHead = [
-          { column_name: "TableName", column_comment: "表名", column_minWidth: "25%" },
-          { column_name: "Description", column_comment: "描述", column_minWidth: "75%" }
-        ]
-      }
-      getConfTbContent(seachdata).then(res => {
-        this.lefttableData = res.ResData
-        this.lefttableloading = false
-      })
-      
-    },
-    /**
-    * 点击一条记录
-    */
-    handleLeftClickRow(row) {
-      this.leftcurrentSelectId = row.Id
-      this.loadRightTableData(row.Fileds)
-    },
 
     /**
       * 加载页面左侧table数据
       */
-    loadRightTableData: function (data) {
+    loadRightTableData: function () {
       this.righttableloading = true
-      this.righttableData = data
-      this.righttableloading = false
+      var seachdata = {
+        Pkey: this.cid
+      }
+      getConfTbContent(seachdata).then(res => {
+        this.righttableData = res.ResData.finFields
+        this.readFieldTableData = res.ResData.sourceFields
+        this.SysId = res.ResData.sysid
+        this.righttableloading = false
+      })
+    },
+    /**
+    * 点击一条记录
+    */
+    handleTableClickRow(row) {
+      this.rightcurrentSelectId = row
     },
     /**
        * 新增/修改保存
        */
-    saveDataSyncEditForm() {
+    saveEditForm() {
       this.configjson = this.tableData
       const data = {
         'Sys_conf_id': this.Sys_conf_id,
@@ -212,6 +249,10 @@
         }
       })
     },
+    cancleEditForm: function (data) {
+      this.readFieldSelected = []
+      this.dialogReadFieldFormVisible = false
+    },
     /**
  * 新增、修改或查看验证明细信息     *
  */
@@ -240,6 +281,43 @@
     closePlugConfig: function (data) {
       this.showPlugConfig = false
       this.dialogVerifyEditFormVisible = false
+    },
+
+    /**
+* 新增、修改或查看验证明细信息     *
+*/
+    ShowDialogReadFieldEditOrViewDialog: function (view, index,row) {
+      this.verifyTableDataIndex = index
+      this.rightcurrentSelectId=row
+      if (this.rightcurrentSelectId.length === 0) {
+        this.$alert('请先选择要操作的数据', '提示')
+        return false
+      }
+      this.rightcurrentSelectId = row
+      if (view == 'ReadField') {
+        this.dialogReadFieldFormVisible = true
+      }
+    },
+    /**
+   * 点击一条记录
+   */
+    handleReadFieldClickRow(row) {
+      this.readFieldSelected = row
+    },
+    saveReadFieldEditForm: function () {
+      if (this.readFieldSelected.length === 0) {
+        this.$alert('请先选择要操作的数据', '提示')
+        return false
+      }
+      if (this.readFieldSelected != null) {
+        this.righttableData[this.verifyTableDataIndex].ReadFieldInfo = this.readFieldSelected
+      }
+      this.dialogReadFieldFormVisible = false
+      this.readFieldSelected=[]
+    },
+    cancleReadFieldEditForm: function(data) {
+      this.readFieldSelected = []
+      this.dialogReadFieldFormVisible = false
     },
   }
 }

@@ -21,7 +21,7 @@
               <el-table ref="gridfromtable"
                         v-loading="fromtableloading"
                         :data="fromtableData"
-                         style="width: 100%;margin-bottom: 20px;"
+                        style="width: 100%;margin-bottom: 20px;"
                         row-key="Id"
                         border
                         size="mini"
@@ -29,10 +29,9 @@
                         default-expand-all
                         highlight-current-row
                         :tree-props="{children: 'Children'}"
-                        @row-click="handlefromClickRow"
-                        >
-                <el-table-column prop="NodeName" label="名称"  min-width="30%" />
-                <el-table-column prop="Description" label="描述"  min-width="70%" />
+                        @row-click="handlefromClickRow">
+                <el-table-column prop="NodeName" label="名称" min-width="30%" />
+                <el-table-column prop="Description" label="描述" min-width="70%" />
               </el-table>
             </el-card>
           </el-col>
@@ -102,17 +101,17 @@
               </template>
             </el-table-column>
           </el-table>
-            <div class="pagination-container">
-              <el-pagination background
-                             :current-page="topagination.currentPage"
-                             :page-sizes="[5,10,20,50,100, 200, 300, 400]"
-                             :page-size="topagination.pagesize"
-                             layout="total, sizes, prev, pager, next, jumper"
-                             :total="topagination.pageTotal"
-                             @size-change="handletoSizeChange"
-                             @current-change="handletoCurrentChange" />
-            </div>
-          
+          <div class="pagination-container">
+            <el-pagination background
+                           :current-page="topagination.currentPage"
+                           :page-sizes="[5,10,20,50,100, 200, 300, 400]"
+                           :page-size="topagination.pagesize"
+                           layout="total, sizes, prev, pager, next, jumper"
+                           :total="topagination.pageTotal"
+                           @size-change="handletoSizeChange"
+                           @current-change="handletoCurrentChange" />
+          </div>
+
 
         </el-card>
       </el-col>
@@ -175,73 +174,76 @@
     getAllClassifyTreeTable
   } from '@/api/dataprocess/sys_classify'
   import {
-     getSdAndTbTree
+    getSdAndTbTree
   } from '@/api/dataprocess/sd_sysdb'
   import {
     getAllSdClassifyTreeTable
   } from '@/api/dataprocess/sd_classify'
-import { getConf_confListWithPager,
-  saveConf_conf, setConf_confEnable,
-  deleteConf_conf
-} from '@/api/dataprocess/conf_conf'
+  import {
+    getConf_confListWithPager,
+    saveConf_conf, setConf_confEnable,
+    deleteConf_conf
+  } from '@/api/dataprocess/conf_conf'
 
   export default {
     name: 'confcontrol',
-  data() {
-    return {
-      selectedSysDb:'',
-      selectSysDb: [{
-        value: '0',
-        label: '系统'
-      }, {
-        value: '1',
-        label: '数据库'
+    data() {
+      return {
+        selectedSysDb: '',
+        selectSysDb: [{
+          value: '0',
+          label: '系统'
+        }, {
+          value: '1',
+          label: '数据库'
         }],
-      cascaderkey:1,
-      selectedclass: '',
-      selectclasses: [],
-      loadBtnFunc: [],
-      fromcurrentSelectId:'',
-      fromtableloading: false,
-      fromtableHead: [],
-      fromtableData: [],
-      fromsortableData: {
-        order: 'desc',
-        sort: 'CreatorTime'
-      },
-      tocurrentId: '', // 当前操作对象的ID值，主要用于修改
-      tocurrentSelectId: '',
-      tocurrentSelected: [],
-      totableloading: false,
-      totableData: [],
-      topagination: {
-        currentPage: 1,
-        pagesize: 20,
-        pageTotal: 0
-      },
-      tosortableData: {
-        order: 'desc',
-        sort: 'CreatorTime'
-      },
-      dialogcurrentId: '', // 当前操作对象的ID值，主要用于修改
-      dialogcurrentSelectId: '',
-      dialogcurrentSelected: [],
-      dialogEditFormVisible: false,
-      editFormTitle: '',
-      dialogselectedSysDb: '',
-      dialogselectedclass: '',
-      dialogselectclasses: [],
-      dialogtableloading: false,
-      dialogtableData: [],
-      dialogsortableData: {
-        order: 'desc',
-        sort: 'CreatorTime'
-      },
-    }
-  },
-  created() {
-    this.loadBtnFunc = JSON.parse(localStorage.getItem('yueboncurrentfuns'))
-  },
+        cascaderkey: 1,
+        selectedclass: '',
+        selectclasses: [],
+        loadBtnFunc: [],
+        fromcurrentSelectId: '',
+        fromcurrentSelectParentId: '', //fromParentId
+        fromtableloading: false,
+        fromtableHead: [],
+        fromtableData: [],
+        fromsortableData: {
+          order: 'desc',
+          sort: 'CreatorTime'
+        },
+        tocurrentId: '', // 当前操作对象的ID值，主要用于修改
+        tocurrentSelectId: '',
+        tocurrentSelected: [],
+        totableloading: false,
+        totableData: [],
+        topagination: {
+          currentPage: 1,
+          pagesize: 20,
+          pageTotal: 0
+        },
+        tosortableData: {
+          order: 'desc',
+          sort: 'CreatorTime'
+        },
+        dialogcurrentId: '', // 当前操作对象的ID值，主要用于修改
+        dialogcurrentSelectId: '',
+        dialogcurrentSelectParentId: '',//toParentId
+        dialogcurrentSelected: [],
+        dialogEditFormVisible: false,
+        editFormTitle: '',
+        dialogselectedSysDb: '',
+        dialogselectedclass: '',
+        dialogselectclasses: [],
+        dialogtableloading: false,
+        dialogtableData: [],
+        dialogsortableData: {
+          order: 'desc',
+          sort: 'CreatorTime'
+        },
+      }
+    },
+    created() {
+      this.loadBtnFunc = JSON.parse(localStorage.getItem('yueboncurrentfuns'))
+    },
     methods: {
 
       /**
@@ -254,7 +256,7 @@ import { getConf_confListWithPager,
         this.cascaderkey++
         if (this.selectedSysDb == '0') {
           this.fromtableHead = [
-            { column_name: "Syscode", column_comment: "编码", column_minWidth:"25%" },
+            { column_name: "Syscode", column_comment: "编码", column_minWidth: "25%" },
             { column_name: "Sysname", column_comment: "名称", column_minWidth: "75%" }
           ]
           getAllClassifyTreeTable().then(res => {
@@ -287,11 +289,11 @@ import { getConf_confListWithPager,
             Classify_id: this.selectedclass,
           }
         }
-        
+
         if (this.selectedSysDb == '0') {
-          
+
           getSysAndModelTree(seachdata).then(res => {
-            
+
             this.fromtableData = res.ResData
             this.fromtableloading = false
           })
@@ -312,9 +314,15 @@ import { getConf_confListWithPager,
        * 点击一条记录
        */
       handlefromClickRow(row) {
-        this.fromcurrentSelectId = row.Id
-        this.topagination.currentPage = 1
-        this.loadToTableData()
+        if (row.NodeType !== "tb") {
+          this.fromcurrentSelectId = ""
+          this.fromcurrentSelectParentId = ""
+        } else {
+          this.fromcurrentSelectId = row.Id
+          this.fromcurrentSelectParentId = row.ParentId
+          this.topagination.currentPage = 1
+          this.loadToTableData()
+        }
       },
       /**
       * 加载页面左侧table数据
@@ -392,7 +400,7 @@ import { getConf_confListWithPager,
       */
       ShowEditOrViewDialog: function () {
         if (this.fromcurrentSelectId.length === 0) {
-          this.$alert('请先选择左侧列表中的一条数据', '提示')
+          this.$alert('请先选择左侧列表中的表或模型', '提示')
         } else {
           this.editFormTitle = '新增'
           this.tocurrentId = ''
@@ -465,60 +473,67 @@ import { getConf_confListWithPager,
         if (this.dialogcurrentSelected.length > 1 || this.dialogcurrentSelected.length === 0) {
           this.$alert('请选择一条数据进行编辑/修改', '提示')
         } else {
-          this.dialogcurrentSelectId = this.dialogcurrentSelected[0].Id
-          alert(this.dialogselectedSysDb)
-          const data = {
-            'FromId': this.fromcurrentSelectId,
-            'ToId': this.dialogcurrentSelectId,
-            'EnabledMark': true,
-            'ConfFromType': this.selectedSysDb,
-            'ConfToType': this.dialogselectedSysDb,
-            'Id': this.currentId
-          }
-          var url = 'Conf_conf/Insert'
-          saveConf_conf(data, url).then(res => {
-            if (res.Success) {
-              this.$message({
-                message: '恭喜你，操作成功',
-                type: 'success'
-              })
-              this.dialogEditFormVisible = false
-              this.dialogcurrentSelected = ''
-              this.dialogselectedclass = ''
-              this.dialogselectedsys = ''
-              this.loadDialogTableData()
-              this.loadToTableData()
-
-            } else {
-              if (res.CustomCode == "err80404") {
-                this.dialogselectedSysDb = '0'
-                getAllClassifyTreeTable().then(res => {
-                  this.dialogselectclasses = res.ResData
-                })
-                this.loadDialogTableData(res.ResData)
-              }
-              this.$message({
-                message: res.ErrMsg,
-                type: 'error'
-              })
+          if (this.dialogcurrentSelected[0].NodeType !== "tb") {
+            this.$alert('请选择表或数据模型', '提示')
+          } else {
+            this.dialogcurrentSelectId = this.dialogcurrentSelected[0].Id
+            this.dialogcurrentSelectParentId = this.dialogcurrentSelected[0].ParentId
+            const data = {
+              'FromId': this.fromcurrentSelectId,
+              'FromParentId': this.fromcurrentSelectParentId,
+              'ToId': this.dialogcurrentSelectId,
+              'ToParentId': this.dialogcurrentSelectParentId,
+              'EnabledMark': true,
+              'ConfFromType': this.selectedSysDb,
+              'ConfToType': this.dialogselectedSysDb,
+              'Id': this.currentId
             }
-          })
+            var url = 'Conf_conf/Insert'
+            saveConf_conf(data, url).then(res => {
+              if (res.Success) {
+                this.$message({
+                  message: '恭喜你，操作成功',
+                  type: 'success'
+                })
+                this.dialogEditFormVisible = false
+                this.dialogcurrentSelected = ''
+                this.dialogselectedclass = ''
+                this.dialogselectedsys = ''
+                this.loadDialogTableData()
+                this.loadToTableData()
+
+              } else {
+                if (res.CustomCode == "err80404") {
+                  this.dialogselectedSysDb = '0'
+                  getAllClassifyTreeTable().then(res => {
+                    this.dialogselectclasses = res.ResData
+                  })
+                  this.loadDialogTableData(res.ResData)
+                }
+                this.$message({
+                  message: res.ErrMsg,
+                  type: 'error'
+                })
+              }
+            })
+          }
+          
         }
       },
-    /**
-   * 关闭对话框
-   */
+      /**
+     * 关闭对话框
+     */
       closeEditForm() {
         this.dialogEditFormVisible = false
         this.dialogcurrentSelected = ''
-        this.dialogselectedSysDb= ''
+        this.dialogselectedSysDb = ''
         this.dialogselectedclass = ''
         this.dialogselectclasses = []
-        this.dialogtableData=[]
-         
-        this.dialogsortableData={
+        this.dialogtableData = []
+
+        this.dialogsortableData = {
           order: 'desc',
-            sort: 'CreatorTime'
+          sort: 'CreatorTime'
         }
       },
 
@@ -567,14 +582,14 @@ import { getConf_confListWithPager,
           })
         } else if (this.dialogselectedSysDb == '1') {
 
-          getAllClassifyTreeTable(seachdata).then(res => {
+          getSdAndTbTree(seachdata).then(res => {
             this.dialogtableData = res.ResData
             this.dialogtableloading = false
           })
         }
       },
-      
-     
+
+
       /**
      * 当用户手动勾选checkbox数据行事件
      */

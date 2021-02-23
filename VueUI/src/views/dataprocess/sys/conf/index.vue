@@ -176,7 +176,7 @@
     <el-dialog
       ref="dialogEditForm"
       :close-on-click-modal="false"
-      :show-close="true"
+      :show-close="false"
       :title="editFormTitle+'数据模型'"
       :visible.sync="dialogEditFormVisible"
       width="640px"
