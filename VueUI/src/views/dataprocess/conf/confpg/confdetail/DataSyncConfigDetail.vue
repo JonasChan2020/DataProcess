@@ -129,7 +129,7 @@
           <el-table-column prop="TableLevelNum" label="表顺序" min-width='10%'></el-table-column>
           <el-table-column prop="WriteTableName" label="表名称" min-width='15%'></el-table-column>
           <el-table-column prop="WriteFieldName" label="字段名称" min-width='15%'></el-table-column>
-          <el-table-column prop=" Description" label="字段描述" min-width='25%'></el-table-column>
+          <el-table-column prop="Description" label="字段描述" min-width='25%'></el-table-column>
         </el-table>
       </el-card>
       <div slot="footer" class="dialog-footer">
