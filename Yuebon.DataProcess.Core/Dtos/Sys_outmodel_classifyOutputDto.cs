@@ -20,12 +20,12 @@ namespace Yuebon.DataProcess.Dtos
         /// 设置或获取类型编码
         /// </summary>
         [MaxLength(300)]
-        public string Classcode { get; set; }
+        public string ClassCode { get; set; }
         /// <summary>
         /// 设置或获取类型名称
         /// </summary>
         [MaxLength(300)]
-        public string Classname { get; set; }
+        public string ClassName { get; set; }
         /// <summary>
         /// 设置或获取父ID
         /// </summary>
@@ -90,6 +90,17 @@ namespace Yuebon.DataProcess.Dtos
         /// </summary>
         [MaxLength(254)]
         public string DeleteUserId { get; set; }
+
+        /// <summary>
+        /// 设置或获取所属系统名称
+        /// </summary>
+        [MaxLength(0)]
+        public string Sys_Name { get; set; }
+
+        /// <summary>
+        /// 子集
+        /// </summary>
+        public List<Sys_outmodel_classifyOutputDto> Children { get; set; }
 
     }
 }

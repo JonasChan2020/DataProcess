@@ -23,6 +23,17 @@ export function getAllSys_outmodel_classifyList() {
   })
 }
 /**
+ * 获取树形分类
+*/
+export function getAlloutModelClassifyTreeTable(data) {
+  return http.request({
+    url: 'Sys_outmodel_classify/GetAllClassifyTreeTable',
+    method: 'post',
+    data: data,
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
+/**
    * 新增或修改保存数据输出模型分类表
    * @param data
    */

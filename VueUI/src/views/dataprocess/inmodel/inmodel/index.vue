@@ -4,17 +4,22 @@
     
       <el-row :gutter="24">
         <el-col :span="10">
-          <el-card>
             <div class="grid-content bg-purple">
               <div class="grid-content bg-purple">
                 <el-card>
-                  <el-cascader v-model="sysselectedclass"placeholder="请选择系统分类" :key="cascaderkey" style="width:500px;" :options="sysselectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSysSelectClassChange" />
-                  <el-select v-model="selectedSys" placeholder="请选择系统" @change="handleSelectSysChange()">
-                    <el-option v-for="item in selectSyses"
-                               :key="item.Id"
-                               :label="item.Sysname"
-                               :value="item.Id" />
-                  </el-select>
+                  <el-row :gutter="24">
+                    <el-col :span="7">
+                      <el-button type="primary"
+                                 icon="el-icon-plus"
+                                 size="small"
+                                 @click="ClassifyManage()">分类管理</el-button>
+                    </el-col>
+                    <el-col :span="17">
+                      <el-cascader v-model="outselectedclass" style="width:400px;" :options="selectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleOutSelectClassChange" />
+                    </el-col>
+                  </el-row>
+                  
+                  
                 </el-card>
                 <el-card>
                   <div class="list-btn-container">
@@ -89,7 +94,6 @@
                 </el-card>
               </div>
             </div>
-          </el-card>
             </el-col>
         <el-col :span="14">
           <el-card>
@@ -194,9 +198,6 @@
         <el-form-item label="所属分类" :label-width="formLabelWidth" prop="Classify_id">
           <el-cascader v-model="selectedclass" style="width:500px;" :options="selectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleSelectClassChange" />
         </el-form-item>
-        <el-form-item label="所属系统" :label-width="formLabelWidth" prop="Sys_id">
-          <el-cascader v-model="formselectedsys" style="width:500px;" :options="formselectsyses" filterable :props="{label:'Sysname',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleFromSelectSysChange" />
-        </el-form-item>
         <el-form-item label="排序" :label-width="formLabelWidth" prop="SortCode">
           <el-input v-model.number="editFrom.SortCode" placeholder="请输入排序,默认为99" autocomplete="off" clearable />
         </el-form-item>
@@ -226,15 +227,10 @@ import {
     getAllEnableByConfId, deleteSys_conf_details,
    changeLevelNumAsync
   } from '@/api/dataprocess/sys_conf_details'
-  import {
-    getAllClassifyTreeTable
-  } from '@/api/dataprocess/sys_classify'
-  import {
-    getSys_sysListWithPager
-  } from '@/api/dataprocess/sys_sys'
 
   export default {
-    name:'sysconfcontrol',
+    name: 'sysconfcontrol',
+    props: ['sid'], //父页面传过来的配置ID
   data() {
     return {
       searchform: {
@@ -251,20 +247,14 @@ import {
         order: 'desc',
         sort: 'CreatorTime'
       },
-      formselectedsys: '',
-      formselectsyses: [],
-      selectedSys: '',
-      selectSyses: [],
       cascaderkey: 1,
-      sysselectedclass: '',
-      sysselectclasses: [],
-      selectedclass: '',
+      outselectedclass: '', //配置首页上的筛选器分类
+      selectedclass: '',//模型编辑内的分类
       selectclasses: [],
       dialogEditFormVisible: false,
       editFormTitle: '',
       editFrom: {
         Classify_id: '',
-        Sysid:'',
         Confcode: '',
         Confdes: '',
         Confname: '',
@@ -278,7 +268,6 @@ import {
       },
       formLabelWidth: '80px',
       currentId: '', // 当前操作对象的ID值，主要用于修改
-      currentSysId: '',
       currentSelected: [],
 
       sortableDetailData: {
@@ -301,23 +290,19 @@ import {
        * 初始化数据
        */
     InitDictItem() {
-      
-      getAllClassifyTreeTable().then(res => {
-        this.sysselectclasses = res.ResData
-      })
-
-      var formsysseachdata = {
-        CurrenetPageIndex: 1,
-        PageSize: 999999999,
+      var seachdata = {
+        Filter: {
+          Sysid: this.sid,
+        }
       }
-      getSys_sysListWithPager(formsysseachdata).then(res => {
-        this.formselectsyses = res.ResData.Items
+      getAllSysConfClassifyTreeTable(seachdata).then(res => {
+        this.selectclasses = res.ResData
       })
     },
     /**
        * 加载页面table数据
        */
-    loadTableData: function() {
+    loadTableData: function () {
       var seachdata = {
         CurrenetPageIndex: this.pagination.currentPage,
         PageSize: this.pagination.pagesize,
@@ -325,16 +310,25 @@ import {
         Order: this.sortableData.order,
         Sort: this.sortableData.sort,
         Filter: {
-          Sysid: this.selectedSys
+          Sysid: this.sid,
+          Classify_id: this.outselectedclass,
         }
       }
       getSys_confListWithPager(seachdata).then(res => {
         this.tableData = res.ResData.Items
         this.pagination.pageTotal = res.ResData.TotalItems
       })
-      getAllSysConfClassifyTreeTable(seachdata).then(res => {
-        this.selectclasses = res.ResData
-      })
+      
+    },
+
+    ClassifyManage: function () {
+      this.$router.push({ name: 'inModelClassify', params: { sysid: this.sid } })
+    },
+    /**
+*选择分类
+*/
+    handleOutSelectClassChange: function () {
+      this.loadTableData()
     },
     /**
        * 加载详情页面table数据
@@ -358,37 +352,7 @@ import {
     },
     handleClickRow(row) {
       this.currentId = row.Id
-      this.currentSysId = row.Sysid
       this.loadTableDetailData()
-    },
-    /**
-      *系统分类选择 
-      */
-    handleSysSelectClassChange: function (value) {
-      this.sysselectedclass = value
-      var seachdata = {
-        CurrenetPageIndex: 1,
-        PageSize: 999999999,
-        Filter: {
-          Classify_id: this.sysselectedclass,
-        }
-      }
-      getSys_sysListWithPager(seachdata).then(res => {
-        this.selectSyses = res.ResData.Items
-      })
-      
-    },
-    /**
-     *系统选择 
-     */
-    handleSelectSysChange: function () {
-      this.loadTableData()
-    },
-    /**
-    *表单内系统选择 
-    */
-    handleFromSelectSysChange: function () {
-      this.editFrom.Sysid = this.formselectedsys
     },
 
     /**
@@ -414,7 +378,6 @@ import {
     bindEditInfo: function() {
       getSys_confDetail(this.currentId).then(res => {
         this.editFrom.Classify_id = res.ResData.Classify_id
-        this.editFrom.Sysid = res.ResData.Sysid
         this.editFrom.Confcode = res.ResData.Confcode
         this.editFrom.Confdes = res.ResData.Confdes
         this.editFrom.Confname = res.ResData.Confname
@@ -432,7 +395,7 @@ import {
         if (valid) {
           const data = {
             'Classify_id': this.editFrom.Classify_id,
-            'Sysid': this.editFrom.Sysid,
+            'Sysid': this.sid,
             'Confcode': this.editFrom.Confcode,
             'Confdes': this.editFrom.Confdes,
             'Confname': this.editFrom.Confname,
@@ -576,6 +539,7 @@ import {
     handleSelectClassChange: function() {
       this.editFrom.Classify_id = this.selectedclass
     },
+  
     /**
        * 当用户手动勾选checkbox数据行事件
        */
@@ -613,12 +577,12 @@ import {
           this.$alert('请选择一条数据进行编辑/修改', '提示')
         } else {
           this.currentDetailId = this.currentDetailSelected[0].Id
-          this.$router.push({ name: 'EditConfDetail', params: { id: this.currentDetailId, showtype: view, Sys_conf_id: this.currentId, SysId: this.currentSysId }})
+          this.$router.push({ name: 'EditConfDetail', params: { id: this.currentDetailId, showtype: view, Sys_conf_id: this.currentId, SysId: this.sid }})
         }
       } else {
         this.currentDetailId = ''
         this.selectedDetailclass = ''
-        this.$router.push({ name: 'EditConfDetail', params: { id: this.currentDetailId, showtype: view, Sys_conf_id: this.currentId, SysId: this.currentSysId }})
+        this.$router.push({ name: 'EditConfDetail', params: { id: this.currentDetailId, showtype: view, Sys_conf_id: this.currentId, SysId: this.sid }})
       }
     },
     deleteDetailSoft: function(val) {

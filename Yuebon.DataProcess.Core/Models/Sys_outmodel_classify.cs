@@ -17,11 +17,11 @@ namespace Yuebon.DataProcess.Models
         /// <summary>
         /// 设置或获取类型编码
         /// </summary>
-        public string Classcode { get; set; }
+        public string ClassCode { get; set; }
         /// <summary>
         /// 设置或获取类型名称
         /// </summary>
-        public string Classname { get; set; }
+        public string ClassName { get; set; }
         /// <summary>
         /// 设置或获取父ID
         /// </summary>

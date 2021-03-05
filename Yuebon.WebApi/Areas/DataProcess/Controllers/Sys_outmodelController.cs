@@ -5,6 +5,17 @@ using Yuebon.Commons.Helpers;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 using Yuebon.DataProcess.IServices;
+using Yuebon.AspNetCore.Mvc;
+using Yuebon.AspNetCore.Models;
+using Yuebon.Commons.Log;
+using System.Collections.Generic;
+using System.Linq;
+using Yuebon.Commons.Models;
+using System.Threading.Tasks;
+using Yuebon.Commons.Mapping;
+using Yuebon.Commons.Dtos;
+using Yuebon.Commons.Extensions;
+using Yuebon.DataProcess.Core.common.Entity.TreeEntity;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -15,13 +26,15 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
     [Route("api/DataProcess/[controller]")]
     public class Sys_outmodelController : AreaApiController<Sys_outmodel, Sys_outmodelOutputDto,Sys_outmodelInputDto,ISys_outmodelService,string>
     {
+        private ISys_sysService SysService;
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="_iService"></param>
-        public Sys_outmodelController(ISys_outmodelService _iService) : base(_iService)
+        public Sys_outmodelController(ISys_outmodelService _iService, ISys_sysService _SysService) : base(_iService)
         {
             iService = _iService;
+            SysService = _SysService;
             AuthorizeKey.ListKey = "Sys_outmodel/List";
             AuthorizeKey.InsertKey = "Sys_outmodel/Add";
             AuthorizeKey.UpdateKey = "Sys_outmodel/Edit";
@@ -67,6 +80,105 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             info.DeleteMark = true;
             info.DeleteTime = DateTime.Now;
             info.DeleteUserId = CurrentUser.UserId;
+        }
+
+        /// <summary>
+        /// 获取所有可用的
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("GetEnableList")]
+        [YuebonAuthorize("List")]
+        public async Task<CommonResult<List<Sys_outmodelOutputDto>>> GetEnableList(SearchInputDto<Sys_outmodel> search)
+        {
+            CommonResult<List<Sys_outmodelOutputDto>> result = new CommonResult<List<Sys_outmodelOutputDto>>();
+            string where = " EnabledMark=1 ";
+            if (search.Filter != null && !string.IsNullOrEmpty(search.Filter.Sysid))
+            {
+                where += string.Format(" and sysid = '{0}' ", search.Filter.Sysid);
+            }
+            IEnumerable<Sys_outmodel> list = await iService.GetListWhereAsync(where);
+            List<Sys_outmodelOutputDto> resultList = list.MapTo<Sys_outmodelOutputDto>();
+            result.ResData = resultList;
+            result.ErrCode = ErrCode.successCode;
+            result.ErrMsg = ErrCode.err0;
+
+            return result;
+        }
+
+        /// <summary>
+        /// 获取 系统和模型的树形列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("GetSysAndModelTree")]
+        [YuebonAuthorize("List")]
+        public async Task<IActionResult> GetSysAndModelTree(SearchInputDto<Sys_sys> search)
+        {
+            CommonResult result = new CommonResult();
+            try
+            {
+                List<Sys_Db_TableTreeEntity> treeList = new List<Sys_Db_TableTreeEntity>();
+                string sysWhere = " EnabledMark=1 ";
+                if (search.Filter != null && !string.IsNullOrEmpty(search.Filter.Classify_id))
+                {
+                    sysWhere += string.Format(" and classify_id = '{0}' ", search.Filter.Classify_id);
+                }
+                IEnumerable<Sys_sys> list = await SysService.GetListWhereAsync(sysWhere);
+                if (list != null && list.Count() > 0)
+                {
+                    string[] sysIds = new string[list.Count()];
+                    int i = 0;
+                    foreach (Sys_sys item in list)
+                    {
+                        sysIds[i] = item.Id;
+                        i++;
+                    }
+                    string tbWhere = " EnabledMark=1 and sysid in ('" + sysIds.Join(",").Trim(',').Replace(",", "','") + "')";
+                    IEnumerable<Sys_outmodel> scList = iService.GetListWhere(tbWhere);
+                    if (scList != null && scList.Count() > 0)
+                    {
+                        foreach (Sys_sys sysItem in list)
+                        {
+                            Sys_Db_TableTreeEntity treeModel = new Sys_Db_TableTreeEntity();
+                            treeModel.Id = sysItem.Id;
+                            treeModel.NodeName = sysItem.Sysname;
+                            treeModel.Description = sysItem.Description;
+                            treeModel.NodeType = "sys";
+                            treeModel.ParentId = "0";
+                            List<Sys_outmodel> childModelList = scList.Where(x => x.Sysid == sysItem.Id).ToList();
+                            if (childModelList != null && childModelList.Count > 0)
+                            {
+                                List<Sys_Db_TableTreeEntity> childtreeList = new List<Sys_Db_TableTreeEntity>();
+                                foreach (Sys_outmodel childItem in childModelList)
+                                {
+                                    Sys_Db_TableTreeEntity childTreeModel = new Sys_Db_TableTreeEntity();
+                                    childTreeModel.Id = childItem.Id;
+                                    childTreeModel.NodeName = childItem.Modelname;
+                                    childTreeModel.Description = childItem.Description;
+                                    childTreeModel.NodeType = "tb";
+                                    childTreeModel.ParentId = sysItem.Id;
+                                    childtreeList.Add(childTreeModel);
+                                }
+                                treeModel.Children = childtreeList;
+                            }
+                            else
+                            {
+                                treeModel.Children = new List<Sys_Db_TableTreeEntity>();
+                            }
+                            treeList.Add(treeModel);
+                        }
+                    }
+                }
+                result.Success = true;
+                result.ResData = treeList;
+                result.ErrCode = ErrCode.successCode;
+            }
+            catch (Exception ex)
+            {
+                Log4NetHelper.Error("获取组织结构异常", ex);
+                result.ErrMsg = ErrCode.err40110;
+                result.ErrCode = "40110";
+            }
+            return ToJsonContent(result);
         }
     }
 }

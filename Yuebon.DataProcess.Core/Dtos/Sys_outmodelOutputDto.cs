@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Yuebon.DataProcess.Core.OutSideDbService.Entity;
 
 namespace Yuebon.DataProcess.Dtos
 {
@@ -85,6 +86,23 @@ namespace Yuebon.DataProcess.Dtos
         /// </summary>
         [MaxLength(254)]
         public string DeleteUserId { get; set; }
+
+        /// <summary>
+        /// 设置或获取所属系统名称
+        /// </summary>
+        [MaxLength(0)]
+        public string Sys_Name { get; set; }
+
+        /// <summary>
+        /// 设置或获取分类名称
+        /// </summary>
+        [MaxLength(0)]
+        public string Classify_Name { get; set; }
+        /// <summary>
+        /// 设置或获取字段集合
+        /// </summary>
+        [MaxLength(0)]
+        public List<DbFieldInfo> Fileds { get; set; }
 
     }
 }

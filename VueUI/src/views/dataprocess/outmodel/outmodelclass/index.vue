@@ -22,14 +22,14 @@
       <div class="list-btn-container">
         <el-button-group>
           <el-button
-            v-hasPermi="['Sys_conf_classify/Add']"
+            v-hasPermi="['Sys_outmodel_classify/Add']"
             type="primary"
             icon="el-icon-plus"
             size="small"
             @click="ShowEditOrViewDialog()"
           >新增</el-button>
           <el-button
-            v-hasPermi="['Sys_conf_classify/Edit']"
+            v-hasPermi="['Sys_outmodel_classify/Edit']"
             type="primary"
             icon="el-icon-edit"
             class="el-button-modify"
@@ -37,28 +37,28 @@
             @click="ShowEditOrViewDialog('edit')"
           >修改</el-button>
           <el-button
-            v-hasPermi="['Sys_conf_classify/Enable']"
+            v-hasPermi="['Sys_outmodel_classify/Enable']"
             type="info"
             icon="el-icon-video-pause"
             size="small"
             @click="setEnable('0')"
           >禁用</el-button>
           <el-button
-            v-hasPermi="['Sys_conf_classify/Enable']"
+            v-hasPermi="['Sys_outmodel_classify/Enable']"
             type="success"
             icon="el-icon-video-play"
             size="small"
             @click="setEnable('1')"
           >启用</el-button>
           <el-button
-            v-hasPermi="['Sys_conf_classify/DeleteSoft']"
+            v-hasPermi="['Sys_outmodel_classify/DeleteSoft']"
             type="warning"
             icon="el-icon-delete"
             size="small"
             @click="deleteSoft('0')"
           >软删除</el-button>
           <el-button
-            v-hasPermi="['Sys_conf_classify/Delete']"
+            v-hasPermi="['Sys_outmodel_classify/Delete']"
             type="danger"
             icon="el-icon-delete"
             size="small"
@@ -136,12 +136,13 @@
 <script>
 
 import {
-  getSys_conf_classifyDetail,
-  saveSys_conf_classify, setSys_conf_classifyEnable, deleteSoftSys_conf_classify,
-    deleteSys_conf_classify, getAllSysConfClassifyTreeTable
-} from '@/api/dataprocess/sys_conf_classify'
+  getSys_outmodel_classifyDetail,
+  saveSys_outmodel_classify, setSys_outmodel_classifyEnable, deleteSoftSys_outmodel_classify,
+    deleteSys_outmodel_classify, getAlloutModelClassifyTreeTable
+} from '@/api/dataprocess/sys_outmodel_classify'
 
-export default {
+  export default {
+    name: 'outModelClassify',
   data() {
     return {
       searchform: {
@@ -159,6 +160,7 @@ export default {
         order: 'desc',
         sort: 'CreatorTime'
       },
+      sysid: '', //系统ID或数据库ID
       selectedclass: '',
       selectclasses: [],
       dialogEditFormVisible: false,
@@ -189,7 +191,9 @@ export default {
      * 初始化数据
      */
     InitDictItem() {
-
+      if (this.$route.params && this.$route.params.sysid && this.$route.params.sysid !== 'null') {
+        this.sysid = this.$route.params.sysid
+      }
     },
     /**
      * 加载页面table数据
@@ -197,9 +201,11 @@ export default {
     loadTableData: function() {
       this.tableloading = true
       var seachdata = {
-        
+        Filter: {
+          Sysid: this.sysid
+        },
       }
-      getAllSysConfClassifyTreeTable(seachdata).then(res => {
+      getAlloutModelClassifyTreeTable(seachdata).then(res => {
         this.tableData = res.ResData
         this.selectclasses = res.ResData
         this.tableloading = false
@@ -234,7 +240,7 @@ export default {
       }
     },
     bindEditInfo: function() {
-      getSys_conf_classifyDetail(this.currentId).then(res => {
+      getSys_outmodel_classifyDetail(this.currentId).then(res => {
         this.editFrom.ClassCode = res.ResData.ClassCode
         this.editFrom.ClassName = res.ResData.ClassName
         this.editFrom.Description = res.ResData.Description
@@ -253,17 +259,18 @@ export default {
           const data = {
             'Description': this.editFrom.Description,
             'Parentid': this.editFrom.Parentid,
+            'Sysid': this.sysid,
             'SortCode': this.editFrom.SortCode,
             'ClassCode': this.editFrom.ClassCode,
             'ClassName': this.editFrom.ClassName,
             'EnabledMark': this.editFrom.EnabledMark,
             'Id': this.currentId
           }
-          var url = 'Sys_conf_classify/Insert'
+          var url = 'Sys_outmodel_classify/Insert'
           if (this.currentId !== '') {
-            url = 'Sys_conf_classify/Update?id=' + this.currentId
+            url = 'Sys_outmodel_classify/Update?id=' + this.currentId
           }
-          saveSys_conf_classify(data, url).then(res => {
+          saveSys_outmodel_classify(data, url).then(res => {
             if (res.Success) {
               this.$message({
                 message: '恭喜你，操作成功',
@@ -300,7 +307,7 @@ export default {
           Ids: currentIds,
           Flag: val
         }
-        setSys_conf_classifyEnable(data).then(res => {
+        setSys_outmodel_classifyEnable(data).then(res => {
           if (res.Success) {
             this.$message({
               message: '恭喜你，操作成功',
@@ -330,7 +337,7 @@ export default {
           Ids: currentIds,
           Flag: val
         }
-        deleteSoftSys_conf_classify(data).then(res => {
+        deleteSoftSys_outmodel_classify(data).then(res => {
           if (res.Success) {
             this.$message({
               message: '恭喜你，操作成功',
@@ -359,7 +366,7 @@ export default {
         const data = {
           Ids: currentIds
         }
-        deleteSys_conf_classify(data).then(res => {
+        deleteSys_outmodel_classify(data).then(res => {
           if (res.Success) {
             this.$message({
               message: '恭喜你，操作成功',

@@ -464,6 +464,15 @@ namespace Yuebon.Commons.IRepositories
         /// <param name="info">分页实体</param>
         /// <param name="trans">事务对象</param>
         /// <returns>指定对象的集合</returns>
+        Task<List<T>> FindWithCheckPagerAsync(string condition, PagerInfo info,bool checkSql, IDbTransaction trans = null);
+
+        /// <summary>
+        /// 根据条件查询数据库,并返回对象集合(用于分页数据显示)
+        /// </summary>
+        /// <param name="condition">查询的条件</param>
+        /// <param name="info">分页实体</param>
+        /// <param name="trans">事务对象</param>
+        /// <returns>指定对象的集合</returns>
         List<T> FindWithPager(string condition, PagerInfo info, IDbTransaction trans = null);
 
 

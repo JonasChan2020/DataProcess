@@ -12,7 +12,8 @@ export function getSys_outmodelListWithPager(data) {
     data: data,
     baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
   })
-}/**
+}
+/**
    * 获取所有可用的数据输出模型
    */
 export function getAllSys_outmodelList() {

@@ -67,19 +67,17 @@
           >选择主数据库</el-button>
         </el-button-group>
       </div>
-      <el-table
-        ref="gridtable"
-        v-loading="tableloading"
-        :data="tableData"
-        border
-        stripe
-        highlight-current-row
-        style="width: 100%"
-        :default-sort="{prop: 'SortCode', order: 'ascending'}"
-        @select="handleSelectChange"
-        @select-all="handleSelectAllChange"
-        @sort-change="handleSortChange"
-      >
+      <el-table ref="gridtable"
+                v-loading="tableloading"
+                :data="tableData"
+                border
+                stripe
+                highlight-current-row
+                style="width: 100%"
+                :default-sort="{prop: 'SortCode', order: 'ascending'}"
+                @select="handleSelectChange"
+                @select-all="handleSelectAllChange"
+                @sort-change="handleSortChange">
         <el-table-column type="selection" width="30" />
         <el-table-column prop="Syscode" label="系统编码" sortable="custom" width="120" />
         <el-table-column prop="Sysname" label="系统名称" sortable="custom" width="120" />
@@ -94,20 +92,21 @@
           </template>
         </el-table-column>
         <el-table-column prop="Description" label="描述" sortable="custom" width="120" />
-        <el-table-column prop="SortCode" label="排序字段" sortable="custom" width="90" align="center" />
         <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
           <template slot-scope="scope">
             <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="选择" sortable="custom" width="120" align="center">
+        <el-table-column label="数据输入模型" sortable="custom" width="120" align="center">
           <template slot-scope="scope">
-            <el-button
-              type="primary"
-              icon="el-icon-plus"
-              size="small"
-              @click="ChoseSys(scope.row.Id)"
-            >选择</el-button>
+            <el-button type="text" @click="HandleToConfig('input',scope.row.Id)">配置</el-button>
+            <el-tag :type="scope.row.InModelConfiged==true ? 'success' : 'info'" disable-transitions>{{ scope.row.InModelConfiged==true ? "(已配置)" : "(未配置)" }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="数据输出模型" sortable="custom" width="120" align="center">
+          <template slot-scope="scope">
+            <el-button type="text" @click="HandleToConfig('output',scope.row.Id)">配置</el-button>
+            <el-tag :type="scope.row.OutModelConfiged==true ? 'success' : 'info'" disable-transitions>{{ scope.row.OutModelConfiged==true ? "(已配置)" : "(未配置)" }}</el-tag>
           </template>
         </el-table-column>
       </el-table>
@@ -587,6 +586,12 @@ export default {
         this.MDbpagination.pageTotal = res.ResData.TotalItems
         this.tableMDbloading = false
       })
+    },
+    /**
+      * 点击表格按钮跳转配置页面
+      */
+    HandleToConfig: function (viewstr, id ) {
+      this.$router.push({ name: 'ModelConfig', params: { id: id, viewstr: viewstr } })
     },
 
     /**

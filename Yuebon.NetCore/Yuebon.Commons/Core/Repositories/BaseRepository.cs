@@ -616,11 +616,36 @@ namespace Yuebon.Commons.Repositories
         /// </summary>
         /// <param name="condition">查询的条件</param>
         /// <param name="info">分页实体</param>
+        /// <param name="fieldToSort">排序字段</param>
+        /// <param name="trans">事务对象</param>
+        /// <returns>指定对象的集合</returns>
+        public virtual async Task<List<T>> FindWithCheckPagerAsync(string condition, PagerInfo info, string fieldToSort,bool checkSql, IDbTransaction trans = null)
+        {
+            return await FindWithCheckPagerAsync(condition, info, fieldToSort, this.isDescending, checkSql, trans);
+        }
+
+        /// <summary>
+        /// 根据条件查询数据库,并返回对象集合(用于分页数据显示)
+        /// </summary>
+        /// <param name="condition">查询的条件</param>
+        /// <param name="info">分页实体</param>
         /// <param name="trans">事务对象</param>
         /// <returns>指定对象的集合</returns>
         public virtual async Task<List<T>> FindWithPagerAsync(string condition, PagerInfo info, IDbTransaction trans = null)
         {
             return await FindWithPagerAsync(condition, info, this.SortField, trans);
+        }
+
+        /// <summary>
+        /// 根据条件查询数据库,并返回对象集合(用于分页数据显示)
+        /// </summary>
+        /// <param name="condition">查询的条件</param>
+        /// <param name="info">分页实体</param>
+        /// <param name="trans">事务对象</param>
+        /// <returns>指定对象的集合</returns>
+        public virtual async Task<List<T>> FindWithCheckPagerAsync(string condition, PagerInfo info,bool checkSql, IDbTransaction trans = null)
+        {
+            return await FindWithCheckPagerAsync(condition, info, this.SortField,checkSql, trans);
         }
         /// <summary>
         /// 根据条件查询数据库,并返回对象集合(用于分页数据显示)
@@ -673,6 +698,43 @@ namespace Yuebon.Commons.Repositories
             {
                 Log4NetHelper.Info(string.Format("检测出SQL注入的恶意数据, {0}", condition));
                 throw new Exception("检测出SQL注入的恶意数据");
+            }
+            if (string.IsNullOrEmpty(condition))
+            {
+                condition = "1=1";
+            }
+
+            PagerHelper pagerHelper = new PagerHelper(this.tableName, this.selectedFields, fieldToSort, info.PageSize, info.CurrenetPageIndex, desc, condition);
+
+            string pageSql = pagerHelper.GetPagingSql(true, this.dbConfigName);
+            pageSql += ";" + pagerHelper.GetPagingSql(false, this.dbConfigName);
+
+            var reader = await DapperConn.QueryMultipleAsync(pageSql);
+            info.RecordCount = reader.ReadFirst<int>();
+            list = reader.Read<T>().AsList();
+            return list;
+        }
+
+        /// <summary>
+        /// 根据条件查询数据库,并返回对象集合(用于分页数据显示)
+        /// </summary>
+        /// <param name="condition">查询的条件</param>
+        /// <param name="info">分页实体</param>
+        /// <param name="fieldToSort">排序字段</param>
+        /// <param name="desc">排序方式 true为desc，false为asc</param>
+        /// <param name="trans">事务对象</param>
+        /// <returns>指定对象的集合</returns>
+        public virtual async Task<List<T>> FindWithCheckPagerAsync(string condition, PagerInfo info, string fieldToSort, bool desc,bool checkSql, IDbTransaction trans = null)
+        {
+
+            List<T> list = new List<T>();
+            if (checkSql)
+            {
+                if (HasInjectionData(condition))
+                {
+                    Log4NetHelper.Info(string.Format("检测出SQL注入的恶意数据, {0}", condition));
+                    throw new Exception("检测出SQL注入的恶意数据");
+                }
             }
             if (string.IsNullOrEmpty(condition))
             {

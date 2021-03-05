@@ -52,7 +52,11 @@ namespace Yuebon.DataProcess.Services
             {
                 where += string.Format(" and sysid = '{0}'", search.Filter.Sysid);
             }
-            List<Sys_conf> list = await repository.FindWithPagerAsync(where, pagerInfo);
+            if (search.Filter != null && !string.IsNullOrEmpty(search.Filter.Classify_id))
+            {
+                where += string.Format(" and Classify_id in (select id from dp_sys_conf_classify where levelpath like '%{0}%' )", search.Filter.Classify_id);
+            }
+            List<Sys_conf> list = await repository.FindWithCheckPagerAsync(where, pagerInfo,false);
             List<Sys_confOutputDto> resultList = list.MapTo<Sys_confOutputDto>();
             List<Sys_confOutputDto> listResult = new List<Sys_confOutputDto>();
             foreach (Sys_confOutputDto item in resultList)

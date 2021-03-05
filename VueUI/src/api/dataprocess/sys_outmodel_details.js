@@ -46,6 +46,17 @@ export function getSys_outmodel_detailsDetail(id) {
   })
 }
 /**
+   * 获取所有可用的
+   */
+export function getAllEnableByConfId(data) {
+  return http.request({
+    url: 'Sys_conf_details/GetAllEnableByConfId',
+    data: data,
+    method: 'post',
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
+/**
    * 批量设置启用状态
    * @param {id集合} ids
    */

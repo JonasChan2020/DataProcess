@@ -5,6 +5,14 @@ using Yuebon.Commons.Helpers;
 using Yuebon.DataProcess.Dtos;
 using Yuebon.DataProcess.Models;
 using Yuebon.DataProcess.IServices;
+using Yuebon.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using Yuebon.Commons.Dtos;
+using Yuebon.Commons.Models;
+using System.Collections.Generic;
+using System.Linq;
+using Yuebon.AspNetCore.Models;
+using Yuebon.Commons.Mapping;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -68,5 +76,28 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             info.DeleteTime = DateTime.Now;
             info.DeleteUserId = CurrentUser.UserId;
         }
+
+        /// <summary>
+        /// 获取所有可用的
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("GetAllEnableByConfId")]
+        [YuebonAuthorize("List")]
+        public async Task<IActionResult> GetAllEnableByConfId(SearchInputDto<Sys_outmodel_details> search)
+        {
+            CommonResult<List<Sys_conf_detailsOutputDto>> result = new CommonResult<List<Sys_conf_detailsOutputDto>>();
+            if (search.Filter == null)
+            {
+                search.Filter = new Sys_outmodel_details();
+            }
+            IEnumerable<Sys_outmodel_details> list = await iService.GetAllByIsNotDeleteAndEnabledMarkAsync(string.Format(" sys_outmodel_id='{0}'", search.Filter.Sys_outmodel_id));
+            List<Sys_outmodel_detailsOutputDto> resultList = list.MapTo<Sys_outmodel_detailsOutputDto>();
+            resultList = resultList.OrderBy(x => x.Levelnum).ToList();
+            result.ResData = resultList;
+            result.ErrCode = ErrCode.successCode;
+            result.ErrMsg = ErrCode.err0;
+
+            return ToJsonContent(result);
+        } 
     }
 }
