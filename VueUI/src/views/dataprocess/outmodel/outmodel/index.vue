@@ -243,28 +243,34 @@
                        :value="item.TableName" />
           </el-select>
         </el-form-item>
-        <el-form-item v-for="(domain, index) in dynamicFiterForm"
+        <el-button @click.prevent="addStartDomain()" type="text" v-if="editMiddleFrom.dynamicFiterForm==null||editMiddleFrom.dynamicFiterForm.length==0">添加</el-button>
+        <el-button @click.prevent="addStartDomainKh()" type="text" v-if="editMiddleFrom.dynamicFiterForm==null||editMiddleFrom.dynamicFiterForm.length==0">括号</el-button>
+        <el-form-item v-for="(domain, index) in editMiddleFrom.dynamicFiterForm"
                       :key="index">
-            <el-select v-model="domain.columnName" placeholder="请选择字段" style="width:20%">
-              <el-option v-for="item in SelectColumnNameList"
-                         :key="item.FieldName"
-                         :label="item.FieldName"
-                         :value="item.FieldName" />
-            </el-select>
-            <el-select v-model="domain.rex" placeholder="请选择操作符" style="width:20%">
-              <el-option v-for="item in SelectRexList"
-                         :key="item.Value"
-                         :label="item.Value"
-                         :value="item.Value" />
-            </el-select>
-            <el-input v-model="domain.value" style="width:20%"></el-input>
-              <el-select v-model="domain.aon" placeholder="请选择连接符" style="width:10%">
-                <el-option v-for="item in SelectaonList"
-                           :key="item.Value"
-                           :label="item.Value"
-                           :value="item.Value" />
-              </el-select>
-            <el-button @click.prevent="removeDomain(domain)" width="50">删除</el-button><el-button @click.prevent="addDomain(domain)" width="50">添加</el-button>
+          <el-tag v-if="domain.KhType==0" effect="dark" :type="domain.type">(</el-tag>
+          <el-tag v-if="domain.KhType==1" effect="dark" :type="domain.type">)</el-tag>
+          <el-select v-model="domain.columnName" placeholder="请选择字段" style="width:20%" v-if="(domain.KhType==-1)">
+            <el-option v-for="item in SelectColumnNameList"
+                       :key="item.FieldName"
+                       :label="item.FieldName"
+                       :value="item.FieldName" />
+          </el-select>
+          <el-select v-model="domain.rex" placeholder="请选择操作符" style="width:20%" v-if="(domain.KhType==-1)">
+            <el-option v-for="item in SelectRexList"
+                       :key="item"
+                       :label="item"
+                       :value="item" />
+          </el-select>
+          <el-input v-model="domain.value" style="width:20%" v-if="(domain.KhType==-1)"></el-input>
+          <el-select v-model="domain.aon" placeholder="请选择连接符" style="width:15%" v-if="(domain.KhType!=0)">
+            <el-option v-for="item in SelectaonList"
+                       :key="item"
+                       :label="item"
+                       :value="item" />
+          </el-select>
+          <el-button @click.prevent="removeDomain(domain)" type="text">删除</el-button>
+          <el-button @click.prevent="addDomain(domain)" type="text" v-if="domain.showBtn==true&&domain.KhType!=0">添加</el-button>
+          <el-button @click.prevent="addDomainKh(domain)" type="text" v-if="domain.showBtn==true&&domain.KhType!=0">括号</el-button>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -286,7 +292,7 @@ import {
   getAlloutModelClassifyTreeTable
   } from '@/api/dataprocess/sys_outmodel_classify'
 import {
-    getAllEnableByConfId
+    getSys_outmodel_detailsDetail, saveSys_outmodel_details, getAllEnableByConfId
   } from '@/api/dataprocess/sys_outmodel_details'
   import {
     getTbNameList
@@ -337,7 +343,7 @@ import {
       editMiddleFormTitle: '',
       editMiddleFrom: {
         Tbname: '',
-
+        dynamicFiterForm: [],
 
       },
       Middlerules: {
@@ -348,13 +354,38 @@ import {
       currentMiddleSelected: [],
       SelectTbnameList: [],
       SelectColumnNameList: [], //字段下拉框数据
-      SelectRexList: [], //操作符下拉框数据
-      SelectaonList:[], //连接符下拉框数据
-      dynamicFiterForm: [{
-        columnName: '', //字段名称
-        rex: '', //操作符
-        value: '' //值
-      }],
+      SelectRexList: [
+        '=',
+        '!=',
+        '<',
+        '<=',
+        '>',
+        '>=',
+        '包含',
+        '不包含',
+        '开始以',
+        '开始不是以',
+        '结束以',
+        '结束不是以',
+        '是null',
+        '不是null',
+        '是空',
+        '不是空',
+        '介于',
+        '不介于',
+      ], //操作符下拉框数据
+      SelectaonList: [
+        'and',
+        'or',
+      ], //连接符下拉框数据
+      
+      tagType: [
+        '',
+        'success',
+        'info',
+        'danger',
+        'warning',
+      ],
       tableRightData: [],
       dialogRightEditFormVisible: false,
       editRighteFormTitle: '',
@@ -621,7 +652,16 @@ import {
    * 加载详情页面table数据
    */
     loadMiddleTableData: function () {
-      
+      this.tableloading = true
+      var seachdata = {
+        Filter: {
+          Sys_outmodel_id: this.currentId,
+        },
+      }
+      getAllEnableByConfId(seachdata).then(res => {
+        this.tableMiddleData = res.ResData
+        this.tableloading = false
+      })
     },
 
     /**
@@ -636,26 +676,74 @@ import {
           }
           this.SelectTbnameList = SelectTbnameListInfo
         })
-        this.dialogMiddleEditFormVisible = true
+        if (view == 'edit') {
+          if (this.currentMiddleSelected.length > 1 || this.currentMiddleSelected.length === 0) {
+            this.$alert('请选择一条数据进行编辑/修改', '提示')
+          } else {
+            this.currentMiddleId = this.currentMiddleSelected[0].Id
+            this.editMiddleFormTitle = '编辑'
+            this.dialogMiddleEditFormVisible = true
+            this.bindMiddleEditInfo()
+          }
+        } else {
+          this.editMiddleFormTitle = '新增'
+          this.currentMiddleId = ''
+          this.editMiddleFrom.dynamicFiterForm = null
+          this.dialogMiddleEditFormVisible = true
+          this.$refs['editMiddleFrom'].resetFields()
+        }
       } else {
         this.$alert('请先在左侧列表中选择一个模型', '提示')
       }
+    },
+    bindMiddleEditInfo: function () {
+      getSys_outmodel_detailsDetail(this.currentMiddleId).then(res => {
+        this.editMiddleFrom.Tbname = res.ResData.Tbname
+        this.editMiddleFrom.dynamicFiterForm = JSON.parse(res.ResData.Fiterstr)
+      })
     },
     /**
    * 新增/修改保存
    */
     saveMiddleEditForm() {
-      
+      this.$refs['editMiddleFrom'].validate((valid) => {
+        if (valid) {
+          const data = {
+            'Tbname': this.editMiddleFrom.Tbname,
+            'Fiterstr': JSON.stringify(this.editMiddleFrom.dynamicFiterForm),
+            'Sys_outmodel_id': this.currentId,
+            'Id': this.currentMiddleId,
+          }
+
+          var url = 'Sys_outmodel_details/Insert'
+          if (this.currentMiddleId !== '') {
+            url = 'Sys_outmodel_details/Update?id=' + this.currentMiddleId
+          }
+          saveSys_outmodel_details(data, url).then(res => {
+            if (res.Success) {
+              this.$message({
+                message: '恭喜你，操作成功',
+                type: 'success'
+              })
+              this.dialogMiddleEditFormVisible = false
+              this.$refs['editMiddleFrom'].resetFields()
+              this.loadMiddleTableData()
+            } else {
+              this.$message({
+                message: res.ErrMsg,
+                type: 'error'
+              })
+            }
+          })
+        } else {
+          return false
+        }
+      })
     },
     closeMiddleEditForm() {
       this.dialogMiddleEditFormVisible = false
       this.$refs['editMiddleFrom'].resetFields()
-      this.dynamicFiterForm= [{
-        columnName: '', //字段名称
-        rex: '', //操作符
-        value: '' //值
-      }]
-
+      //this.editMiddleFrom.dynamicFiterForm= []
     },
     deleteMiddlePhysics: function () {
       
@@ -684,17 +772,205 @@ import {
       this.SelectColumnNameList = res[0].Fileds
     },
     removeDomain(item) {
-      var index = this.dynamicFiterForm.indexOf(item)
+      var index = this.editMiddleFrom.dynamicFiterForm.indexOf(item)
       if (index !== -1) {
-        this.dynamicFiterForm.splice(index, 1)
+        if (item.KhType != -1) { //如果是括号
+          var startkh;
+          var endkh;
+          var children = this.editMiddleFrom.dynamicFiterForm.filter(tmp => tmp.InKhIndex == item.Kh && tmp.KhType == 0)
+          children.forEach(tmp => {
+            this.removeDomain(tmp) //删掉整个括号
+          })
+          if (item.KhType == 0) {
+            startkh = item
+            endkh = this.editMiddleFrom.dynamicFiterForm.filter(tmp => tmp.Kh == item.Kh && tmp.KhType == 1)[0]
+          } else {
+            startkh = this.editMiddleFrom.dynamicFiterForm.filter(tmp => tmp.Kh == item.Kh && tmp.KhType == 0)[0]
+            endkh = item
+          }
+          var startindex = this.editMiddleFrom.dynamicFiterForm.indexOf(startkh)
+          var endindex = this.editMiddleFrom.dynamicFiterForm.indexOf(endkh)
+          if (startindex != 0) {
+            if (this.editMiddleFrom.dynamicFiterForm[startindex - 1].KhType == 0 && this.editMiddleFrom.dynamicFiterForm[endindex + 1].KhType == 1) { //括号外层也是括号
+              var upstartkh = this.editMiddleFrom.dynamicFiterForm[startindex - 1]
+              this.editMiddleFrom.dynamicFiterForm = this.editMiddleFrom.dynamicFiterForm.filter(tmp => tmp.Kh != item.Kh)
+              this.removeDomain(upstartkh) //删掉上层括号
+            } else {
+              this.editMiddleFrom.dynamicFiterForm = this.editMiddleFrom.dynamicFiterForm.filter(tmp => tmp.Kh != item.Kh)
+            }
+          } else {
+            this.editMiddleFrom.dynamicFiterForm = this.editMiddleFrom.dynamicFiterForm.filter(tmp => tmp.Kh != item.Kh)
+          }
+
+
+        } else {
+          if (this.editMiddleFrom.dynamicFiterForm[index - 1].KhType == 0) { //如果上一个是左括号，则删除整个括号，并更新括号序号
+            if (this.editMiddleFrom.dynamicFiterForm[index + 1].KhType == 1) { //如果下一个是右括号，则证明括号内无数据了。
+              this.removeDomain(this.editMiddleFrom.dynamicFiterForm[index - 1]) //删掉整个括号
+            } else {
+              this.editMiddleFrom.dynamicFiterForm.splice(index, 1)
+            }
+          } else {
+            this.editMiddleFrom.dynamicFiterForm.splice(index, 1)
+          }
+        }
       }
     },
-    addDomain() {
-      this.dynamicFiterForm.push({
+    addDomain(item) {
+      var index = this.editMiddleFrom.dynamicFiterForm.indexOf(item)
+      if (item.InKhIndex >= 0) { //括号内，需要插入
+        this.editMiddleFrom.dynamicFiterForm.splice(index+1,0,{
+          columnName: '', //字段名称
+          rex: '', //操作符
+          value: '', //值
+          Kh: item.InKhIndex, //括号序号 从1开始
+          KhType: -1, //括号类型，0是起始，1是结束
+          InKhIndex: item.InKhIndex, //属于第几个括号内
+          NextKhIndex: item.NextKhIndex,
+          type: '',
+          showBtn: true, //是否显示按钮
+        })
+      } else { //括号外，直接新增
+        this.editMiddleFrom.dynamicFiterForm.push({
+          columnName: '', //字段名称
+          rex: '', //操作符
+          value: '', //值
+          Kh: item.InKhIndex, //括号序号 从1开始
+          KhType: -1, //括号类型，0是起始，1是结束
+          InKhIndex: item.InKhIndex, //属于第几个括号内
+          NextKhIndex: item.NextKhIndex,
+          type: '',
+          showBtn: true, //是否显示按钮
+        })
+      }
+      
+    },
+    addDomainKh(item) {
+      var index = this.editMiddleFrom.dynamicFiterForm.indexOf(item)
+      if (item.InKhIndex >= 0) { //括号内，需要插入
+        this.editMiddleFrom.dynamicFiterForm.splice(index + 1, 0, { //加左括号
+          columnName: '', //字段名称
+          rex: '', //操作符
+          value: '', //值
+          Kh: item.NextKhIndex, //括号序号 从1开始
+          KhType: 0, //括号类型，0是起始，1是结束
+          InKhIndex: item.InKhIndex, //属于第几个括号内
+          NextKhIndex: item.NextKhIndex + 1,
+          type: this.tagType[item.NextKhIndex %5],
+          showBtn: false, //是否显示按钮
+        })
+        this.editMiddleFrom.dynamicFiterForm.splice(index + 2, 0, { //加数据
+          columnName: '', //字段名称
+          rex: '', //操作符
+          value: '', //值
+          Kh: item.NextKhIndex, //括号序号 从1开始
+          KhType: -1, //括号类型，0是起始，1是结束
+          InKhIndex: item.NextKhIndex, //属于第几个括号内
+          NextKhIndex: item.NextKhIndex + 1,
+          type: '',
+          showBtn: true, //是否显示按钮
+        })
+        this.editMiddleFrom.dynamicFiterForm.splice(index + 3, 0, { //加右括号
+          columnName: '', //字段名称
+          rex: '', //操作符
+          value: '', //值
+          Kh: item.NextKhIndex, //括号序号 从1开始
+          KhType: 1, //括号类型，0是起始，1是结束
+          InKhIndex: item.InKhIndex, //属于第几个括号内
+          NextKhIndex: item.NextKhIndex + 1,
+          type: this.tagType[item.NextKhIndex % 5],
+          showBtn: true, //是否显示按钮
+        })
+      } else { //括号外，直接新增
+        this.editMiddleFrom.dynamicFiterForm.push({ //加左括号
+          columnName: '', //字段名称
+          rex: '', //操作符
+          value: '', //值
+          Kh: item.NextKhIndex, //括号序号 从1开始
+          KhType: 0, //括号类型，0是起始，1是结束
+          InKhIndex: item.InKhIndex, //属于第几个括号内
+          NextKhIndex: item.NextKhIndex + 1,
+          type: '',
+          showBtn: false, //是否显示按钮
+        })
+        this.editMiddleFrom.dynamicFiterForm.push({ //加数据
+          columnName: '', //字段名称
+          rex: '', //操作符
+          value: '', //值
+          Kh: item.NextKhIndex, //括号序号 从1开始
+          KhType: -1, //括号类型，0是起始，1是结束
+          InKhIndex: item.NextKhIndex, //属于第几个括号内
+          NextKhIndex: item.NextKhIndex + 1,
+          type: '',
+          showBtn: true, //是否显示按钮
+        })
+        this.editMiddleFrom.dynamicFiterForm.push({ //加右括号
+          columnName: '', //字段名称
+          rex: '', //操作符
+          value: '', //值
+          Kh: item.NextKhIndex, //括号序号 从1开始
+          KhType: 1, //括号类型，0是起始，1是结束
+          InKhIndex: item.InKhIndex, //属于第几个括号内
+          NextKhIndex: item.NextKhIndex + 1,
+          type: '',
+          showBtn: true, //是否显示按钮
+        })
+      }
+      //更新下一个括号Index
+      this.editMiddleFrom.dynamicFiterForm.forEach(tmp => {
+        tmp.NextKhIndex = item.NextKhIndex + 1
+      })
+
+    },
+    addStartDomain() {
+      this.editMiddleFrom.dynamicFiterForm=[{
         columnName: '', //字段名称
         rex: '', //操作符
-        value: '' //值
-      });
+        value: '', //值
+        Kh: -1, //括号序号 从1开始
+        KhType: -1, //括号类型，0是起始，1是结束
+        InKhIndex: -1, //属于第几个括号内
+        NextKhIndex: 0,
+        type: '',
+        showBtn: true, //是否显示按钮
+      }]
+
+    },
+    addStartDomainKh() {
+      this.editMiddleFrom.dynamicFiterForm=[{ //加左括号
+        columnName: '', //字段名称
+        rex: '', //操作符
+        value: '', //值
+        Kh: 0, //括号序号 从0开始
+        KhType: 0, //括号类型，0是起始，1是结束
+        InKhIndex: -1, //属于第几个括号内
+        NextKhIndex: 1,
+        type: '',
+        showBtn: false, //是否显示按钮
+      }]
+      this.editMiddleFrom.dynamicFiterForm.push({ //加数据
+        columnName: '', //字段名称
+        rex: '', //操作符
+        value: '', //值
+        Kh: 0, //括号序号 从1开始
+        KhType: -1, //括号类型，0是起始，1是结束
+        InKhIndex: 0, //属于第几个括号内
+        NextKhIndex: 1,
+        type: '',
+        showBtn: true, //是否显示按钮
+      })
+      this.editMiddleFrom.dynamicFiterForm.push({ //加右括号
+        columnName: '', //字段名称
+        rex: '', //操作符
+        value: '', //值
+        Kh: 0, //括号序号 从1开始
+        KhType: 1, //括号类型，0是起始，1是结束
+        InKhIndex: -1, //属于第几个括号内
+        NextKhIndex: 1,
+        type: '',
+        showBtn: true, //是否显示按钮
+      })
+
     },
 
     /**
