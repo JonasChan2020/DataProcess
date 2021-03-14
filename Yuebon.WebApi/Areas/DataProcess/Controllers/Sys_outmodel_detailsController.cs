@@ -16,6 +16,9 @@ using Yuebon.Commons.Mapping;
 using Yuebon.Commons.Core.Dtos;
 using System.Reflection;
 using Yuebon.Commons.Extensions;
+using Yuebon.DataProcess.Core.OutSideDbService.Entity;
+using Newtonsoft.Json;
+using Yuebon.DataProcess.Core.common;
 
 namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 {
@@ -26,13 +29,22 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
     [Route("api/DataProcess/[controller]")]
     public class Sys_outmodel_detailsController : AreaApiController<Sys_outmodel_details, Sys_outmodel_detailsOutputDto,Sys_outmodel_detailsInputDto,ISys_outmodel_detailsService,string>
     {
+        private ISys_sysService SysService;
+        private ISd_sysdbService SdService;
+        private ISd_detailService SdDetailService;
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="_iService"></param>
-        public Sys_outmodel_detailsController(ISys_outmodel_detailsService _iService) : base(_iService)
+        /// <param name="_SysService"></param>
+        /// <param name="_SdService"></param>
+        /// <param name="_SdDetailService"></param>
+        public Sys_outmodel_detailsController(ISys_outmodel_detailsService _iService, ISys_sysService _SysService, ISd_sysdbService _SdService, ISd_detailService _SdDetailService) : base(_iService)
         {
             iService = _iService;
+            SysService = _SysService;
+            SdService = _SdService;
+            SdDetailService = _SdDetailService;
             AuthorizeKey.ListKey = "Sys_outmodel_details/List";
             AuthorizeKey.InsertKey = "Sys_outmodel_details/Add";
             AuthorizeKey.UpdateKey = "Sys_outmodel_details/Edit";
@@ -103,6 +115,79 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
 
             return ToJsonContent(result);
         }
+
+        /// <summary>
+        /// 获取所有表
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("GetOutTbNameList")]
+        [YuebonAuthorize("List")]
+        public IActionResult GetOutTbNameList([FromBody] dynamic formData)
+        {
+            CommonResult<List<DbTableInfo>> result = new CommonResult<List<DbTableInfo>>();
+            string dataStr = formData.ToString();
+            var paramsObj = new { SysId = "",outModelId="" };
+            paramsObj = JsonConvert.DeserializeAnonymousType(dataStr, paramsObj);
+            if (!string.IsNullOrEmpty(paramsObj.SysId))
+            {
+                Sys_sys sysModel = SysService.Get(paramsObj.SysId);
+                if (sysModel != null)
+                {
+                    Sd_sysdb dbModel = SdService.Get(sysModel.MdbId);
+                    if (dbModel != null)
+                    {
+                        Sd_detail sdDetailModel = SdDetailService.GetWhere(string.Format(" sd_id = '{0}'", dbModel.Id));
+                        List<DbTableInfo> tbList = sdDetailModel.Tbs.ToObject<List<DbTableInfo>>();
+
+                        #region 获取并返回输出模型详情中的表
+                        if (!string.IsNullOrEmpty(paramsObj.outModelId))
+                        {
+                            List<Sys_outmodel_details> outModelDetailList = iService.GetListWhere(string.Format(" sys_outmodel_id = '{0}'", paramsObj.outModelId)).ToList();
+                            List<Sys_outmodel_detailsOutputDto> outDetailList = outModelDetailList.MapTo<Sys_outmodel_detailsOutputDto>();
+                            foreach (Sys_outmodel_detailsOutputDto item in outDetailList)
+                            {
+                                
+                                DbTableInfo tmpTbModel = tbList.Find(x => x.TableName == item.Tbname);
+                                if (tmpTbModel != null)
+                                {
+                                    item.Fileds = tmpTbModel.Fileds;
+                                }
+                                #region 修改表名
+                                item.Tbname = item.Levelnum + "." + item.Tbname;
+                                #endregion
+                            }
+                            result.ResData = outDetailList;
+                            result.ErrCode = ErrCode.successCode;
+                            result.ErrMsg = ErrCode.err0;
+                            return ToJsonContent(result);
+                        }
+                        
+                        #endregion
+
+                        result.ResData = tbList;
+                        result.ErrCode = ErrCode.successCode;
+                        result.ErrMsg = ErrCode.err0;
+                    }
+                    else
+                    {
+                        result.ErrCode = ErrCode.err80406;
+                        result.ErrMsg = ErrCode.err80406;
+                    }
+                }
+                else
+                {
+                    result.ErrCode = ErrCode.err80405;
+                    result.ErrMsg = ErrCode.err80405;
+                }
+            }
+            else
+            {
+                result.ErrCode = ErrCode.err1;
+                result.ErrMsg = "未获取到所选系统参数";
+            }
+            return ToJsonContent(result);
+        }
+
         #region 增删改
         /// <summary>
         /// 异步新增数据

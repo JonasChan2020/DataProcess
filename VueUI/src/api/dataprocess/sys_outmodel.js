@@ -14,6 +14,17 @@ export function getSys_outmodelListWithPager(data) {
   })
 }
 /**
+   * 根据条件获取系统与模型的树列表
+   */
+export function getSysAndOutModelTree(data) {
+  return http.request({
+    url: 'Sys_outmodel/GetSysAndOutModelTree',
+    method: 'post',
+    data: data,
+    baseURL: defaultSettings.apiDataProcessUrl // 直接通过覆盖的方式
+  })
+}
+/**
    * 获取所有可用的数据输出模型
    */
 export function getAllSys_outmodelList() {

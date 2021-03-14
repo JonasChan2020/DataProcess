@@ -31,6 +31,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         private readonly ISys_confService sysconfService;
         private readonly ISys_conf_finalconfService scfService;
         private readonly IConf_confService confService;
+        private readonly ISys_outmodel_sqlService sysOutModelSqlService;
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -40,7 +41,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// <param name="_detailService"></param>
         /// <param name="_sysconfService"></param>
         /// <param name="_sysService"></param>
-        public Conf_detailController(IConf_detailService _iService, IConf_confService _confService, ISd_sysdbService _sdService, ISd_detailService _detailService, ISys_confService _sysconfService, ISys_conf_finalconfService _scfService, ISys_sysService _sysService) : base(_iService)
+        public Conf_detailController(IConf_detailService _iService, IConf_confService _confService, ISd_sysdbService _sdService, ISd_detailService _detailService, ISys_confService _sysconfService, ISys_conf_finalconfService _scfService, ISys_sysService _sysService, ISys_outmodel_sqlService _sysOutModelSqlService) : base(_iService)
         {
             iService = _iService;
             sdService = _sdService;
@@ -49,6 +50,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             sysconfService = _sysconfService;
             scfService = _scfService;
             confService = _confService;
+            sysOutModelSqlService = _sysOutModelSqlService;
             AuthorizeKey.ListKey = "Conf_detail/List";
             AuthorizeKey.InsertKey = "Conf_detail/Add";
             AuthorizeKey.UpdateKey = "Conf_detail/Edit";
@@ -98,21 +100,27 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             List<DbFieldInfo> sourceFields = new List<DbFieldInfo>(); //源字段集合
             List<DbFieldInfo> finFields = new List<DbFieldInfo>(); //目标字段集合
             string sysid = "";
+            string confDetailId = "";
             if (!string.IsNullOrEmpty(search.Pkey))
             {
                 Conf_conf confModel = confService.Get(search.Pkey);
                 if (confModel != null)
                 {
-                    #region 获取源表信息
+                    #region 获取读取表信息
                     if (confModel.ConfFromType == 0) //系统
                     {
-                        Sys_sys sysModel = sysService.Get(confModel.FromParentId);
-                        Sys_conf sysconfModel = sysconfService.Get(confModel.FromId);
-                        Sys_confOutputDto outsysconfModel = sysconfModel.MapTo<Sys_confOutputDto>();
-                        Sys_conf_finalconf scfModel = scfService.GetWhere(string.Format("sys_conf_id='{0}'", sysconfModel.Id));
-                        if (outsysconfModel != null)
+                        //Sys_sys sysModel = sysService.Get(confModel.FromParentId);
+                        Sys_outmodel_sql sysOutModelSqlModel = sysOutModelSqlService.GetWhere(string.Format(" sys_outmodel_id='{0}'", confModel.FromId));
+                        if (sysOutModelSqlModel != null&& !string.IsNullOrEmpty(sysOutModelSqlModel.Sqlstr))
                         {
-                            sourceFields = scfModel.ConfJson.ToObject<List<DbFieldInfo>>();
+                            List<SysOutModelSqlEntity> outSqlModelList = sysOutModelSqlModel.Sqlstr.ToObject<List<SysOutModelSqlEntity>>();
+                            foreach (SysOutModelSqlEntity item in outSqlModelList)
+                            {
+                                DbFieldInfo tmpModel = new DbFieldInfo();
+                                tmpModel.FieldName = item.Tbname + "." + item.ColumnCode;
+                                tmpModel.Description = item.ColumnName;
+                                sourceFields.Add(tmpModel);
+                            }
                         }
                         else
                         {
@@ -147,11 +155,10 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                     }
                     #endregion
 
-
-                    #region 获取目标表信息
+                    #region 获取写入表信息
                     if (confModel.ConfToType == 0) //系统
                     {
-                        Sys_sys sysModel = sysService.Get(confModel.ToParentId);
+                        //Sys_sys sysModel = sysService.Get(confModel.ToParentId);
                         Sys_conf sysconfModel = sysconfService.Get(confModel.ToId);
                         Sys_confOutputDto outsysconfModel = sysconfModel.MapTo<Sys_confOutputDto>();
                         Sys_conf_finalconf scfModel = scfService.GetWhere(string.Format("sys_conf_id='{0}'",sysconfModel.Id));
@@ -193,6 +200,36 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                     sysid = confModel.ToParentId;
                     #endregion
 
+                    #region 获取此关联配置详情
+                    Conf_detail confDetailModel = iService.GetWhere(string.Format(" conf_id='{0}'", confModel.Id));
+                    if (confDetailModel != null && !string.IsNullOrEmpty(confDetailModel.ConfStr))
+                    {
+                        confDetailId = confDetailModel.Id;
+                        List<DbFieldInfo> dbFieldList = confDetailModel.ConfStr.ToObject<List<DbFieldInfo>>();
+                        if (dbFieldList != null && dbFieldList.Count > 0)
+                        {
+                            foreach (DbFieldInfo item in finFields)
+                            {
+                                DbFieldInfo itemConfig = dbFieldList.Find(x =>
+                                      x.TableLevelNum == item.TableLevelNum &&
+                                      x.WriteTableName == item.WriteTableName &&
+                                      x.FieldName == item.FieldName &&
+                                      (
+                                          (x.ReadFieldInfo != null && !string.IsNullOrEmpty(x.ReadFieldInfo.FieldName)) || !string.IsNullOrEmpty(x.DefaultValue)
+                                      )
+                                  );
+                                if (itemConfig != null)
+                                {
+                                    item.ReadFieldInfo = itemConfig.ReadFieldInfo;
+                                    item.DefaultValue = itemConfig.DefaultValue;
+                                    item.Is_DynamicSingle = itemConfig.Is_DynamicSingle;
+                                    item.SyncDataConfParamter = itemConfig.SyncDataConfParamter;
+                                }
+                            }
+                        }
+                    }
+                    #endregion
+
                 }
                 else
                 {
@@ -209,7 +246,8 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             {
                 sourceFields=sourceFields,
                 finFields = finFields,
-                sysid= sysid
+                sysid= sysid,
+                confDetailId= confDetailId
             };
             result.ResData = resultList;
             result.ErrCode = ErrCode.successCode;

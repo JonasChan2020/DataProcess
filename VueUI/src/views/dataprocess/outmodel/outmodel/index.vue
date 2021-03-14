@@ -52,6 +52,7 @@
                 </el-button-group>
               </div>
               <el-table ref="gridtable"
+                        v-loading="tableloading"
                         :data="tableData"
                         row-key="Id"
                         :height="550"
@@ -64,16 +65,16 @@
                         @select="handleSelectChange"
                         @select-all="handleSelectAllChange"
                         @sort-change="handleSortChange">
-                <el-table-column type="selection" width="30" />
-                <el-table-column prop="Modelcode" label="编码" sortable="custom" width="120" />
-                <el-table-column prop="Modelname" label="名称" sortable="custom" width="120" />
-                <el-table-column prop="Sys_Name" label="所属系统" sortable="custom" width="120" />
-                <el-table-column prop="Classify_id" label="分类" sortable="custom" width="260" align="center">
+                <el-table-column type="selection" width="50" />
+                <el-table-column prop="Modelcode" label="编码" width="100" />
+                <el-table-column prop="Modelname" label="名称"  width="100" />
+                <el-table-column prop="Sys_Name" label="所属系统" width="100" />
+                <el-table-column prop="Classify_id" label="分类"  width="100" align="center">
                   <template slot-scope="scope">
                     {{ scope.row.Classify_Name }}
                   </template>
                 </el-table-column>
-                <el-table-column label="是否启用" sortable="custom" width="120" prop="EnabledMark" align="center">
+                <el-table-column label="是否启用" width="100" prop="EnabledMark" align="center">
                   <template slot-scope="scope">
                     <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
                   </template>
@@ -118,6 +119,7 @@
               </el-button-group>
             </div>
             <el-table ref="gridMiddletable"
+                      v-loading="tableMiddleloading"
                       :data="tableMiddleData"
                       row-key="Id"
                       :height="660"
@@ -130,8 +132,8 @@
                       @select="handleMiddleSelectChange"
                       @select-all="handleMiddleSelectAllChange">
               <el-table-column type="selection" width="30" />
-              <el-table-column prop="Levelnum" label="顺序" sortable="custom" width="80" />
-              <el-table-column prop="Tbname" label="表名" sortable="custom" width="200" />
+              <el-table-column prop="Levelnum" label="顺序"  min-width="20%" />
+              <el-table-column prop="Tbname" label="表名" min-width="80%" />
             </el-table>
           </div>
         </el-card>
@@ -141,26 +143,17 @@
           <div class="grid-content bg-purple">
             <div class="list-btn-container">
               <el-button-group>
-                <el-button v-hasPermi="['Sys_outmodel_details/Add']"
-                           type="primary"
-                           icon="el-icon-plus"
-                           size="small"
-                           @click="ShowRightDialog('add')">新增</el-button>
                 <el-button v-hasPermi="['Sys_outmodel_details/Edit']"
                            type="primary"
                            icon="el-icon-edit"
                            class="el-button-modify"
                            size="small"
-                           @click="ShowRightDialog('edit')">修改</el-button>
-                <el-button v-hasPermi="['Sys_outmodel_details/DeleteSoft']"
-                           type="warning"
-                           icon="el-icon-delete"
-                           size="small"
-                           @click="deleteRightPhysics('0')">删除</el-button>
+                           @click="ShowRightDialog()">修改</el-button>
                 <el-button type="default" icon="el-icon-refresh" size="small" @click="loadRightTableData()">刷新</el-button>
               </el-button-group>
             </div>
             <el-table ref="gridRighttable"
+                      v-loading="tableRightloading"
                       :data="tableRightData"
                       row-key="Id"
                       :height="660"
@@ -169,28 +162,13 @@
                       stripe
                       highlight-current-row
                       style="width: 100%;margin-bottom: 20px;"
-                      :default-sort="{prop: 'Levelnum', order: 'ascending'}"
-                      @select="handleRightSelectChange"
-                      @select-all="handleRightSelectAllChange">
-              <el-table-column type="selection" width="30" />
-              <el-table-column prop="Levelnum" label="顺序" sortable="custom" width="80" />
-              <el-table-column prop="Tbname" label="表名" sortable="custom" width="120" />
-              <el-table-column label="动态表" sortable="custom" width="100" prop="Is_dynamic" align="center">
+                      :default-sort="{prop: 'Levelnum', order: 'ascending'}">
+              <el-table-column prop="ColumnName" label="模型字段" min-width="40%" />
+              <el-table-column label="数据库字段" min-width="60%">
                 <template slot-scope="scope">
-                  <el-tag :type="scope.row.Is_dynamic === true ? 'success' : 'info'" disable-transitions>{{ scope.row.Is_dynamic === true ? "是" : "否" }}</el-tag>
+                  {{ scope.row.Tbname+'.'+ scope.row.ColumnCode}}
                 </template>
               </el-table-column>
-              <el-table-column label="标识表" sortable="custom" width="100" prop="Is_flag" align="center">
-                <template slot-scope="scope">
-                  <el-tag :type="scope.row.Is_flag === true ? 'success' : 'info'" disable-transitions>{{ scope.row.Is_flag === true ? "是" : "否" }}</el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column label="启用" sortable="custom" width="100" prop="EnabledMark" align="center">
-                <template slot-scope="scope">
-                  <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
-                </template>
-              </el-table-column>
-
             </el-table>
           </div>
         </el-card>
@@ -278,6 +256,72 @@
         <el-button type="primary" @click="saveMiddleEditForm()">确 定</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog ref="dialogRightEditForm"
+               :close-on-click-modal="false"
+               :show-close="false"
+               :title="editRighteFormTitle+'数据输出模型'"
+               :visible.sync="dialogRightEditFormVisible"
+               width="640px">
+      <div class="grid-content bg-purple">
+        <div class="list-btn-container">
+          <el-button-group>
+            <el-button 
+                       type="primary"
+                       icon="el-icon-plus"
+                       size="small"
+                       @click="AddRightDetail()">新增</el-button>
+            <el-button
+                       type="warning"
+                       icon="el-icon-delete"
+                       size="small"
+                       @click="DelRightDetail()">删除</el-button>
+            <el-button type="default" icon="el-icon-refresh" size="small" @click="loadRightDetailTableData()">刷新</el-button>
+          </el-button-group>
+        </div>
+        <el-table ref="gridRightDetailtable"
+                  v-loading="tableRightDetailloading"
+                  :data="tableRightDetailData"
+                  row-key="Id"
+                  :height="400"
+                  border
+                  max-height="400"
+                  stripe
+                  highlight-current-row
+                  style="width: 100%;margin-bottom: 20px;"
+                  :default-sort="{prop: 'Levelnum', order: 'ascending'}"
+                  @select="handleRightDetailSelectChange"
+                  @select-all="handleRightDetailSelectAllChange">
+          <el-table-column type="selection" min-width="5%" />
+          <el-table-column prop="Tbname" label="数据集" min-width="25%">
+            <template slot-scope="scope">
+              <el-select v-model="scope.row.Tbname" @change="handleSelectRightTbChange(scope.row)" placeholder="请选择" filterable allow-create>
+                <el-option v-for="item in SelectRightTbNameList " :key="item.Tbname" :label="item.Tbname" :value="item.Tbname">
+                </el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column prop="ColumnCode" label="字段编码" min-width="20%">
+            <template slot-scope="scope">
+              <el-select v-model="scope.row.ColumnCode" @change="handleSelectRightColumnChange(scope.row)" placeholder="请选择" filterable allow-create>
+                <el-option v-for="item in scope.row.columnList " :key="item.FieldName" :label="item.FieldName" :value="item.FieldName">
+                </el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column prop="ColumnDescription" label="字段描述" min-width="20%" />
+          <el-table-column prop="ColumnName" label="字段名称" min-width="20%">
+            <template slot-scope="scope">
+              <input type="text" v-model="scope.row.ColumnName" style="width:100%" />
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogRightEditFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveRightEditForm()">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -292,11 +336,11 @@ import {
   getAlloutModelClassifyTreeTable
   } from '@/api/dataprocess/sys_outmodel_classify'
 import {
-    getSys_outmodel_detailsDetail, saveSys_outmodel_details, getAllEnableByConfId
+    getSys_outmodel_detailsDetail, saveSys_outmodel_details, getAllEnableByConfId, getOutTbNameList
   } from '@/api/dataprocess/sys_outmodel_details'
   import {
-    getTbNameList
-  } from '@/api/dataprocess/sys_conf_details'
+    saveSys_outmodel_sql, getByOutModelId
+  } from '@/api/dataprocess/sys_outmodel_sql'
 
   export default {
     name: 'sysconfcontrol',
@@ -308,6 +352,7 @@ import {
       },
       loadBtnFunc: [],
       tableData: [],
+      tableloading:false,
       pagination: {
         currentPage: 1,
         pagesize: 20,
@@ -339,6 +384,7 @@ import {
       currentId: '', // 当前操作对象的ID值，主要用于修改
       currentSelected: [],
       tableMiddleData: [],
+      tableMiddleloading:false,
       dialogMiddleEditFormVisible: false,
       editMiddleFormTitle: '',
       editMiddleFrom: {
@@ -378,7 +424,6 @@ import {
         'and',
         'or',
       ], //连接符下拉框数据
-      
       tagType: [
         '',
         'success',
@@ -387,18 +432,14 @@ import {
         'warning',
       ],
       tableRightData: [],
+      tableRightloading:false,
       dialogRightEditFormVisible: false,
       editRighteFormTitle: '',
-      editRightFrom: {
-
-
-      },
-      Rightrules: {
-
-      },
-      formRightLabelWidth: '80px',
-      currentRightId: '', // 当前操作对象的ID值，主要用于修改
-      currentRightSelected: [],
+      tableRightDetailData: [],
+      tableRightDetailloading: false,
+      currentRightDetailId: '', // 当前操作对象的ID值，主要用于修改
+      currentRightDetailSelected: [],
+      SelectRightTbNameList:[],
     }
   },
   created() {
@@ -426,6 +467,7 @@ import {
        * 加载页面table数据
        */
     loadTableData: function () {
+      this.tableloading=true
       var seachdata = {
         CurrenetPageIndex: this.pagination.currentPage,
         PageSize: this.pagination.pagesize,
@@ -440,6 +482,7 @@ import {
       getSys_outmodelListWithPager(seachdata).then(res => {
         this.tableData = res.ResData.Items
         this.pagination.pageTotal = res.ResData.TotalItems
+        this.tableloading=false
       })
       
     },
@@ -652,7 +695,7 @@ import {
    * 加载详情页面table数据
    */
     loadMiddleTableData: function () {
-      this.tableloading = true
+      this.tableMiddleloading = true
       var seachdata = {
         Filter: {
           Sys_outmodel_id: this.currentId,
@@ -660,7 +703,7 @@ import {
       }
       getAllEnableByConfId(seachdata).then(res => {
         this.tableMiddleData = res.ResData
-        this.tableloading = false
+        this.tableMiddleloading = false
       })
     },
 
@@ -669,7 +712,7 @@ import {
       */
     ShowMiddleDialog: function (view) {
       if (this.currentId !== undefined && this.currentId !== null && this.currentId.length > 0) {
-        getTbNameList({ SysId: this.sid }).then(res => {
+        getOutTbNameList({ SysId: this.sid, outModelId:'' }).then(res => {
           let SelectTbnameListInfo = [];
           for (let i in res.ResData) {
             SelectTbnameListInfo.push(res.ResData[i]);
@@ -690,7 +733,6 @@ import {
           this.currentMiddleId = ''
           this.editMiddleFrom.dynamicFiterForm = null
           this.dialogMiddleEditFormVisible = true
-          this.$refs['editMiddleFrom'].resetFields()
         }
       } else {
         this.$alert('请先在左侧列表中选择一个模型', '提示')
@@ -977,40 +1019,176 @@ import {
  * 加载详情页面table数据
  */
     loadRightTableData: function () {
+      this.tableRightloading = true
+      var seachdata = {
+        Filter: {
+          Sys_outmodel_id: this.currentId,
+        },
+      }
+      getByOutModelId(seachdata).then(res => {
+        if (res.ResData != undefined && res.ResData != null && res.ResData.Sqlstr != undefined && res.ResData.Sqlstr != null) {
+          this.tableRightData = JSON.parse(res.ResData.Sqlstr)
+          this.currentRightDetailId = res.ResData.Id
+        } else {
+          this.tableRightData =[]
+        }
+        
+        this.tableRightloading = false
+      })
       
     },
 
     /**
       * 新增、修改或查看中间列表项（绑定显示数据）     *
       */
-    ShowRightDialog: function (view) {
-      
+    ShowRightDialog: function () {
+      if (this.currentId !== undefined && this.currentId !== null && this.currentId.length > 0) {
+        getOutTbNameList({ SysId: this.sid, outModelId: this.currentId }).then(res => {
+          let SelectTbnameListInfo = [];
+          for (let i in res.ResData) {
+            SelectTbnameListInfo.push(res.ResData[i]);
+          }
+          this.SelectRightTbNameList = SelectTbnameListInfo
+          this.dialogRightEditFormVisible = true
+          this.loadRightDetailTableData()
+        })
+      } else {
+        this.$alert('请先在左侧列表中选择一个模型', '提示')
+      }
     },
     /**
    * 新增/修改保存
    */
     saveRightEditForm() {
-      
+      var url = 'Sys_outmodel_sql/Insert'
+      if (this.currentRightDetailId !== '') {
+        url = 'Sys_outmodel_sql/Update?id=' + this.currentRightDetailId
+      }
+      this.tableRightDetailData.forEach(item => {
+        if (item.columnList != undefined && item.columnList != null) {
+          item.columnList=[]
+        }
+      })
+      var data = {
+        Id: this.currentRightDetailId,
+        Sys_outmodel_id: this.currentId,
+        Sqlstr: JSON.stringify(this.tableRightDetailData),
+      }
+      saveSys_outmodel_sql(data, url).then(res => {
+        if (res.Success) {
+          this.$message({
+            message: '恭喜你，操作成功',
+            type: 'success'
+          })
+          this.dialogRightEditFormVisible = false
+          this.loadRightTableData()
+        } else {
+          this.$message({
+            message: res.ErrMsg,
+            type: 'error'
+          })
+        }
+      })
     },
-    deleteRightPhysics: function () {
-      
+    /**
+* 加载详情页面table数据
+*/
+    loadRightDetailTableData: function () {
+      this.tableRightDetailloading=true
+      this.tableRightDetailData = this.tableRightData
+      this.tableRightDetailData.forEach(item => {
+        if (item.columnList != undefined && item.columnList != null && item.columnList.length>0) {
+
+        } else {
+          var res = this.SelectRightTbNameList.filter(TbNameItem => TbNameItem.Tbname.includes(item.Tbname))
+          item.columnList = res[0].Fileds
+        }
+      })
+      this.tableRightDetailloading = false
     },
     /**
       * 当用户手动勾选checkbox数据行事件
       */
-    handleRightSelectChange: function (selection, row) {
-      this.currentRightSelected = selection
+    handleRightDetailSelectChange: function (selection, row) {
+      this.currentRightDetailSelected = selection
     },
     /**
        * 当用户手动勾选全选checkbox事件
        */
-    handleRightSelectAllChange: function (selection) {
-      this.currentRightSelected = selection
+    handleRightDetailSelectAllChange: function (selection) {
+      this.currentRightDetailSelected = selection
     },
+    AddRightDetail() {
+      if (this.tableRightDetailData != null && this.tableRightDetailData != undefined && this.tableRightDetailData.length > 0) {
+        this.tableRightDetailData.push({
+          id:this.uuid(),
+          Tbname: '',
+          ColumnCode: '',
+          ColumnDescription: '',
+          columnList: [],
+        })
+      } else {
+        this.tableRightDetailData = [{
+          id: this.uuid(),
+          Tbname: '',
+          ColumnCode: '',
+          ColumnDescription: '',
+          columnList: [],
+        }]
+      }
+    },
+    DelRightDetail() {
+      if (this.currentRightDetailSelected.length === 0) {
+        this.$alert('请选择一条数据进行删除', '提示')
+      } else {
+        this.currentRightDetailSelected.forEach(item => {
+          var tmpIndex = this.tableRightDetailData.indexOf(item)
+          this.tableRightDetailData.splice(tmpIndex, 1)
+        })
+        this.$refs.gridRightDetailtable.clearSelection()
+      }
+    },
+    /**
+         *选择表
+         */
+    handleSelectRightTbChange: function (row) {
+      var res = this.SelectRightTbNameList.filter(item => {
+        if (item.Tbname.includes(row.Tbname)) {
+          return item
+        }
+      })
+      row.columnList = res[0].Fileds
+    },
+    /**
+         *选择表
+         */
+    handleSelectRightColumnChange: function (row) {
+      var res = row.columnList.filter(item => {
+        if (item.FieldName.includes(row.ColumnCode)) {
+          return item
+        }
+      })
+      row.ColumnDescription = res[0].Description
+      row.ColumnName = res[0].Description
+    },
+    uuid() {
+      var s = [];
+      var hexDigits = '0123456789abcdef';
+      for (var i = 0; i < 36; i++) {
+        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+      }
+      s[14] = '4';
+      s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);
+      s[8] = s[13] = s[18] = s[23] = '-';
 
+      this.uuidA = s.join('');
+      console.log(s.join(''), 's.join("")');
+      return this.uuidA;
+    },
   }
 }
 </script>
 
 <style>
+
 </style>

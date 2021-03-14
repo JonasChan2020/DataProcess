@@ -27,14 +27,16 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
     public class Sys_outmodelController : AreaApiController<Sys_outmodel, Sys_outmodelOutputDto,Sys_outmodelInputDto,ISys_outmodelService,string>
     {
         private ISys_sysService SysService;
+        private ISys_outmodel_detailsService OutModelDetailService;
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="_iService"></param>
-        public Sys_outmodelController(ISys_outmodelService _iService, ISys_sysService _SysService) : base(_iService)
+        public Sys_outmodelController(ISys_outmodelService _iService, ISys_sysService _SysService, ISys_outmodel_detailsService _OutModelDetailService) : base(_iService)
         {
             iService = _iService;
             SysService = _SysService;
+            OutModelDetailService = _OutModelDetailService;
             AuthorizeKey.ListKey = "Sys_outmodel/List";
             AuthorizeKey.InsertKey = "Sys_outmodel/Add";
             AuthorizeKey.UpdateKey = "Sys_outmodel/Edit";
@@ -109,9 +111,9 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// 获取 系统和模型的树形列表
         /// </summary>
         /// <returns></returns>
-        [HttpPost("GetSysAndModelTree")]
+        [HttpPost("GetSysAndOutModelTree")]
         [YuebonAuthorize("List")]
-        public async Task<IActionResult> GetSysAndModelTree(SearchInputDto<Sys_sys> search)
+        public async Task<IActionResult> GetSysAndOutModelTree(SearchInputDto<Sys_sys> search)
         {
             CommonResult result = new CommonResult();
             try
@@ -180,5 +182,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
             }
             return ToJsonContent(result);
         }
+
+       
     }
 }

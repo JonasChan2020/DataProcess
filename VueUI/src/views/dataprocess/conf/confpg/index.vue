@@ -17,10 +17,10 @@
         <el-row :gutter="24">
           <el-col :span="24">
             <el-card>
-              <el-cascader v-model="selectedclass" :key="cascaderkey" style="width: 100%;" :options="selectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleFromSelectClassChange" />
-              <el-table ref="gridfromtable"
-                        v-loading="fromtableloading"
-                        :data="fromtableData"
+              <el-cascader v-model="selectedclass" :key="cascaderkey" style="width: 100%;" :options="selectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handletoSelectClassChange" />
+              <el-table ref="gridtotable"
+                        v-loading="totableloading"
+                        :data="totableData"
                         style="width: 100%;margin-bottom: 20px;"
                         row-key="Id"
                         border
@@ -29,7 +29,7 @@
                         default-expand-all
                         highlight-current-row
                         :tree-props="{children: 'Children'}"
-                        @row-click="handlefromClickRow">
+                        @row-click="handletoClickRow">
                 <el-table-column prop="NodeName" label="名称" min-width="30%" />
                 <el-table-column prop="Description" label="描述" min-width="70%" />
               </el-table>
@@ -41,52 +41,52 @@
         <el-card>
           <div class="list-btn-container">
             <el-button-group>
-              <el-button v-hasPermi="['Sd_sysdb/Add']"
+              <el-button v-hasPermi="['Conf_conf/Add']"
                          type="primary"
                          icon="el-icon-plus"
                          size="small"
                          @click="ShowEditOrViewDialog()">新增</el-button>
-              <el-button v-hasPermi="['Sd_sysdb/Delete']"
+              <el-button v-hasPermi="['Conf_conf/Delete']"
                          type="danger"
                          icon="el-icon-delete"
                          size="small"
                          @click="deletePhysics()">删除</el-button>
-              <el-button v-hasPermi="['Sd_sysdb/Enable']"
+              <el-button v-hasPermi="['Conf_conf/Enable']"
                          type="info"
                          icon="el-icon-video-pause"
                          size="small"
                          @click="setEnable('0')">禁用</el-button>
-              <el-button v-hasPermi="['Sd_sysdb/Enable']"
+              <el-button v-hasPermi="['Conf_conf/Enable']"
                          type="success"
                          icon="el-icon-video-play"
                          size="small"
                          @click="setEnable('1')">启用</el-button>
-              <el-button type="default" icon="el-icon-refresh" size="small" @click="loadToTableData()">刷新</el-button>
+              <el-button type="default" icon="el-icon-refresh" size="small" @click="loadfromTableData()">刷新</el-button>
             </el-button-group>
           </div>
-          <el-table ref="gridtotable"
-                    v-loading="totableloading"
-                    :data="totableData"
+          <el-table ref="gridfromtable"
+                    v-loading="fromtableloading"
+                    :data="fromtableData"
                     :height="700"
                     border
                     stripe
                     highlight-current-row
                     style="width: 100%"
-                    :default-sort="{prop: 'Conftype', order: 'ascending'}"
-                    @row-click="handletoClickRow"
-                    @select="handleToSelectChange"
-                    @select-all="handleToSelectAllChange"
-                    @sort-change="handletoSortChange">
+                    :default-sort="{prop: 'ConfFromType', order: 'ascending'}"
+                    @row-click="handlefromClickRow"
+                    @select="handlefromSelectChange"
+                    @select-all="handlefromSelectAllChange"
+                    @sort-change="handlefromSortChange">
             <el-table-column type="selection" min-width="5%" />
-            <el-table-column prop="ConfToType" label="类型" sortable="custom" min-width="10%">
+            <el-table-column prop="ConfFromType" label="类型" sortable="custom" min-width="10%">
               <template slot-scope="scope">
-                <el-tag :type="scope.row.ConfToType === 1 ? 'success' : 'info'" disable-transitions>{{ scope.row.ConfToType === 1 ? "数据库" : "系统" }}</el-tag>
+                <el-tag :type="scope.row.ConfFromType === 1 ? 'success' : 'info'" disable-transitions>{{ scope.row.ConfFromType === 1 ? "数据库" : "系统" }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="ToTbName" label="名称" sortable="custom" min-width="15%" />
-            <el-table-column prop="ToDescription" label="描述" sortable="custom" min-width="15%" />
-            <el-table-column prop="ToParentName" label="所属模型或库" sortable="custom" min-width="15%" />
-            <el-table-column prop="ToParentDescription" label="描述" sortable="custom" min-width="15%" />
+            <el-table-column prop="FromTbName" label="名称" sortable="custom" min-width="15%" />
+            <el-table-column prop="FromDescription" label="描述" sortable="custom" min-width="15%" />
+            <el-table-column prop="FromParentName" label="所属模型或库" sortable="custom" min-width="15%" />
+            <el-table-column prop="FromParentDescription" label="描述" sortable="custom" min-width="15%" />
             <el-table-column label="是否启用" sortable="custom" min-width="10%" prop="EnabledMark" align="center">
               <template slot-scope="scope">
                 <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
@@ -97,19 +97,19 @@
                 <el-button type="primary"
                            icon="el-icon-plus"
                            size="small"
-                           @click="HandleToConfig(scope.row.Id,scope.row.ConfToType,'DataSyncConfig')">同步配置</el-button>
+                           @click="HandlefromConfig(scope.row.Id,'DataSyncConfig')">同步配置</el-button>
               </template>
             </el-table-column>
           </el-table>
           <div class="pagination-container">
             <el-pagination background
-                           :current-page="topagination.currentPage"
+                           :current-page="frompagination.currentPage"
                            :page-sizes="[5,10,20,50,100, 200, 300, 400]"
-                           :page-size="topagination.pagesize"
+                           :page-size="frompagination.pagesize"
                            layout="total, sizes, prev, pager, next, jumper"
-                           :total="topagination.pageTotal"
-                           @size-change="handletoSizeChange"
-                           @current-change="handletoCurrentChange" />
+                           :total="frompagination.pageTotal"
+                           @size-change="handlefromSizeChange"
+                           @current-change="handlefromCurrentChange" />
           </div>
 
 
@@ -185,6 +185,10 @@
     deleteConf_conf
   } from '@/api/dataprocess/conf_conf'
 
+  import {
+    getSysAndOutModelTree
+  } from '@/api/dataprocess/sys_outmodel'
+
   export default {
     name: 'confcontrol',
     data() {
@@ -201,35 +205,35 @@
         selectedclass: '',
         selectclasses: [],
         loadBtnFunc: [],
-        fromcurrentSelectId: '',
-        fromcurrentSelectParentId: '', //fromParentId
-        fromtableloading: false,
-        fromtableHead: [],
-        fromtableData: [],
-        fromsortableData: {
-          order: 'desc',
-          sort: 'CreatorTime'
-        },
-        tocurrentId: '', // 当前操作对象的ID值，主要用于修改
         tocurrentSelectId: '',
-        tocurrentSelected: [],
+        tocurrentSelectParentId: '', //toParentId
         totableloading: false,
+        totableHead: [],
         totableData: [],
-        topagination: {
-          currentPage: 1,
-          pagesize: 20,
-          pageTotal: 0
-        },
         tosortableData: {
           order: 'desc',
           sort: 'CreatorTime'
         },
+        fromcurrentId: '', // 当前操作对象的ID值，主要用于修改
+        fromcurrentSelectId: '',
+        fromcurrentSelected: [],
+        fromtableloading: false,
+        fromtableData: [],
+        frompagination: {
+          currentPage: 1,
+          pagesize: 20,
+          pageTotal: 0
+        },
+        fromsortableData: {
+          order: 'desc',
+          sort: 'CreatorTime'
+        },
+        editFormTitle: '',
         dialogcurrentId: '', // 当前操作对象的ID值，主要用于修改
         dialogcurrentSelectId: '',
         dialogcurrentSelectParentId: '',//toParentId
         dialogcurrentSelected: [],
         dialogEditFormVisible: false,
-        editFormTitle: '',
         dialogselectedSysDb: '',
         dialogselectedclass: '',
         dialogselectclasses: [],
@@ -252,10 +256,10 @@
       handleSelectSysDbChange: function () {
         this.selectclasses = []
         this.selectedclass = ''
-        this.fromtableData = []
+        this.totableData = []
         this.cascaderkey++
         if (this.selectedSysDb == '0') {
-          this.fromtableHead = [
+          this.totableHead = [
             { column_name: "Syscode", column_comment: "编码", column_minWidth: "25%" },
             { column_name: "Sysname", column_comment: "名称", column_minWidth: "75%" }
           ]
@@ -263,27 +267,27 @@
             this.selectclasses = res.ResData
           })
         } else if (this.selectedSysDb == '1') {
-          this.fromtableHead = [
+          this.totableHead = [
             { column_name: "SdName", column_comment: "名称", column_minWidth: "95%" }
           ]
           getAllSdClassifyTreeTable().then(res => {
             this.selectclasses = res.ResData
           })
         }
-        this.loadFromTableData()
+        this.loadtoTableData()
       },
       /**
       *系统或数据库分类选择
       */
-      handleFromSelectClassChange: function (value) {
+      handletoSelectClassChange: function (value) {
         this.selectedclass = value
-        this.loadFromTableData()
+        //this.loadtoTableData()
       },
       /**
       * 加载页面左侧table数据
       */
-      loadFromTableData: function () {
-        this.fromtableloading = true
+      loadtoTableData: function () {
+        this.totableloading = true
         var seachdata = {
           Filter: {
             Classify_id: this.selectedclass,
@@ -294,14 +298,14 @@
 
           getSysAndModelTree(seachdata).then(res => {
 
-            this.fromtableData = res.ResData
-            this.fromtableloading = false
+            this.totableData = res.ResData
+            this.totableloading = false
           })
         } else if (this.selectedSysDb == '1') {
 
           getSdAndTbTree(seachdata).then(res => {
-            this.fromtableData = res.ResData
-            this.fromtableloading = false
+            this.totableData = res.ResData
+            this.totableloading = false
           })
         }
         //getSequenceListWithPager(seachdata).then(res => {
@@ -313,141 +317,41 @@
       /**
        * 点击一条记录
        */
-      handlefromClickRow(row) {
-        if (row.NodeType !== "tb") {
-          this.fromcurrentSelectId = ""
-          this.fromcurrentSelectParentId = ""
-        } else {
-          this.fromcurrentSelectId = row.Id
-          this.fromcurrentSelectParentId = row.ParentId
-          this.topagination.currentPage = 1
-          this.loadToTableData()
-        }
-      },
-      /**
-      * 加载页面左侧table数据
-      */
-      loadToTableData: function () {
-        this.totableloading = true
-        var seachdata = {
-          CurrenetPageIndex: this.topagination.currentPage,
-          PageSize: this.topagination.pagesize,
-          Order: this.tosortableData.order,
-          Sort: this.tosortableData.sort,
-          Filter: {
-            FromId: this.fromcurrentSelectId
-          }
-        }
-        getConf_confListWithPager(seachdata).then(res => {
-          this.totableData = res.ResData.Items
-          this.topagination.pageTotal = res.ResData.TotalItems
-          this.totableloading = false
-        })
-      },
-      /**
-       * 当表格的排序条件发生变化的时候会触发该事件
-       */
-      handletoSortChange: function (column) {
-        this.tosortableData.sort = column.prop
-        if (column.order === 'ascending') {
-          this.tosortableData.order = 'asc'
-        } else {
-          this.tosortableData.order = 'desc'
-        }
-        this.loadToTableData()
-      },
-      /**
-      * 选择每页显示数量
-      */
-      handletoSizeChange(val) {
-        this.topagination.pagesize = val
-        this.topagination.currentPage = 1
-        this.loadToTableData()
-      },
-      /**
-       * 选择当页面
-       */
-      handletoCurrentChange(val) {
-        this.topagination.currentPage = val
-        this.loadToTableData()
-      },
-      /**
-      * 点击一条记录
-      */
       handletoClickRow(row) {
-        this.tocurrentSelectId = row.Id
+        if (row.NodeType !== "tb") {
+          this.tocurrentSelectId = ""
+          this.tocurrentSelectParentId = ""
+        } else {
+          this.tocurrentSelectId = row.Id
+          this.tocurrentSelectParentId = row.ParentId
+          this.frompagination.currentPage = 1
+          this.loadfromTableData()
+        }
       },
+
       /**
-     * 当用户手动勾选checkbox数据行事件
-     */
-      handleToSelectChange: function (selection, row) {
-        this.tocurrentSelected = selection
-      },
-      /**
-       * 当用户手动勾选全选checkbox事件
-       */
-      handleToSelectAllChange: function (selection) {
-        this.tocurrentSelected = selection
-      },
-      /**
-       * 点击表格按钮跳转配置页面
-       */
-      HandleToConfig: function (id, dbtype, viewstr) {
-        this.$router.push({ name: 'ConfigDetails', params: { id: id, dtype: dbtype, viewstr: viewstr } })
-      },
-      /**
-      * 新增、修改或查看明细信息（绑定显示数据）     *
-      */
+    * 新增、修改或查看明细信息（绑定显示数据）     *
+    */
       ShowEditOrViewDialog: function () {
-        if (this.fromcurrentSelectId.length === 0) {
+        if (this.tocurrentSelectId.length === 0) {
           this.$alert('请先选择左侧列表中的表或模型', '提示')
         } else {
           this.editFormTitle = '新增'
-          this.tocurrentId = ''
+          this.fromcurrentId = ''
           this.dialogEditFormVisible = true
         }
       },
-      setEnable: function (val) {
-        if (this.tocurrentSelected.length === 0) {
-          this.$alert('请先选择要操作的数据', '提示')
-          return false
-        } else {
-          var tocurrentIds = []
-          this.tocurrentSelected.forEach(element => {
-            tocurrentIds.push(element.Id)
-          })
-          const data = {
-            Ids: tocurrentIds,
-            Flag: val
-          }
-          setConf_confEnable(data).then(res => {
-            if (res.Success) {
-              this.$message({
-                message: '恭喜你，操作成功',
-                type: 'success'
-              })
-              this.tocurrentSelected = ''
-              this.loadToTableData()
-            } else {
-              this.$message({
-                message: res.ErrMsg,
-                type: 'error'
-              })
-            }
-          })
-        }
-      },
       deletePhysics: function () {
-        if (this.tocurrentSelected.length === 0) {
+        if (this.fromcurrentSelected.length === 0) {
           this.$alert('请先选择要操作的数据', '提示')
           return false
         } else {
-          var tocurrentIds = []
-          this.tocurrentSelected.forEach(element => {
-            tocurrentIds.push(element.Id)
+          var fromcurrentIds = []
+          this.fromcurrentSelected.forEach(element => {
+            fromcurrentIds.push(element.Id)
           })
           const data = {
-            Ids: tocurrentIds
+            Ids: fromcurrentIds
           }
           deleteConf_conf(data).then(res => {
             if (res.Success) {
@@ -455,8 +359,8 @@
                 message: '恭喜你，操作成功',
                 type: 'success'
               })
-              this.tocurrentSelected = ''
-              this.loadToTableData()
+              this.fromcurrentSelected = ''
+              this.loadfromTableData()
             } else {
               this.$message({
                 message: res.ErrMsg,
@@ -465,6 +369,77 @@
             }
           })
         }
+      },
+      /**
+     * 加载页面左侧table数据
+     */
+      loadfromTableData: function () {
+        this.fromtableloading = true
+        var seachdata = {
+          CurrenetPageIndex: this.frompagination.currentPage,
+          PageSize: this.frompagination.pagesize,
+          Order: this.fromsortableData.order,
+          Sort: this.fromsortableData.sort,
+          Filter: {
+            ToId: this.tocurrentSelectId
+          }
+        }
+        getConf_confListWithPager(seachdata).then(res => {
+          this.fromtableData = res.ResData.Items
+          this.frompagination.pageTotal = res.ResData.TotalItems
+          this.fromtableloading = false
+        })
+      },
+      /**
+       * 当表格的排序条件发生变化的时候会触发该事件
+       */
+      handlefromSortChange: function (column) {
+        this.fromsortableData.sort = column.prop
+        if (column.order === 'ascending') {
+          this.fromsortableData.order = 'asc'
+        } else {
+          this.fromsortableData.order = 'desc'
+        }
+        this.loadfromTableData()
+      },
+      /**
+      * 选择每页显示数量
+      */
+      handlefromSizeChange(val) {
+        this.frompagination.pagesize = val
+        this.frompagination.currentPage = 1
+        this.loadfromTableData()
+      },
+      /**
+       * 选择当页面
+       */
+      handlefromCurrentChange(val) {
+        this.frompagination.currentPage = val
+        this.loadfromTableData()
+      },
+      /**
+      * 点击一条记录
+      */
+      handlefromClickRow(row) {
+        this.fromcurrentSelectId = row.Id
+      },
+      /**
+     * 当用户手动勾选checkbox数据行事件
+     */
+      handlefromSelectChange: function (selection, row) {
+        this.fromcurrentSelected = selection
+      },
+      /**
+       * 当用户手动勾选全选checkbox事件
+       */
+      handlefromSelectAllChange: function (selection) {
+        this.fromcurrentSelected = selection
+      },
+      /**
+       * 点击表格按钮跳转配置页面
+       */
+      HandlefromConfig: function (id, viewstr) {
+        this.$router.push({ name: 'ConfigDetails', params: { id: id, viewstr: viewstr } })
       },
       /**
      * 新增/修改保存
@@ -479,13 +454,13 @@
             this.dialogcurrentSelectId = this.dialogcurrentSelected[0].Id
             this.dialogcurrentSelectParentId = this.dialogcurrentSelected[0].ParentId
             const data = {
-              'FromId': this.fromcurrentSelectId,
-              'FromParentId': this.fromcurrentSelectParentId,
-              'ToId': this.dialogcurrentSelectId,
-              'ToParentId': this.dialogcurrentSelectParentId,
+              'ToId': this.tocurrentSelectId,
+              'ToParentId': this.tocurrentSelectParentId,
+              'FromId': this.dialogcurrentSelectId,
+              'FromParentId': this.dialogcurrentSelectParentId,
               'EnabledMark': true,
-              'ConfFromType': this.selectedSysDb,
-              'ConfToType': this.dialogselectedSysDb,
+              'ConfToType': this.selectedSysDb,
+              'ConfFromType': this.dialogselectedSysDb,
               'Id': this.currentId
             }
             var url = 'Conf_conf/Insert'
@@ -500,7 +475,7 @@
                 this.dialogselectedclass = ''
                 this.dialogselectedsys = ''
                 this.loadDialogTableData()
-                this.loadToTableData()
+                this.loadfromTableData()
 
               } else {
                 if (res.CustomCode == "err80404") {
@@ -517,7 +492,7 @@
               }
             })
           }
-          
+
         }
       },
       /**
@@ -576,7 +551,7 @@
         }
         if (this.dialogselectedSysDb == '0') {
 
-          getSysAndModelTree(seachdata).then(res => {
+          getSysAndOutModelTree(seachdata).then(res => {
             this.dialogtableData = res.ResData
             this.dialogtableloading = false
           })

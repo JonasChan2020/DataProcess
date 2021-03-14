@@ -16,6 +16,16 @@ namespace Yuebon.DataProcess.Dtos
         /// </summary>
         [MaxLength(0)]
         public string FromParentId { get; set; }
+         /// <summary>
+        /// 目标上级ID
+        /// </summary>
+        [MaxLength(0)]
+        public string FromParentName { get; set; }
+        /// <summary>
+        /// 目标上级ID
+        /// </summary>
+        [MaxLength(0)]
+        public string FromParentDescription { get; set; }
         /// <summary>
         /// 源表ID
         /// </summary>

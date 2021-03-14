@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-card>
-      <DataSyncConfigDetailtab v-if="DataSyncFormVisible"  :cid="confId" :dbtype="dtype"/>
+      <DataSyncConfigDetailtab v-if="DataSyncFormVisible"  :cid="confId"/>
     </el-card>
   </div>
 </template>
@@ -17,7 +17,6 @@ export default {
   data() {
     return {
       confId: '', //系统ID或数据库ID
-      dtype:'', //系统或数据库
       viewstr: '', //跳转页面类型
       DataSyncFormVisible: false,
     }
@@ -32,7 +31,6 @@ export default {
       InitDictItem() {
         if (this.$route.params && this.$route.params.id && this.$route.params.id !== 'null') {
           this.confId = this.$route.params.id
-          this.dtype = this.$route.params.dtype
           this.viewstr = this.$route.params.viewstr
           if (this.viewstr == "VerifyConfig") {
 

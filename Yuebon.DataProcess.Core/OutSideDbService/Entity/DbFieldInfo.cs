@@ -155,7 +155,7 @@ namespace Yuebon.DataProcess.Core.OutSideDbService.Entity
         /// <summary>
         /// 读取字段信息
         /// </summary>
-        public DataGetType ReadFieldInfo { get; set; }
+        public DbFieldInfo ReadFieldInfo { get; set; }
         /// <summary>
         /// 默认值
         /// </summary>

@@ -26,14 +26,16 @@ namespace Yuebon.DataProcess.Services
         
         private readonly ISys_sysService sysService;
         private readonly ISys_confService sysConfService;
+        private readonly ISys_outmodelService OutModelService;
         private readonly ILogService _logService;
-        public Conf_confService(IConf_confRepository repository, ISd_sysdbService _sdService, ISd_detailService _sdDetailService, ISys_sysService _sysService, ISys_confService _sysConfService, ILogService logService) : base(repository)
+        public Conf_confService(IConf_confRepository repository, ISd_sysdbService _sdService, ISd_detailService _sdDetailService, ISys_sysService _sysService, ISys_confService _sysConfService, ISys_outmodelService _OutModelService, ILogService logService) : base(repository)
         {
 			_repository=repository;
             sdService = _sdService;
             sdDetailService = _sdDetailService;
             sysService = _sysService;
             sysConfService = _sysConfService;
+            OutModelService = _OutModelService;
             _logService =logService;
             //_repository.OnOperationLog += _logService.OnOperationLog;
         }
@@ -55,64 +57,64 @@ namespace Yuebon.DataProcess.Services
                 CurrenetPageIndex = search.CurrenetPageIndex,
                 PageSize = search.PageSize
             };
-            if (search.Filter != null && !string.IsNullOrEmpty(search.Filter.FromId))
+            if (search.Filter != null && !string.IsNullOrEmpty(search.Filter.ToId))
             {
-                where += string.Format(" and fromid = '{0}'", search.Filter.FromId);
+                where += string.Format(" and toid = '{0}'", search.Filter.ToId);
             }
             List<Conf_conf> list = await repository.FindWithPagerAsync(where, pagerInfo);
             List<Conf_confOutputDto> resultList = list.MapTo<Conf_confOutputDto>();
             List<Conf_confOutputDto> listResult = new List<Conf_confOutputDto>();
             foreach (Conf_confOutputDto item in resultList)
             {
-                if (!string.IsNullOrEmpty(item.ToId))
+                if (!string.IsNullOrEmpty(item.FromId))
                 {
-                    if (item.ConfToType == 0)
+                    if (item.ConfFromType == 0)
                     {
-                        Sys_sys sysModel = sysService.Get(item.ToParentId);
-                        Sys_conf sysconfModel = sysConfService.Get(item.ToId);
-                        if (sysModel != null && sysconfModel != null)
+                        Sys_sys sysModel = sysService.Get(item.FromParentId);
+                        Sys_outmodel sysOutModel = OutModelService.Get(item.FromId);
+                        if (sysModel != null && sysOutModel != null)
                         {
-                            item.ToTbName = sysconfModel.Confname;
-                            item.ToDescription = sysconfModel.Description;
-                            item.ToParentName = sysModel.Sysname;
-                            item.ToParentDescription = sysModel.Description;
+                            item.FromTbName = sysOutModel.Modelname;
+                            item.FromDescription = sysOutModel.Description;
+                            item.FromParentName = sysModel.Sysname;
+                            item.FromParentDescription = sysModel.Description;
                         }
                         else
                         {
                             if (sysModel == null)
                             {
-                                item.ToTbName = "系统已丢失：" + item.ToParentId;
+                                item.FromTbName = "系统已丢失：" + item.FromParentId;
                             }
                             else
                             {
-                                item.ToTbName = "模型已丢失：" + item.ToId;
+                                item.FromTbName = "模型已丢失：" + item.FromId;
                             }
                             
                         }
                     }
-                    else if (item.ConfToType == 1)
+                    else if (item.ConfFromType == 1)
                     {
-                        Sd_sysdb sdModel = sdService.Get(item.ToParentId);
-                        Sd_detail detailModel = sdDetailService.GetWhere(string.Format(" sd_id = '{0}'", item.ToParentId));
+                        Sd_sysdb sdModel = sdService.Get(item.FromParentId);
+                        Sd_detail detailModel = sdDetailService.GetWhere(string.Format(" sd_id = '{0}'", item.FromParentId));
                         if (sdModel != null && detailModel != null)
                         {
                             List<DbTableInfo> childModelList = detailModel.Tbs.ToObject<List<DbTableInfo>>();
-                            DbTableInfo tbModel = childModelList.Find(x => x.TableName == item.ToId);
+                            DbTableInfo tbModel = childModelList.Find(x => x.TableName == item.FromId);
                             if (tbModel != null)
                             {
-                                item.ToTbName = tbModel.TableName;
-                                item.ToDescription = tbModel.Description;
-                                item.ToParentName = sdModel.SdName;
-                                item.ToParentDescription = sdModel.Description;
+                                item.FromTbName = tbModel.TableName;
+                                item.FromDescription = tbModel.Description;
+                                item.FromParentName = sdModel.SdName;
+                                item.FromParentDescription = sdModel.Description;
                             }
                             else
                             {
-                                item.ToTbName = "数据表已丢失：" + item.ToId;
+                                item.FromTbName = "数据表已丢失：" + item.ToId;
                             }
                         }
                         else
                         {
-                            item.ToTbName = "数据库已丢失：" + item.ToParentId;
+                            item.FromTbName = "数据库已丢失：" + item.FromParentId;
                         }
                         
                     }

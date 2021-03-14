@@ -49,16 +49,28 @@
             </el-form>
           </template>
         </el-table-column>
+        <el-table-column prop="FieldName" label="字段名" min-width='15%'></el-table-column>
         <el-table-column prop="WriteDescription" label="字段描述" min-width='20%'></el-table-column>
         <el-table-column prop="ReadFieldName" label="对应表字段" min-width='20%'>
           <template slot-scope="scope">
-            {{ scope.row.ReadFieldInfo!=undefined&&scope.row.ReadFieldInfo!=null ? scope.row.ReadFieldInfo.TableLevelNum+'^'+scope.row.ReadFieldInfo.WriteTableName+'^'+scope.row.ReadFieldInfo.FieldName : "" }}
+            {{ scope.row.ReadFieldInfo!=undefined&&scope.row.ReadFieldInfo!=null ? scope.row.ReadFieldInfo.FieldName : "" }}
             <el-button type="text" @click="ShowDialogReadFieldEditOrViewDialog('ReadField',scope.$index,scope.row)">配置</el-button>
           </template>
         </el-table-column>
-        <el-table-column prop="DefaultValue" label="默认值" min-width='10%'></el-table-column>
-        <el-table-column prop=" Is_DynamicSingle" label="动态表唯一判定字段" min-width='15%'></el-table-column>
-        <el-table-column label="配置" min-width='15%' align="center">
+        <el-table-column prop="DefaultValue" label="默认值" min-width='10%'>
+          <template slot-scope="scope">
+            <input type="text" v-model="scope.row.DefaultValue" style="width:100%" />
+          </template>
+        </el-table-column>
+        <el-table-column prop=" Is_DynamicSingle" label="动态表唯一判定字段" min-width='10%'>
+          <template slot-scope="scope">
+            <el-select v-model="scope.row.Is_DynamicSingle" placeholder="请选择" filterable allow-create>
+              <el-option v-for="item in yesorno " :key="item.Value" :label="item.Name" :value="item.Value">
+              </el-option>
+            </el-select>
+          </template>
+        </el-table-column>
+        <el-table-column label="配置" min-width='10%' align="center">
           <template slot-scope="scope">
             <el-button type="text" @click="ShowDialogVerifyEditOrViewDialog('Verify',scope.$index)">配置</el-button>
             <el-tag :type="scope.row.SyncDataConfParamter!=undefined&&scope.row.SyncDataConfParamter!=null&&scope.row.SyncDataConfParamter.length>5 ? 'success' : 'info'" disable-transitions>{{ scope.row.SyncDataConfParamter!=undefined&&scope.row.SyncDataConfParamter!=null&&scope.row.SyncDataConfParamter.length>5 ? "(已配置)" : "(未配置)" }}</el-tag>
@@ -87,48 +99,7 @@
                   highlight-current-row
                   @row-click="handleReadFieldClickRow"
                   style="width: 100%">
-          <el-table-column type="expand" label="详情" width="50">
-            <template slot-scope="props">
-              <el-form label-position="left" inline class="demo-table-expand">
-                <el-form-item label="表顺序">
-                  <span>{{ props.row.TableLevelNum }}</span>
-                </el-form-item>
-                <el-form-item label="表名称">
-                  <span>{{ props.row.WriteTableName }}</span>
-                </el-form-item>
-                <el-form-item label="字段名称">
-                  <span>{{ props.row.WriteFieldName }}</span>
-                </el-form-item>
-                <el-form-item label="字段描述">
-                  <span>{{ props.row.Description }}</span>
-                </el-form-item>
-                <el-form-item label="数据类型">
-                  <span>{{ props.row.DataType }}</span>
-                </el-form-item>
-                <el-form-item label="小数位精度">
-                  <span>{{ props.row.FieldScale }}</span>
-                </el-form-item>
-                <el-form-item label="字段长度">
-                  <span>{{ props.row.FieldMaxLength }}</span>
-                </el-form-item>
-                <el-form-item label="默认值">
-                  <span>{{ props.row.FieldDefaultValue }}</span>
-                </el-form-item>
-                <el-form-item label="是否可空">
-                  {{ props.row.IsNullable === true ? "是" : "否" }}
-                </el-form-item>
-                <el-form-item label="是否主键">
-                  {{ props.row.IsIdentity === true ? "是" : "否" }}
-                </el-form-item>
-                <el-form-item label="是否自增">
-                  {{ props.row.Increment === true ? "是" : "否" }}
-                </el-form-item>
-              </el-form>
-            </template>
-          </el-table-column>
-          <el-table-column prop="TableLevelNum" label="表顺序" min-width='10%'></el-table-column>
-          <el-table-column prop="WriteTableName" label="表名称" min-width='15%'></el-table-column>
-          <el-table-column prop="WriteFieldName" label="字段名称" min-width='15%'></el-table-column>
+          <el-table-column prop="FieldName" label="字段名称" min-width='15%'></el-table-column>
           <el-table-column prop="Description" label="字段描述" min-width='25%'></el-table-column>
         </el-table>
       </el-card>
@@ -151,12 +122,12 @@
 <script>
 
   import {
-    getConfTbContent
+    getConfTbContent, saveConf_detail
   } from '@/api/dataprocess/conf_detail'
 
   export default {
     name:  'DataSyncConfigDetail ',
-    props: ['cid','dbtype'], //父页面传过来的配置ID
+    props: ['cid'], //父页面传过来的配置ID
   data() {
     return {
       dtype:'',
@@ -175,6 +146,11 @@
       readFieldtableloading:false,
       readFieldTableData: [],
       readFieldSelected: [],
+      yesorno: [
+        { Name: '是', Value: '1' },
+        { Name: '否', Value: '0' }
+      ],
+      currentId:'',
 
 
     }
@@ -207,6 +183,7 @@
         this.righttableData = res.ResData.finFields
         this.readFieldTableData = res.ResData.sourceFields
         this.SysId = res.ResData.sysid
+        this.currentId = res.ResData.confDetailId
         this.righttableloading = false
       })
     },
@@ -220,20 +197,16 @@
        * 新增/修改保存
        */
     saveEditForm() {
-      this.configjson = this.tableData
       const data = {
-        'Sys_conf_id': this.Sys_conf_id,
-        'Tbname': this.Tbname,
-        'Is_dynamic': this.Is_dynamic,
-        'Is_flag': this.Is_flag,
-        'configjson': JSON.stringify(this.tableData),
+        'Conf_id': this.cid,
+        'ConfStr': JSON.stringify(this.righttableData),
         'Id': this.currentId
       }
-      var url = 'Sys_conf_details/Insert'
+      var url = 'Conf_detail/Insert'
       if (this.currentId !== '') {
-        url = 'Sys_conf_details/Update?id=' + this.currentId
+        url = 'Conf_detail/Update?id=' + this.currentId
       }
-      saveSys_conf_details(data, url).then(res => {
+      saveConf_detail(data, url).then(res => {
         if (res.Success) {
           this.$message({
             message: '恭喜你，操作成功',
