@@ -22,6 +22,11 @@ namespace Yuebon.DataProcess.Models
         /// 设置或获取表集合信息
         /// </summary>
         public string Tbs { get; set; }
+
+        /// <summary>
+        /// excel表信息
+        /// </summary>
+        public string ExcelTbs { get; set; }
 
     }
 }

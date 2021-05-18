@@ -139,6 +139,11 @@ namespace Yuebon.DataProcess.Services
             }
             detailModel.Tbs = tbList.ToJson();
 
+            if (entity.Sdtype == "Oledb")
+            { 
+                
+            }
+
             bool result = false;
             if (has)
             {

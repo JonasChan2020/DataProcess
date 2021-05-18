@@ -24,6 +24,8 @@ namespace Yuebon.DataProcess.Core.OutSideDbService.Factory
                     return new SqlDatabase(connString);
                 case "Oracle":
                     return new OracleDatabase(connString);
+                case "Oledb":
+                    return new OleDatabase(connString);
                 default:
                     return null;
                     break;

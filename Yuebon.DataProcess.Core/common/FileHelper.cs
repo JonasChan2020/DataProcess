@@ -1,12 +1,13 @@
 ﻿using ICSharpCode.SharpZipLib.Checksum;
 using ICSharpCode.SharpZipLib.Zip;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Yuebon.Commons.Extend;
 using Yuebon.Commons.Log;
 
-namespace Yuebon.Commons.Helpers
+namespace Yuebon.DataProcess.Core.common
 {
     /// <summary>
     /// 文件处理帮助类

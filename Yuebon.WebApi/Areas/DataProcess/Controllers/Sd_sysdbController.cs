@@ -36,6 +36,7 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// 构造函数
         /// </summary>
         /// <param name="_iService"></param>
+        /// <param name="_SdDetailService"></param>
         public Sd_sysdbController(ISd_sysdbService _iService, ISd_detailService _SdDetailService) : base(_iService)
         {
             iService = _iService;
@@ -222,7 +223,6 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
         /// 根据条件查询数据库,并返回对象集合(用于分页数据显示)
         /// </summary>
         /// <param name="search"></param>
-        /// <param name="sysid"></param>
         /// <returns></returns>
         [HttpPost("FindWithPagerWithSysAsync")]
         [YuebonAuthorize("List")]

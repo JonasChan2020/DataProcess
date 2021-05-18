@@ -26,6 +26,12 @@ namespace Yuebon.DataProcess.Dtos
         /// </summary>
         [MaxLength(16777215)]
         public string Tbs { get; set; }
+
+        /// <summary>
+        /// excel表信息
+        /// </summary>
+        [MaxLength(16777215)]
+        public string ExcelTbs { get; set; }
 
     }
 }

@@ -22,11 +22,16 @@ namespace Yuebon.DataProcess.Core.OutSideDbService.Entity
         /// </summary>
         public List<DbFieldInfo> Fileds { get; set; }
         /// <summary>
+        /// 行列表
+        /// </summary>
+        public List<DbRowInfo> Rows { get; set; }
+        /// <summary>
         /// 初始化
         /// </summary>
         public DbTableInfo()
         {
             Fileds = new List<DbFieldInfo>();
+            Rows = new List<DbRowInfo>();
         }
 
         /// <summary>
