@@ -193,8 +193,7 @@ namespace Yuebon.DataProcess.Core.OutSideDbService.DbFiles
             {
                 if (cusTbNames.IndexOf(item) > 0)
                 {
-                    DataTable dt = NPOIHelper.ReadExcelToDataTable(connectionString, item);
-                    dbTableList.Add(DataTableToDbTableInfo(dt));
+                    dbTableList.Add(new DbTableInfo() { TableName = item.ToString() });
                 }
             }
             return dbTableList;
@@ -210,7 +209,18 @@ namespace Yuebon.DataProcess.Core.OutSideDbService.DbFiles
         /// <returns></returns>
         public List<DbTableInfo> GetAllTables(string dbName, string strwhere, string fieldNameToSort, bool isDescending, int PageSize, int CurrenetPageIndex,int RecordCount)
         {
-            return null;
+            ArrayList tbNameList = NPOIHelper.ReadExcelSheets(connectionString);
+
+            int minRow = PageSize * (CurrenetPageIndex - 1) + 1;
+            int maxRow = PageSize * CurrenetPageIndex;
+
+            var list = new List<DbTableInfo>();
+            for (int i = minRow-1; i < maxRow-1; i++)
+            {
+                list.Add(new DbTableInfo() { TableName = tbNameList[i].ToString() });
+            }
+            RecordCount = tbNameList.Count;
+            return list;
         }
         /// <summary>
         /// 获取表的所有字段名及字段类型
