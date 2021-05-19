@@ -200,7 +200,7 @@ namespace Yuebon.DataProcess.Core.OutSideDbService.DbFiles
             return dbTableList;
         }
         /// <summary>
-        /// 无用
+        /// 分页获取数据库的所有表的信息
         /// </summary>
         /// <param name="dbName"></param>
         /// <param name="strwhere"></param>
@@ -238,34 +238,6 @@ namespace Yuebon.DataProcess.Core.OutSideDbService.DbFiles
                 return new List<DbFieldInfo>();
             }
            
-        }
-
-        /// <summary>
-        /// 获取指定的
-        /// </summary>
-        /// <param name="dbName">dbName</param>
-        /// <param name="tableName">数据表的名称</param>
-        /// <returns></returns>
-        public List<DbRowInfo> GetTableContent(string dbName, string tableName,int headStartIndex,int headEndIndex)
-        {
-            List<DbRowInfo> list = NPOIHelper.ReadExcelHeadInfoToDataTable(connectionString, tableName, headStartIndex, headEndIndex);
-            List<DbTableInfo> tbInfo = GetAllTables("", tableName);
-            if (tbInfo != null && tbInfo.Count > 0)
-            {
-                list = tbInfo[0].Fileds;
-                List<DbFieldInfo> reslist = new List<DbFieldInfo>();
-                foreach (DbFieldInfo info in list)
-                {
-                    info.DataType = ConvertDataType(info);
-                    reslist.Add(info);
-                }
-                return reslist;
-            }
-            else
-            {
-                return new List<DbFieldInfo>();
-            }
-
         }
         #endregion
 
