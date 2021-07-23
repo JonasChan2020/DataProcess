@@ -2,16 +2,12 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
-using System.Text;
 using MySql.Data.MySqlClient;
 using Dapper;
 using System.Collections;
 using System.Linq;
-using Yuebon.DataProcess.Core.OutSideDbService.Extension;
 using Yuebon.DataProcess.Core.OutSideDbService.Entity;
 using Yuebon.DataProcess.Core.PlugIServices;
-using Yuebon.DataProcess.Core.OutSideDbService.Factory;
 using Yuebon.DataProcess.Core.common;
 
 namespace Yuebon.DataProcess.Core.OutSideDbService.DbFiles
