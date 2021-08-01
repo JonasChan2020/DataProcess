@@ -211,7 +211,7 @@
                :show-close="false"
                :title="editMiddleFormTitle+'数据输出模型'"
                :visible.sync="dialogMiddleEditFormVisible"
-               width="640px">
+               width="1000px">
       <el-form ref="editMiddleFrom" :model="editMiddleFrom" :rules="Middlerules">
         <el-form-item label="数据表" :label-width="formLabelWidth" prop="Tbname">
           <el-select v-model="editMiddleFrom.Tbname" placeholder="请选择" @change="handleSelectTbChange()">
@@ -221,35 +221,9 @@
                        :value="item.TableName" />
           </el-select>
         </el-form-item>
-        <el-button @click.prevent="addStartDomain()" type="text" v-if="editMiddleFrom.dynamicFiterForm==null||editMiddleFrom.dynamicFiterForm.length==0">添加</el-button>
-        <el-button @click.prevent="addStartDomainKh()" type="text" v-if="editMiddleFrom.dynamicFiterForm==null||editMiddleFrom.dynamicFiterForm.length==0">括号</el-button>
-        <el-form-item v-for="(domain, index) in editMiddleFrom.dynamicFiterForm"
-                      :key="index">
-          <el-tag v-if="domain.KhType==0" effect="dark" :type="domain.type">(</el-tag>
-          <el-tag v-if="domain.KhType==1" effect="dark" :type="domain.type">)</el-tag>
-          <el-select v-model="domain.columnName" placeholder="请选择字段" style="width:20%" v-if="(domain.KhType==-1)">
-            <el-option v-for="item in SelectColumnNameList"
-                       :key="item.FieldName"
-                       :label="item.FieldName"
-                       :value="item.FieldName" />
-          </el-select>
-          <el-select v-model="domain.rex" placeholder="请选择操作符" style="width:20%" v-if="(domain.KhType==-1)">
-            <el-option v-for="item in SelectRexList"
-                       :key="item"
-                       :label="item"
-                       :value="item" />
-          </el-select>
-          <el-input v-model="domain.value" style="width:20%" v-if="(domain.KhType==-1)"></el-input>
-          <el-select v-model="domain.aon" placeholder="请选择连接符" style="width:15%" v-if="(domain.KhType!=0)">
-            <el-option v-for="item in SelectaonList"
-                       :key="item"
-                       :label="item"
-                       :value="item" />
-          </el-select>
-          <el-button @click.prevent="removeDomain(domain)" type="text">删除</el-button>
-          <el-button @click.prevent="addDomain(domain)" type="text" v-if="domain.showBtn==true&&domain.KhType!=0">添加</el-button>
-          <el-button @click.prevent="addDomainKh(domain)" type="text" v-if="domain.showBtn==true&&domain.KhType!=0">括号</el-button>
-        </el-form-item>
+        <el-card>
+          <searchfitercom ref="mysfc" :beforeTables="tbs" />
+        </el-card>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeMiddleEditForm">取 消</el-button>
@@ -342,9 +316,17 @@ import {
     saveSys_outmodel_sql, getByOutModelId
   } from '@/api/dataprocess/sys_outmodel_sql'
 
+  import searchfitercom
+    from '@/views/dataprocess/components/SqlComponents/SearchFiterComponent.vue'
+
+
+
   export default {
     name: 'sysconfcontrol',
     props: ['sid'], //父页面传过来的配置ID
+    components: {
+      searchfitercom
+    },
   data() {
     return {
       searchform: {
@@ -399,38 +381,6 @@ import {
       currentMiddleId: '', // 当前操作对象的ID值，主要用于修改
       currentMiddleSelected: [],
       SelectTbnameList: [],
-      SelectColumnNameList: [], //字段下拉框数据
-      SelectRexList: [
-        '=',
-        '!=',
-        '<',
-        '<=',
-        '>',
-        '>=',
-        '包含',
-        '不包含',
-        '开始以',
-        '开始不是以',
-        '结束以',
-        '结束不是以',
-        '是null',
-        '不是null',
-        '是空',
-        '不是空',
-        '介于',
-        '不介于',
-      ], //操作符下拉框数据
-      SelectaonList: [
-        'and',
-        'or',
-      ], //连接符下拉框数据
-      tagType: [
-        '',
-        'success',
-        'info',
-        'danger',
-        'warning',
-      ],
       tableRightData: [],
       tableRightloading:false,
       dialogRightEditFormVisible: false,
@@ -439,7 +389,8 @@ import {
       tableRightDetailloading: false,
       currentRightDetailId: '', // 当前操作对象的ID值，主要用于修改
       currentRightDetailSelected: [],
-      SelectRightTbNameList:[],
+      SelectRightTbNameList: [],
+      tbs:''
     }
   },
   created() {
@@ -750,33 +701,36 @@ import {
     saveMiddleEditForm() {
       this.$refs['editMiddleFrom'].validate((valid) => {
         if (valid) {
-          const data = {
-            'Tbname': this.editMiddleFrom.Tbname,
-            'Fiterstr': JSON.stringify(this.editMiddleFrom.dynamicFiterForm),
-            'Sys_outmodel_id': this.currentId,
-            'Id': this.currentMiddleId,
-          }
+          var fiterJson = '';
+          fiterJson = this.$refs.mysfc.getResultJson();
+          alert(fiterJson);
+          //const data = {
+          //  'Tbname': this.editMiddleFrom.Tbname,
+          //  'Fiterstr': fiterJson,
+          //  'Sys_outmodel_id': this.currentId,
+          //  'Id': this.currentMiddleId,
+          //}
 
-          var url = 'Sys_outmodel_details/Insert'
-          if (this.currentMiddleId !== '') {
-            url = 'Sys_outmodel_details/Update?id=' + this.currentMiddleId
-          }
-          saveSys_outmodel_details(data, url).then(res => {
-            if (res.Success) {
-              this.$message({
-                message: '恭喜你，操作成功',
-                type: 'success'
-              })
-              this.dialogMiddleEditFormVisible = false
-              this.$refs['editMiddleFrom'].resetFields()
-              this.loadMiddleTableData()
-            } else {
-              this.$message({
-                message: res.ErrMsg,
-                type: 'error'
-              })
-            }
-          })
+          //var url = 'Sys_outmodel_details/Insert'
+          //if (this.currentMiddleId !== '') {
+          //  url = 'Sys_outmodel_details/Update?id=' + this.currentMiddleId
+          //}
+          //saveSys_outmodel_details(data, url).then(res => {
+          //  if (res.Success) {
+          //    this.$message({
+          //      message: '恭喜你，操作成功',
+          //      type: 'success'
+          //    })
+          //    this.dialogMiddleEditFormVisible = false
+          //    this.$refs['editMiddleFrom'].resetFields()
+          //    this.loadMiddleTableData()
+          //  } else {
+          //    this.$message({
+          //      message: res.ErrMsg,
+          //      type: 'error'
+          //    })
+          //  }
+          //})
         } else {
           return false
         }
@@ -811,7 +765,7 @@ import {
           return item
         }
       })
-      this.SelectColumnNameList = res[0].Fileds
+      this.$refs.mysfc.changeCols(res[0].Fileds);
     },
     removeDomain(item) {
       var index = this.editMiddleFrom.dynamicFiterForm.indexOf(item)
@@ -864,6 +818,7 @@ import {
         this.editMiddleFrom.dynamicFiterForm.splice(index+1,0,{
           columnName: '', //字段名称
           rex: '', //操作符
+          valuetype: '', //值类型
           value: '', //值
           Kh: item.InKhIndex, //括号序号 从1开始
           KhType: -1, //括号类型，0是起始，1是结束
@@ -876,6 +831,7 @@ import {
         this.editMiddleFrom.dynamicFiterForm.push({
           columnName: '', //字段名称
           rex: '', //操作符
+          valuetype: '', //值类型
           value: '', //值
           Kh: item.InKhIndex, //括号序号 从1开始
           KhType: -1, //括号类型，0是起始，1是结束
@@ -893,6 +849,7 @@ import {
         this.editMiddleFrom.dynamicFiterForm.splice(index + 1, 0, { //加左括号
           columnName: '', //字段名称
           rex: '', //操作符
+          valuetype: '', //值类型
           value: '', //值
           Kh: item.NextKhIndex, //括号序号 从1开始
           KhType: 0, //括号类型，0是起始，1是结束
@@ -904,6 +861,7 @@ import {
         this.editMiddleFrom.dynamicFiterForm.splice(index + 2, 0, { //加数据
           columnName: '', //字段名称
           rex: '', //操作符
+          valuetype: '', //值类型
           value: '', //值
           Kh: item.NextKhIndex, //括号序号 从1开始
           KhType: -1, //括号类型，0是起始，1是结束
@@ -915,6 +873,7 @@ import {
         this.editMiddleFrom.dynamicFiterForm.splice(index + 3, 0, { //加右括号
           columnName: '', //字段名称
           rex: '', //操作符
+          valuetype: '', //值类型
           value: '', //值
           Kh: item.NextKhIndex, //括号序号 从1开始
           KhType: 1, //括号类型，0是起始，1是结束
@@ -927,6 +886,7 @@ import {
         this.editMiddleFrom.dynamicFiterForm.push({ //加左括号
           columnName: '', //字段名称
           rex: '', //操作符
+          valuetype: '', //值类型
           value: '', //值
           Kh: item.NextKhIndex, //括号序号 从1开始
           KhType: 0, //括号类型，0是起始，1是结束
@@ -938,6 +898,7 @@ import {
         this.editMiddleFrom.dynamicFiterForm.push({ //加数据
           columnName: '', //字段名称
           rex: '', //操作符
+          valuetype: '', //值类型
           value: '', //值
           Kh: item.NextKhIndex, //括号序号 从1开始
           KhType: -1, //括号类型，0是起始，1是结束
@@ -949,6 +910,7 @@ import {
         this.editMiddleFrom.dynamicFiterForm.push({ //加右括号
           columnName: '', //字段名称
           rex: '', //操作符
+          valuetype: '', //值类型
           value: '', //值
           Kh: item.NextKhIndex, //括号序号 从1开始
           KhType: 1, //括号类型，0是起始，1是结束
@@ -968,6 +930,7 @@ import {
       this.editMiddleFrom.dynamicFiterForm=[{
         columnName: '', //字段名称
         rex: '', //操作符
+        valuetype: '', //值类型
         value: '', //值
         Kh: -1, //括号序号 从1开始
         KhType: -1, //括号类型，0是起始，1是结束
@@ -982,6 +945,7 @@ import {
       this.editMiddleFrom.dynamicFiterForm=[{ //加左括号
         columnName: '', //字段名称
         rex: '', //操作符
+        valuetype: '', //值类型
         value: '', //值
         Kh: 0, //括号序号 从0开始
         KhType: 0, //括号类型，0是起始，1是结束
@@ -993,6 +957,7 @@ import {
       this.editMiddleFrom.dynamicFiterForm.push({ //加数据
         columnName: '', //字段名称
         rex: '', //操作符
+        valuetype: '', //值类型
         value: '', //值
         Kh: 0, //括号序号 从1开始
         KhType: -1, //括号类型，0是起始，1是结束
@@ -1004,6 +969,7 @@ import {
       this.editMiddleFrom.dynamicFiterForm.push({ //加右括号
         columnName: '', //字段名称
         rex: '', //操作符
+        valuetype: '', //值类型
         value: '', //值
         Kh: 0, //括号序号 从1开始
         KhType: 1, //括号类型，0是起始，1是结束

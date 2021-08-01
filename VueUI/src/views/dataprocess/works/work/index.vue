@@ -116,57 +116,79 @@
       ref="dialogEditForm"
       :title="editFormTitle+'{TableNameDesc}'"
       :visible.sync="dialogEditFormVisible"
-      width="640px"
+      width="1280px"
     >
       <el-form ref="editFrom" :model="editFrom" :rules="rules">
-        <el-form-item label="配置信息ID" :label-width="formLabelWidth" prop="Conf_conf_id">
-          <el-input v-model="editFrom.Conf_conf_id" placeholder="请输入配置信息ID" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="配置信息详情IDs" :label-width="formLabelWidth" prop="Conf_detail_ids">
-          <el-input v-model="editFrom.Conf_detail_ids" placeholder="请输入配置信息详情IDs" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="创建时间" :label-width="formLabelWidth" prop="CreatorTime">
-          <el-input v-model="editFrom.CreatorTime" placeholder="请输入创建时间" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="创建人" :label-width="formLabelWidth" prop="CreatorUserId">
-          <el-input v-model="editFrom.CreatorUserId" placeholder="请输入创建人" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="数据路径" :label-width="formLabelWidth" prop="Datapath">
-          <el-input v-model="editFrom.Datapath" placeholder="请输入数据路径" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="删除标记" :label-width="formLabelWidth" prop="DeleteMark">
-          <el-input v-model="editFrom.DeleteMark" placeholder="请输入删除标记" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="删除时间" :label-width="formLabelWidth" prop="DeleteTime">
-          <el-input v-model="editFrom.DeleteTime" placeholder="请输入删除时间" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="删除人" :label-width="formLabelWidth" prop="DeleteUserId">
-          <el-input v-model="editFrom.DeleteUserId" placeholder="请输入删除人" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="描述" :label-width="formLabelWidth" prop="Description">
-          <el-input v-model="editFrom.Description" placeholder="请输入描述" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="启用标记" :label-width="formLabelWidth" prop="EnabledMark">
-          <el-input v-model="editFrom.EnabledMark" placeholder="请输入启用标记" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="最后修改时间" :label-width="formLabelWidth" prop="LastModifyTime">
-          <el-input v-model="editFrom.LastModifyTime" placeholder="请输入最后修改时间" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="最后修改人" :label-width="formLabelWidth" prop="LastModifyUserId">
-          <el-input v-model="editFrom.LastModifyUserId" placeholder="请输入最后修改人" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="目标ID" :label-width="formLabelWidth" prop="Sdid">
-          <el-input v-model="editFrom.Sdid" placeholder="请输入目标ID" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="排序字段" :label-width="formLabelWidth" prop="SortCode">
-          <el-input v-model="editFrom.SortCode" placeholder="请输入排序字段" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="状态" :label-width="formLabelWidth" prop="State">
-          <el-input v-model="editFrom.State" placeholder="请输入状态" autocomplete="off" clearable />
-        </el-form-item>
-        <el-form-item label="工作编码" :label-width="formLabelWidth" prop="Wcode">
-          <el-input v-model="editFrom.Wcode" placeholder="请输入工作编码" autocomplete="off" clearable />
-        </el-form-item>
+        <el-row :gutter="24">
+          <el-col :span="12">
+            <el-card>
+              <el-select v-model="editFrom.selectedSysDb" placeholder="请选择系统或数据库" @change="handleSelectSysDbChange()">
+                <el-option v-for="item in editFrom.selectSysDb"
+                           :key="item.value"
+                           :label="item.label"
+                           :value="item.value" />
+              </el-select>
+            </el-card>
+            <el-card>
+              <el-cascader v-model="editFrom.selectedclass" :key="editFrom.cascaderkey" style="width: 100%;" :options="editFrom.selectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handlefromSelectClassChange" />
+              <el-table ref="editFrom.gridfromtable"
+                        v-loading="editFrom.fromtableloading"
+                        :data="editFrom.fromtableData"
+                        style="width: 100%;margin-bottom: 20px;"
+                        row-key="Id"
+                        border
+                        size="mini"
+                        max-height="850"
+                        default-expand-all
+                        highlight-current-row
+                        :tree-props="{children: 'Children'}"
+                        @row-click="handlefromClickRow">
+                <el-table-column prop="NodeName" label="名称" min-width="30%" />
+                <el-table-column prop="Description" label="描述" min-width="70%" />
+              </el-table>
+            </el-card>
+          </el-col>
+          <el-col :span="12">
+            <el-table ref="gridtotable"
+                      v-loading="editFrom.totableloading"
+                      :data="editFrom.totableData"
+                      :height="700"
+                      border
+                      stripe
+                      highlight-current-row
+                      style="width: 100%"
+                      :default-sort="{prop: 'ConfFromType', order: 'ascending'}"
+                      @row-click="handletoClickRow"
+                      @select="handletoSelectChange"
+                      @sort-change="handletoSortChange">
+              <el-table-column type="selection" min-width="5%" />
+              <el-table-column prop="ConfFromType" label="类型" sortable="custom" min-width="10%">
+                <template slot-scope="scope">
+                  <el-tag :type="scope.row.ConfFromType === 1 ? 'success' : 'info'" disable-transitions>{{ scope.row.ConfFromType === 1 ? "数据库" : "系统" }}</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="FromTbName" label="名称" sortable="custom" min-width="15%" />
+              <el-table-column prop="FromDescription" label="描述" sortable="custom" min-width="15%" />
+              <el-table-column prop="FromParentName" label="所属模型或库" sortable="custom" min-width="15%" />
+              <el-table-column prop="FromParentDescription" label="描述" sortable="custom" min-width="15%" />
+              <el-table-column label="是否启用" sortable="custom" min-width="10%" prop="EnabledMark" align="center">
+                <template slot-scope="scope">
+                  <el-tag :type="scope.row.EnabledMark === true ? 'success' : 'info'" disable-transitions>{{ scope.row.EnabledMark === true ? "启用" : "禁用" }}</el-tag>
+                </template>
+              </el-table-column>
+            </el-table>
+            <div class="pagination-container">
+              <el-pagination background
+                             :current-page="editFrom.topagination.currentPage"
+                             :page-sizes="[5,10,20,50,100, 200, 300, 400]"
+                             :page-size="editFrom.topagination.pagesize"
+                             layout="total, sizes, prev, pager, next, jumper"
+                             :total="editFrom.topagination.pageTotal"
+                             @size-change="handletoSizeChange"
+                             @current-change="handletoCurrentChange" />
+            </div>
+          </el-col>
+        </el-row>
 
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -182,7 +204,27 @@
 import { getWork_workListWithPager, getWork_workDetail,
   saveWork_work, setWork_workEnable, deleteSoftWork_work,
   deleteWork_work
-} from '@/api/dataprocess/work_work'
+  } from '@/api/dataprocess/work_work'
+
+  import {
+    getAllClassifyTreeTable
+  } from '@/api/dataprocess/sys_classify'
+
+  import {
+    getAllSdClassifyTreeTable
+  } from '@/api/dataprocess/sd_classify'
+
+  import {
+    getSysAndModelTree
+  } from '@/api/dataprocess/sys_conf'
+
+  import {
+    getSdAndTbTree
+  } from '@/api/dataprocess/sd_sysdb'
+
+  import {
+    getConf_confListWithPager,
+  } from '@/api/dataprocess/conf_conf'
 
 export default {
   data() {
@@ -205,23 +247,40 @@ export default {
       dialogEditFormVisible: false,
       editFormTitle: '',
       editFrom: {
-        Conf_conf_id: '',
-        Conf_detail_ids: '',
-        CreatorTime: '',
-        CreatorUserId: '',
-        Datapath: '',
-        DeleteMark: '',
-        DeleteTime: '',
-        DeleteUserId: '',
-        Description: '',
-        EnabledMark: '',
-        LastModifyTime: '',
-        LastModifyUserId: '',
-        Sdid: '',
-        SortCode: '',
-        State: '',
-        Wcode: ''
-
+        selectedSysDb: '',
+        selectSysDb: [{
+          value: '0',
+          label: '系统'
+        }, {
+          value: '1',
+          label: '数据库'
+          }],
+        cascaderkey: 1,
+        selectedclass: '',
+        selectclasses: [],
+        fromcurrentSelectId: '',
+        fromcurrentSelectParentId: '', //toParentId
+        fromtableloading: false,
+        fromtableHead: [],
+        fromtableData: [],
+        fromsortableData: {
+          order: 'desc',
+          sort: 'CreatorTime'
+        },
+        tocurrentId: '', // 当前操作对象的ID值，主要用于修改
+        tocurrentSelectId: '',
+        tocurrentSelected: [],
+        totableloading: false,
+        totableData: [],
+        topagination: {
+          currentPage: 1,
+          pagesize: 20,
+          pageTotal: 0
+        },
+        tosortableData: {
+          order: 'desc',
+          sort: 'CreatorTime'
+        },
       },
       rules: {
 
@@ -289,73 +348,14 @@ export default {
       }
     },
     bindEditInfo: function() {
-      getWork_workDetail(this.currentId).then(res => {
-        this.editFrom.Conf_conf_id = res.ResData.Conf_conf_id
-        this.editFrom.Conf_detail_ids = res.ResData.Conf_detail_ids
-        this.editFrom.CreatorTime = res.ResData.CreatorTime
-        this.editFrom.CreatorUserId = res.ResData.CreatorUserId
-        this.editFrom.Datapath = res.ResData.Datapath
-        this.editFrom.DeleteMark = res.ResData.DeleteMark
-        this.editFrom.DeleteTime = res.ResData.DeleteTime
-        this.editFrom.DeleteUserId = res.ResData.DeleteUserId
-        this.editFrom.Description = res.ResData.Description
-        this.editFrom.EnabledMark = res.ResData.EnabledMark
-        this.editFrom.LastModifyTime = res.ResData.LastModifyTime
-        this.editFrom.LastModifyUserId = res.ResData.LastModifyUserId
-        this.editFrom.Sdid = res.ResData.Sdid
-        this.editFrom.SortCode = res.ResData.SortCode
-        this.editFrom.State = res.ResData.State
-        this.editFrom.Wcode = res.ResData.Wcode
-      })
+      
     },
     /**
      * 新增/修改保存
      */
     saveEditForm() {
-      this.$refs['editFrom'].validate((valid) => {
-        if (valid) {
-          const data = {
-            'Conf_conf_id': this.editFrom.Conf_conf_id,
-            'Conf_detail_ids': this.editFrom.Conf_detail_ids,
-            'CreatorTime': this.editFrom.CreatorTime,
-            'CreatorUserId': this.editFrom.CreatorUserId,
-            'Datapath': this.editFrom.Datapath,
-            'DeleteMark': this.editFrom.DeleteMark,
-            'DeleteTime': this.editFrom.DeleteTime,
-            'DeleteUserId': this.editFrom.DeleteUserId,
-            'Description': this.editFrom.Description,
-            'EnabledMark': this.editFrom.EnabledMark,
-            'LastModifyTime': this.editFrom.LastModifyTime,
-            'LastModifyUserId': this.editFrom.LastModifyUserId,
-            'Sdid': this.editFrom.Sdid,
-            'SortCode': this.editFrom.SortCode,
-            'State': this.editFrom.State,
-            'Wcode': this.editFrom.Wcode,
-
-            'Id': this.currentId
-          }
-          saveWork_work(data).then(res => {
-            if (res.Success) {
-              this.$message({
-                message: '恭喜你，操作成功',
-                type: 'success'
-              })
-              this.dialogEditFormVisible = false
-              this.currentSelected = ''
-              this.$refs['editFrom'].resetFields()
-              this.loadTableData()
-              this.InitDictItem()
-            } else {
-              this.$message({
-                message: res.ErrMsg,
-                type: 'error'
-              })
-            }
-          })
-        } else {
-          return false
-        }
-      })
+     
+      
     },
     setEnable: function(val) {
       if (this.currentSelected.length === 0) {
@@ -484,7 +484,154 @@ export default {
     handleCurrentChange(val) {
       this.pagination.currentPage = val
       this.loadTableData()
-    }
+    },
+
+  /**
+   * 子页面
+   */
+
+    /**
+      *系统或数据库选择
+      */
+      handleSelectSysDbChange: function () {
+        this.editFrom.selectclasses = []
+        this.editFrom.selectedclass = ''
+        this.editFrom.fromtableData = []
+        this.editFrom.cascaderkey++
+        if (this.editFrom.selectedSysDb == '0') {
+          this.editFrom.fromtableHead = [
+          { column_name: "Syscode", column_comment: "编码", column_minWidth: "25%" },
+          { column_name: "Sysname", column_comment: "名称", column_minWidth: "75%" }
+        ]
+        getAllClassifyTreeTable().then(res => {
+          this.editFrom.selectclasses = res.ResData
+        })
+        } else if (this.editFrom.selectedSysDb == '1') {
+          this.editFrom.fromtableHead = [
+          { column_name: "SdName", column_comment: "名称", column_minWidth: "95%" }
+        ]
+        getAllSdClassifyTreeTable().then(res => {
+          this.editFrom.selectclasses = res.ResData
+        })
+      }
+      this.loadfromTableData()
+    },
+    /**
+    * 加载页面左侧table数据
+    */
+    loadfromTableData: function () {
+      this.editFrom.fromtableloading = true
+      var seachdata = {
+        Filter: {
+          Classify_id: this.editFrom.selectedclass,
+        }
+      }
+
+      if (this.editFrom.selectedSysDb == '0') {
+
+        getSysAndModelTree(seachdata).then(res => {
+
+          this.editFrom.fromtableData = res.ResData
+          this.editFrom.fromtableloading = false
+        })
+      } else if (this.editFrom.selectedSysDb == '1') {
+
+        getSdAndTbTree(seachdata).then(res => {
+          this.editFrom.fromtableData = res.ResData
+          this.editFrom.fromtableloading = false
+        })
+      }
+    },
+
+    /**
+*系统或数据库分类选择
+*/
+    handlefromSelectClassChange: function (value) {
+      this.editFrom.selectedclass = value
+    },
+
+    /**
+      * 点击一条记录
+      */
+    handlefromClickRow(row) {
+      if (row.NodeType !== "tb") {
+        this.editFrom.fromcurrentSelectId = ""
+        this.editFrom.fromcurrentSelectParentId = ""
+      } else {
+        this.editFrom.fromcurrentSelectId = row.Id
+        this.editFrom.fromcurrentSelectParentId = row.ParentId
+        this.editFrom.topagination.currentPage = 1
+        this.loadtoTableData()
+      }
+    },
+
+
+    /**
+    * 加载页面左侧table数据
+    */
+    loadtoTableData: function () {
+      this.editFrom.totableloading = true
+      var seachdata = {
+        CurrenetPageIndex: this.editFrom.topagination.currentPage,
+        PageSize: this.editFrom.topagination.pagesize,
+        Order: this.editFrom.tosortableData.order,
+        Sort: this.editFrom.tosortableData.sort,
+        Filter: {
+          ToId: this.editFrom.tocurrentSelectId
+        }
+      }
+      getConf_confListWithPager(seachdata).then(res => {
+        this.editFrom.totableData = res.ResData.Items
+        this.editFrom.topagination.pageTotal = res.ResData.TotalItems
+        this.editFrom.totableloading = false
+      })
+    },
+    /**
+       * 当表格的排序条件发生变化的时候会触发该事件
+       */
+      handletoSortChange: function (column) {
+        this.editFrom.tosortableData.sort = column.prop
+        if (column.order === 'ascending') {
+          this.editFrom.tosortableData.order = 'asc'
+        } else {
+          this.editFrom.tosortableData.order = 'desc'
+        }
+        this.loadtoTableData()
+      },
+      /**
+      * 选择每页显示数量
+      */
+      handletoSizeChange(val) {
+        this.editFrom.topagination.pagesize = val
+        this.editFrom.topagination.currentPage = 1
+        this.loadtoTableData()
+      },
+      /**
+       * 选择当页面
+       */
+      handletoCurrentChange(val) {
+        this.editFrom.topagination.currentPage = val
+        this.loadtoTableData()
+      },
+      /**
+      * 点击一条记录
+      */
+      handletoClickRow(row) {
+        this.editFrom.tocurrentSelectId = row.Id
+      },
+      /**
+     * 当用户手动勾选checkbox数据行事件
+     */
+      handletoSelectChange: function (selection, row) {
+        this.editFrom.tocurrentSelected = selection
+      },
+      /**
+       * 当用户手动勾选全选checkbox事件
+       */
+      handletoSelectAllChange: function (selection) {
+        this.editFrom.tocurrentSelected = selection
+      },
+
   }
 }
 </script>
