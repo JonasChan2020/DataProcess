@@ -123,44 +123,50 @@
           <el-col :span="12">
             <el-card>
               <el-select v-model="editFrom.selectedSysDb" placeholder="请选择系统或数据库" @change="handleSelectSysDbChange()">
-                <el-option v-for="item in editFrom.selectSysDb"
-                           :key="item.value"
-                           :label="item.label"
-                           :value="item.value" />
+                <el-option
+                  v-for="item in editFrom.selectSysDb"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
               </el-select>
             </el-card>
             <el-card>
-              <el-cascader v-model="editFrom.selectedclass" :key="editFrom.cascaderkey" style="width: 100%;" :options="editFrom.selectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handlefromSelectClassChange" />
-              <el-table ref="editFrom.gridfromtable"
-                        v-loading="editFrom.fromtableloading"
-                        :data="editFrom.fromtableData"
-                        style="width: 100%;margin-bottom: 20px;"
-                        row-key="Id"
-                        border
-                        size="mini"
-                        max-height="850"
-                        default-expand-all
-                        highlight-current-row
-                        :tree-props="{children: 'Children'}"
-                        @row-click="handlefromClickRow">
+              <el-cascader :key="editFrom.cascaderkey" v-model="editFrom.selectedclass" style="width: 100%;" :options="editFrom.selectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handlefromSelectClassChange" />
+              <el-table
+                ref="editFrom.gridfromtable"
+                v-loading="editFrom.fromtableloading"
+                :data="editFrom.fromtableData"
+                style="width: 100%;margin-bottom: 20px;"
+                row-key="Id"
+                border
+                size="mini"
+                max-height="850"
+                default-expand-all
+                highlight-current-row
+                :tree-props="{children: 'Children'}"
+                @row-click="handlefromClickRow"
+              >
                 <el-table-column prop="NodeName" label="名称" min-width="30%" />
                 <el-table-column prop="Description" label="描述" min-width="70%" />
               </el-table>
             </el-card>
           </el-col>
           <el-col :span="12">
-            <el-table ref="gridtotable"
-                      v-loading="editFrom.totableloading"
-                      :data="editFrom.totableData"
-                      :height="700"
-                      border
-                      stripe
-                      highlight-current-row
-                      style="width: 100%"
-                      :default-sort="{prop: 'ConfFromType', order: 'ascending'}"
-                      @row-click="handletoClickRow"
-                      @select="handletoSelectChange"
-                      @sort-change="handletoSortChange">
+            <el-table
+              ref="gridtotable"
+              v-loading="editFrom.totableloading"
+              :data="editFrom.totableData"
+              :height="700"
+              border
+              stripe
+              highlight-current-row
+              style="width: 100%"
+              :default-sort="{prop: 'ConfFromType', order: 'ascending'}"
+              @row-click="handletoClickRow"
+              @select="handletoSelectChange"
+              @sort-change="handletoSortChange"
+            >
               <el-table-column type="selection" min-width="5%" />
               <el-table-column prop="ConfFromType" label="类型" sortable="custom" min-width="10%">
                 <template slot-scope="scope">
@@ -178,14 +184,16 @@
               </el-table-column>
             </el-table>
             <div class="pagination-container">
-              <el-pagination background
-                             :current-page="editFrom.topagination.currentPage"
-                             :page-sizes="[5,10,20,50,100, 200, 300, 400]"
-                             :page-size="editFrom.topagination.pagesize"
-                             layout="total, sizes, prev, pager, next, jumper"
-                             :total="editFrom.topagination.pageTotal"
-                             @size-change="handletoSizeChange"
-                             @current-change="handletoCurrentChange" />
+              <el-pagination
+                background
+                :current-page="editFrom.topagination.currentPage"
+                :page-sizes="[5,10,20,50,100, 200, 300, 400]"
+                :page-size="editFrom.topagination.pagesize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="editFrom.topagination.pageTotal"
+                @size-change="handletoSizeChange"
+                @current-change="handletoCurrentChange"
+              />
             </div>
           </el-col>
         </el-row>
@@ -204,27 +212,27 @@
 import { getWork_workListWithPager, getWork_workDetail,
   saveWork_work, setWork_workEnable, deleteSoftWork_work,
   deleteWork_work
-  } from '@/api/dataprocess/work_work'
+} from '@/api/dataprocess/work_work'
 
-  import {
-    getAllClassifyTreeTable
-  } from '@/api/dataprocess/sys_classify'
+import {
+  getAllClassifyTreeTable
+} from '@/api/dataprocess/sys_classify'
 
-  import {
-    getAllSdClassifyTreeTable
-  } from '@/api/dataprocess/sd_classify'
+import {
+  getAllSdClassifyTreeTable
+} from '@/api/dataprocess/sd_classify'
 
-  import {
-    getSysAndModelTree
-  } from '@/api/dataprocess/sys_conf'
+import {
+  getSysAndModelTree
+} from '@/api/dataprocess/sys_conf'
 
-  import {
-    getSdAndTbTree
-  } from '@/api/dataprocess/sd_sysdb'
+import {
+  getSdAndTbTree
+} from '@/api/dataprocess/sd_sysdb'
 
-  import {
-    getConf_confListWithPager,
-  } from '@/api/dataprocess/conf_conf'
+import {
+  getConf_confListWithPager
+} from '@/api/dataprocess/conf_conf'
 
 export default {
   data() {
@@ -254,12 +262,12 @@ export default {
         }, {
           value: '1',
           label: '数据库'
-          }],
+        }],
         cascaderkey: 1,
         selectedclass: '',
         selectclasses: [],
         fromcurrentSelectId: '',
-        fromcurrentSelectParentId: '', //toParentId
+        fromcurrentSelectParentId: '', // toParentId
         fromtableloading: false,
         fromtableHead: [],
         fromtableData: [],
@@ -280,7 +288,7 @@ export default {
         tosortableData: {
           order: 'desc',
           sort: 'CreatorTime'
-        },
+        }
       },
       rules: {
 
@@ -348,14 +356,13 @@ export default {
       }
     },
     bindEditInfo: function() {
-      
+
     },
     /**
      * 新增/修改保存
      */
     saveEditForm() {
-     
-      
+
     },
     setEnable: function(val) {
       if (this.currentSelected.length === 0) {
@@ -486,29 +493,29 @@ export default {
       this.loadTableData()
     },
 
-  /**
+    /**
    * 子页面
    */
 
     /**
       *系统或数据库选择
       */
-      handleSelectSysDbChange: function () {
-        this.editFrom.selectclasses = []
-        this.editFrom.selectedclass = ''
-        this.editFrom.fromtableData = []
-        this.editFrom.cascaderkey++
-        if (this.editFrom.selectedSysDb == '0') {
-          this.editFrom.fromtableHead = [
-          { column_name: "Syscode", column_comment: "编码", column_minWidth: "25%" },
-          { column_name: "Sysname", column_comment: "名称", column_minWidth: "75%" }
+    handleSelectSysDbChange: function() {
+      this.editFrom.selectclasses = []
+      this.editFrom.selectedclass = ''
+      this.editFrom.fromtableData = []
+      this.editFrom.cascaderkey++
+      if (this.editFrom.selectedSysDb == '0') {
+        this.editFrom.fromtableHead = [
+          { column_name: 'Syscode', column_comment: '编码', column_minWidth: '25%' },
+          { column_name: 'Sysname', column_comment: '名称', column_minWidth: '75%' }
         ]
         getAllClassifyTreeTable().then(res => {
           this.editFrom.selectclasses = res.ResData
         })
-        } else if (this.editFrom.selectedSysDb == '1') {
-          this.editFrom.fromtableHead = [
-          { column_name: "SdName", column_comment: "名称", column_minWidth: "95%" }
+      } else if (this.editFrom.selectedSysDb == '1') {
+        this.editFrom.fromtableHead = [
+          { column_name: 'SdName', column_comment: '名称', column_minWidth: '95%' }
         ]
         getAllSdClassifyTreeTable().then(res => {
           this.editFrom.selectclasses = res.ResData
@@ -519,23 +526,20 @@ export default {
     /**
     * 加载页面左侧table数据
     */
-    loadfromTableData: function () {
+    loadfromTableData: function() {
       this.editFrom.fromtableloading = true
       var seachdata = {
         Filter: {
-          Classify_id: this.editFrom.selectedclass,
+          Classify_id: this.editFrom.selectedclass
         }
       }
 
       if (this.editFrom.selectedSysDb == '0') {
-
         getSysAndModelTree(seachdata).then(res => {
-
           this.editFrom.fromtableData = res.ResData
           this.editFrom.fromtableloading = false
         })
       } else if (this.editFrom.selectedSysDb == '1') {
-
         getSdAndTbTree(seachdata).then(res => {
           this.editFrom.fromtableData = res.ResData
           this.editFrom.fromtableloading = false
@@ -546,7 +550,7 @@ export default {
     /**
 *系统或数据库分类选择
 */
-    handlefromSelectClassChange: function (value) {
+    handlefromSelectClassChange: function(value) {
       this.editFrom.selectedclass = value
     },
 
@@ -554,9 +558,9 @@ export default {
       * 点击一条记录
       */
     handlefromClickRow(row) {
-      if (row.NodeType !== "tb") {
-        this.editFrom.fromcurrentSelectId = ""
-        this.editFrom.fromcurrentSelectParentId = ""
+      if (row.NodeType !== 'tb') {
+        this.editFrom.fromcurrentSelectId = ''
+        this.editFrom.fromcurrentSelectParentId = ''
       } else {
         this.editFrom.fromcurrentSelectId = row.Id
         this.editFrom.fromcurrentSelectParentId = row.ParentId
@@ -565,11 +569,10 @@ export default {
       }
     },
 
-
     /**
     * 加载页面左侧table数据
     */
-    loadtoTableData: function () {
+    loadtoTableData: function() {
       this.editFrom.totableloading = true
       var seachdata = {
         CurrenetPageIndex: this.editFrom.topagination.currentPage,
@@ -589,48 +592,48 @@ export default {
     /**
        * 当表格的排序条件发生变化的时候会触发该事件
        */
-      handletoSortChange: function (column) {
-        this.editFrom.tosortableData.sort = column.prop
-        if (column.order === 'ascending') {
-          this.editFrom.tosortableData.order = 'asc'
-        } else {
-          this.editFrom.tosortableData.order = 'desc'
-        }
-        this.loadtoTableData()
-      },
-      /**
+    handletoSortChange: function(column) {
+      this.editFrom.tosortableData.sort = column.prop
+      if (column.order === 'ascending') {
+        this.editFrom.tosortableData.order = 'asc'
+      } else {
+        this.editFrom.tosortableData.order = 'desc'
+      }
+      this.loadtoTableData()
+    },
+    /**
       * 选择每页显示数量
       */
-      handletoSizeChange(val) {
-        this.editFrom.topagination.pagesize = val
-        this.editFrom.topagination.currentPage = 1
-        this.loadtoTableData()
-      },
-      /**
+    handletoSizeChange(val) {
+      this.editFrom.topagination.pagesize = val
+      this.editFrom.topagination.currentPage = 1
+      this.loadtoTableData()
+    },
+    /**
        * 选择当页面
        */
-      handletoCurrentChange(val) {
-        this.editFrom.topagination.currentPage = val
-        this.loadtoTableData()
-      },
-      /**
+    handletoCurrentChange(val) {
+      this.editFrom.topagination.currentPage = val
+      this.loadtoTableData()
+    },
+    /**
       * 点击一条记录
       */
-      handletoClickRow(row) {
-        this.editFrom.tocurrentSelectId = row.Id
-      },
-      /**
+    handletoClickRow(row) {
+      this.editFrom.tocurrentSelectId = row.Id
+    },
+    /**
      * 当用户手动勾选checkbox数据行事件
      */
-      handletoSelectChange: function (selection, row) {
-        this.editFrom.tocurrentSelected = selection
-      },
-      /**
+    handletoSelectChange: function(selection, row) {
+      this.editFrom.tocurrentSelected = selection
+    },
+    /**
        * 当用户手动勾选全选checkbox事件
        */
-      handletoSelectAllChange: function (selection) {
-        this.editFrom.tocurrentSelected = selection
-      },
+    handletoSelectAllChange: function(selection) {
+      this.editFrom.tocurrentSelected = selection
+    }
 
   }
 }

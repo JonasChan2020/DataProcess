@@ -1,7 +1,6 @@
 <template>
   <div class="app-container">
 
-
     <el-row :gutter="24">
       <el-col :span="8">
         <div class="grid-content bg-purple">
@@ -9,10 +8,12 @@
             <el-card>
               <el-row :gutter="24">
                 <el-col :span="7">
-                  <el-button type="primary"
-                             icon="el-icon-plus"
-                             size="small"
-                             @click="ClassifyManage()">分类管理</el-button>
+                  <el-button
+                    type="primary"
+                    icon="el-icon-plus"
+                    size="small"
+                    @click="ClassifyManage()"
+                  >分类管理</el-button>
                 </el-col>
                 <el-col :span="17">
                   <el-cascader v-model="outselectedclass" style="width:300px;" :options="selectclasses" filterable :props="{label:'ClassName',value:'Id',children:'Children',emitPath:false, checkStrictly: true,expandTrigger: 'hover' }" clearable @change="handleOutSelectClassChange" />
@@ -22,54 +23,66 @@
             <el-card>
               <div class="list-btn-container">
                 <el-button-group>
-                  <el-button v-hasPermi="['Sys_outmodel/Add']"
-                             type="primary"
-                             icon="el-icon-plus"
-                             size="small"
-                             @click="ShowEditOrViewDialog()">新增</el-button>
-                  <el-button v-hasPermi="['Sys_outmodel/Edit']"
-                             type="primary"
-                             icon="el-icon-edit"
-                             class="el-button-modify"
-                             size="small"
-                             @click="ShowEditOrViewDialog('edit')">修改</el-button>
-                  <el-button v-hasPermi="['Sys_outmodel/Enable']"
-                             type="info"
-                             icon="el-icon-video-pause"
-                             size="small"
-                             @click="setEnable('0')">禁用</el-button>
-                  <el-button v-hasPermi="['Sys_outmodel/Enable']"
-                             type="success"
-                             icon="el-icon-video-play"
-                             size="small"
-                             @click="setEnable('1')">启用</el-button>
-                  <el-button v-hasPermi="['Sys_outmodel/Delete']"
-                             type="danger"
-                             icon="el-icon-delete"
-                             size="small"
-                             @click="deletePhysics()">删除</el-button>
+                  <el-button
+                    v-hasPermi="['Sys_outmodel/Add']"
+                    type="primary"
+                    icon="el-icon-plus"
+                    size="small"
+                    @click="ShowEditOrViewDialog()"
+                  >新增</el-button>
+                  <el-button
+                    v-hasPermi="['Sys_outmodel/Edit']"
+                    type="primary"
+                    icon="el-icon-edit"
+                    class="el-button-modify"
+                    size="small"
+                    @click="ShowEditOrViewDialog('edit')"
+                  >修改</el-button>
+                  <el-button
+                    v-hasPermi="['Sys_outmodel/Enable']"
+                    type="info"
+                    icon="el-icon-video-pause"
+                    size="small"
+                    @click="setEnable('0')"
+                  >禁用</el-button>
+                  <el-button
+                    v-hasPermi="['Sys_outmodel/Enable']"
+                    type="success"
+                    icon="el-icon-video-play"
+                    size="small"
+                    @click="setEnable('1')"
+                  >启用</el-button>
+                  <el-button
+                    v-hasPermi="['Sys_outmodel/Delete']"
+                    type="danger"
+                    icon="el-icon-delete"
+                    size="small"
+                    @click="deletePhysics()"
+                  >删除</el-button>
                   <el-button type="default" icon="el-icon-refresh" size="small" @click="loadTableData()">刷新</el-button>
                 </el-button-group>
               </div>
-              <el-table ref="gridtable"
-                        v-loading="tableloading"
-                        :data="tableData"
-                        row-key="Id"
-                        :height="550"
-                        border
-                        stripe
-                        highlight-current-row
-                        style="width: 100%;margin-bottom: 20px;"
-                        :default-sort="{prop: 'SortCode', order: 'ascending'}"
-                        @row-click="handleClickRow"
-                        @select="handleSelectChange"
-                        @select-all="handleSelectAllChange"
-                        @sort-change="handleSortChange">
+              <el-table
+                ref="gridtable"
+                v-loading="tableloading"
+                :data="tableData"
+                row-key="Id"
+                :height="550"
+                border
+                stripe
+                highlight-current-row
+                style="width: 100%;margin-bottom: 20px;"
+                :default-sort="{prop: 'SortCode', order: 'ascending'}"
+                @row-click="handleClickRow"
+                @select="handleSelectChange"
+                @select-all="handleSelectAllChange"
+                @sort-change="handleSortChange"
+              >
                 <el-table-column type="selection" width="50" />
                 <el-table-column prop="Modelcode" label="编码" width="100" />
-                <el-table-column prop="Modelname" label="名称"  width="100" />
+                <el-table-column prop="Modelname" label="名称" width="100" />
                 <el-table-column prop="Sys_Name" label="所属系统" width="100" />
-                <el-table-column prop="Classify_id" label="分类"  width="100" align="center">
+                <el-table-column prop="Classify_id" label="分类" width="100" align="center">
                   <template slot-scope="scope">
                     {{ scope.row.Classify_Name }}
                   </template>
@@ -81,14 +94,16 @@
                 </el-table-column>
               </el-table>
               <div class="pagination-container">
-                <el-pagination background
-                               :current-page="pagination.currentPage"
-                               :page-sizes="[5,10,20,50,100, 200, 300, 400]"
-                               :page-size="pagination.pagesize"
-                               layout="total, sizes, prev, pager, next, jumper"
-                               :total="pagination.pageTotal"
-                               @size-change="handleSizeChange"
-                               @current-change="handleCurrentChange" />
+                <el-pagination
+                  background
+                  :current-page="pagination.currentPage"
+                  :page-sizes="[5,10,20,50,100, 200, 300, 400]"
+                  :page-size="pagination.pagesize"
+                  layout="total, sizes, prev, pager, next, jumper"
+                  :total="pagination.pageTotal"
+                  @size-change="handleSizeChange"
+                  @current-change="handleCurrentChange"
+                />
               </div>
             </el-card>
           </div>
@@ -99,40 +114,48 @@
           <div class="grid-content bg-purple">
             <div class="list-btn-container">
               <el-button-group>
-                <el-button v-hasPermi="['Sys_outmodel_details/Add']"
-                           type="primary"
-                           icon="el-icon-plus"
-                           size="small"
-                           @click="ShowMiddleDialog('add')">新增</el-button>
-                <el-button v-hasPermi="['Sys_outmodel_details/Edit']"
-                           type="primary"
-                           icon="el-icon-edit"
-                           class="el-button-modify"
-                           size="small"
-                           @click="ShowMiddleDialog('edit')">修改</el-button>
-                <el-button v-hasPermi="['Sys_outmodel_details/DeleteSoft']"
-                           type="warning"
-                           icon="el-icon-delete"
-                           size="small"
-                           @click="deleteMiddlePhysics('0')">删除</el-button>
+                <el-button
+                  v-hasPermi="['Sys_outmodel_details/Add']"
+                  type="primary"
+                  icon="el-icon-plus"
+                  size="small"
+                  @click="ShowMiddleDialog('add')"
+                >新增</el-button>
+                <el-button
+                  v-hasPermi="['Sys_outmodel_details/Edit']"
+                  type="primary"
+                  icon="el-icon-edit"
+                  class="el-button-modify"
+                  size="small"
+                  @click="ShowMiddleDialog('edit')"
+                >修改</el-button>
+                <el-button
+                  v-hasPermi="['Sys_outmodel_details/DeleteSoft']"
+                  type="warning"
+                  icon="el-icon-delete"
+                  size="small"
+                  @click="deleteMiddlePhysics('0')"
+                >删除</el-button>
                 <el-button type="default" icon="el-icon-refresh" size="small" @click="loadMiddleTableData()">刷新</el-button>
               </el-button-group>
             </div>
-            <el-table ref="gridMiddletable"
-                      v-loading="tableMiddleloading"
-                      :data="tableMiddleData"
-                      row-key="Id"
-                      :height="660"
-                      border
-                      max-height="660"
-                      stripe
-                      highlight-current-row
-                      style="width: 100%;margin-bottom: 20px;"
-                      :default-sort="{prop: 'Levelnum', order: 'ascending'}"
-                      @select="handleMiddleSelectChange"
-                      @select-all="handleMiddleSelectAllChange">
+            <el-table
+              ref="gridMiddletable"
+              v-loading="tableMiddleloading"
+              :data="tableMiddleData"
+              row-key="Id"
+              :height="660"
+              border
+              max-height="660"
+              stripe
+              highlight-current-row
+              style="width: 100%;margin-bottom: 20px;"
+              :default-sort="{prop: 'Levelnum', order: 'ascending'}"
+              @select="handleMiddleSelectChange"
+              @select-all="handleMiddleSelectAllChange"
+            >
               <el-table-column type="selection" width="30" />
-              <el-table-column prop="Levelnum" label="顺序"  min-width="20%" />
+              <el-table-column prop="Levelnum" label="顺序" min-width="20%" />
               <el-table-column prop="Tbname" label="表名" min-width="80%" />
             </el-table>
           </div>
@@ -143,30 +166,34 @@
           <div class="grid-content bg-purple">
             <div class="list-btn-container">
               <el-button-group>
-                <el-button v-hasPermi="['Sys_outmodel_details/Edit']"
-                           type="primary"
-                           icon="el-icon-edit"
-                           class="el-button-modify"
-                           size="small"
-                           @click="ShowRightDialog()">修改</el-button>
+                <el-button
+                  v-hasPermi="['Sys_outmodel_details/Edit']"
+                  type="primary"
+                  icon="el-icon-edit"
+                  class="el-button-modify"
+                  size="small"
+                  @click="ShowRightDialog()"
+                >修改</el-button>
                 <el-button type="default" icon="el-icon-refresh" size="small" @click="loadRightTableData()">刷新</el-button>
               </el-button-group>
             </div>
-            <el-table ref="gridRighttable"
-                      v-loading="tableRightloading"
-                      :data="tableRightData"
-                      row-key="Id"
-                      :height="660"
-                      border
-                      max-height="660"
-                      stripe
-                      highlight-current-row
-                      style="width: 100%;margin-bottom: 20px;"
-                      :default-sort="{prop: 'Levelnum', order: 'ascending'}">
+            <el-table
+              ref="gridRighttable"
+              v-loading="tableRightloading"
+              :data="tableRightData"
+              row-key="Id"
+              :height="660"
+              border
+              max-height="660"
+              stripe
+              highlight-current-row
+              style="width: 100%;margin-bottom: 20px;"
+              :default-sort="{prop: 'Levelnum', order: 'ascending'}"
+            >
               <el-table-column prop="ColumnName" label="模型字段" min-width="40%" />
               <el-table-column label="数据库字段" min-width="60%">
                 <template slot-scope="scope">
-                  {{ scope.row.Tbname+'.'+ scope.row.ColumnCode}}
+                  {{ scope.row.Tbname+'.'+ scope.row.ColumnCode }}
                 </template>
               </el-table-column>
             </el-table>
@@ -174,12 +201,14 @@
         </el-card>
       </el-col>
     </el-row>
-    <el-dialog ref="dialogEditForm"
-               :close-on-click-modal="false"
-               :show-close="false"
-               :title="editFormTitle+'数据输出模型'"
-               :visible.sync="dialogEditFormVisible"
-               width="640px">
+    <el-dialog
+      ref="dialogEditForm"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :title="editFormTitle+'数据输出模型'"
+      :visible.sync="dialogEditFormVisible"
+      width="640px"
+    >
       <el-form ref="editFrom" :model="editFrom" :rules="rules">
         <el-form-item label="编码" :label-width="formLabelWidth" prop="Modelcode">
           <el-input v-model="editFrom.Modelcode" placeholder="请输入配置信息编码" autocomplete="off" clearable />
@@ -206,23 +235,27 @@
       </div>
     </el-dialog>
 
-    <el-dialog ref="dialogMiddleEditForm"
-               :close-on-click-modal="false"
-               :show-close="false"
-               :title="editMiddleFormTitle+'数据输出模型'"
-               :visible.sync="dialogMiddleEditFormVisible"
-               width="1000px">
+    <el-dialog
+      ref="dialogMiddleEditForm"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :title="editMiddleFormTitle+'数据输出模型'"
+      :visible.sync="dialogMiddleEditFormVisible"
+      width="1000px"
+    >
       <el-form ref="editMiddleFrom" :model="editMiddleFrom" :rules="Middlerules">
         <el-form-item label="数据表" :label-width="formLabelWidth" prop="Tbname">
           <el-select v-model="editMiddleFrom.Tbname" placeholder="请选择" @change="handleSelectTbChange()">
-            <el-option v-for="item in SelectTbnameList"
-                       :key="item.TableName"
-                       :label="item.TableName"
-                       :value="item.TableName" />
+            <el-option
+              v-for="item in SelectTbnameList"
+              :key="item.TableName"
+              :label="item.TableName"
+              :value="item.TableName"
+            />
           </el-select>
         </el-form-item>
         <el-card>
-          <searchfitercom ref="mysfc" :beforeTables="tbs" />
+          <searchfitercom ref="mysfc" :before-tables="tbs" />
         </el-card>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -231,62 +264,66 @@
       </div>
     </el-dialog>
 
-    <el-dialog ref="dialogRightEditForm"
-               :close-on-click-modal="false"
-               :show-close="false"
-               :title="editRighteFormTitle+'数据输出模型'"
-               :visible.sync="dialogRightEditFormVisible"
-               width="640px">
+    <el-dialog
+      ref="dialogRightEditForm"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :title="editRighteFormTitle+'数据输出模型'"
+      :visible.sync="dialogRightEditFormVisible"
+      width="640px"
+    >
       <div class="grid-content bg-purple">
         <div class="list-btn-container">
           <el-button-group>
-            <el-button 
-                       type="primary"
-                       icon="el-icon-plus"
-                       size="small"
-                       @click="AddRightDetail()">新增</el-button>
             <el-button
-                       type="warning"
-                       icon="el-icon-delete"
-                       size="small"
-                       @click="DelRightDetail()">删除</el-button>
+              type="primary"
+              icon="el-icon-plus"
+              size="small"
+              @click="AddRightDetail()"
+            >新增</el-button>
+            <el-button
+              type="warning"
+              icon="el-icon-delete"
+              size="small"
+              @click="DelRightDetail()"
+            >删除</el-button>
             <el-button type="default" icon="el-icon-refresh" size="small" @click="loadRightDetailTableData()">刷新</el-button>
           </el-button-group>
         </div>
-        <el-table ref="gridRightDetailtable"
-                  v-loading="tableRightDetailloading"
-                  :data="tableRightDetailData"
-                  row-key="Id"
-                  :height="400"
-                  border
-                  max-height="400"
-                  stripe
-                  highlight-current-row
-                  style="width: 100%;margin-bottom: 20px;"
-                  :default-sort="{prop: 'Levelnum', order: 'ascending'}"
-                  @select="handleRightDetailSelectChange"
-                  @select-all="handleRightDetailSelectAllChange">
+        <el-table
+          ref="gridRightDetailtable"
+          v-loading="tableRightDetailloading"
+          :data="tableRightDetailData"
+          row-key="Id"
+          :height="400"
+          border
+          max-height="400"
+          stripe
+          highlight-current-row
+          style="width: 100%;margin-bottom: 20px;"
+          :default-sort="{prop: 'Levelnum', order: 'ascending'}"
+          @select="handleRightDetailSelectChange"
+          @select-all="handleRightDetailSelectAllChange"
+        >
           <el-table-column type="selection" min-width="5%" />
           <el-table-column prop="Tbname" label="数据集" min-width="25%">
             <template slot-scope="scope">
-              <el-select v-model="scope.row.Tbname" @change="handleSelectRightTbChange(scope.row)" placeholder="请选择" filterable allow-create>
-                <el-option v-for="item in SelectRightTbNameList " :key="item.Tbname" :label="item.Tbname" :value="item.Tbname">
-                </el-option>
+              <el-select v-model="scope.row.Tbname" placeholder="请选择" filterable allow-create @change="handleSelectRightTbChange(scope.row)">
+                <el-option v-for="item in SelectRightTbNameList " :key="item.Tbname" :label="item.Tbname" :value="item.Tbname" />
               </el-select>
             </template>
           </el-table-column>
           <el-table-column prop="ColumnCode" label="字段编码" min-width="20%">
             <template slot-scope="scope">
-              <el-select v-model="scope.row.ColumnCode" @change="handleSelectRightColumnChange(scope.row)" placeholder="请选择" filterable allow-create>
-                <el-option v-for="item in scope.row.columnList " :key="item.FieldName" :label="item.FieldName" :value="item.FieldName">
-                </el-option>
+              <el-select v-model="scope.row.ColumnCode" placeholder="请选择" filterable allow-create @change="handleSelectRightColumnChange(scope.row)">
+                <el-option v-for="item in scope.row.columnList " :key="item.FieldName" :label="item.FieldName" :value="item.FieldName" />
               </el-select>
             </template>
           </el-table-column>
           <el-table-column prop="ColumnDescription" label="字段描述" min-width="20%" />
           <el-table-column prop="ColumnName" label="字段名称" min-width="20%">
             <template slot-scope="scope">
-              <input type="text" v-model="scope.row.ColumnName" style="width:100%" />
+              <input v-model="scope.row.ColumnName" type="text" style="width:100%">
             </template>
           </el-table-column>
         </el-table>
@@ -305,28 +342,26 @@ import {
   getSys_outmodelListWithPager, getSys_outmodelDetail,
   saveSys_outmodel, setSys_outmodelEnable,
   deleteSys_outmodel
-  } from '@/api/dataprocess/sys_outmodel'
+} from '@/api/dataprocess/sys_outmodel'
 import {
   getAlloutModelClassifyTreeTable
-  } from '@/api/dataprocess/sys_outmodel_classify'
+} from '@/api/dataprocess/sys_outmodel_classify'
 import {
-    getSys_outmodel_detailsDetail, saveSys_outmodel_details, getAllEnableByConfId, getOutTbNameList
-  } from '@/api/dataprocess/sys_outmodel_details'
-  import {
-    saveSys_outmodel_sql, getByOutModelId
-  } from '@/api/dataprocess/sys_outmodel_sql'
+  getSys_outmodel_detailsDetail, saveSys_outmodel_details, getAllEnableByConfId, getOutTbNameList
+} from '@/api/dataprocess/sys_outmodel_details'
+import {
+  saveSys_outmodel_sql, getByOutModelId
+} from '@/api/dataprocess/sys_outmodel_sql'
 
-  import searchfitercom
-    from '@/views/dataprocess/components/SqlComponents/SearchFiterComponent.vue'
+import searchfitercom
+  from '@/views/dataprocess/components/SqlComponents/SearchFiterComponent.vue'
 
-
-
-  export default {
-    name: 'sysconfcontrol',
-    props: ['sid'], //父页面传过来的配置ID
-    components: {
-      searchfitercom
-    },
+export default {
+  name: 'Sysconfcontrol', // 父页面传过来的配置ID
+  components: {
+    searchfitercom
+  },
+  props: ['sid'],
   data() {
     return {
       searchform: {
@@ -334,7 +369,7 @@ import {
       },
       loadBtnFunc: [],
       tableData: [],
-      tableloading:false,
+      tableloading: false,
       pagination: {
         currentPage: 1,
         pagesize: 20,
@@ -345,8 +380,8 @@ import {
         sort: 'CreatorTime'
       },
       cascaderkey: 1,
-      outselectedclass: '', //配置首页上的筛选器分类
-      selectedclass: '',//模型编辑内的分类
+      outselectedclass: '', // 配置首页上的筛选器分类
+      selectedclass: '', // 模型编辑内的分类
       selectclasses: [],
       dialogEditFormVisible: false,
       editFormTitle: '',
@@ -366,12 +401,12 @@ import {
       currentId: '', // 当前操作对象的ID值，主要用于修改
       currentSelected: [],
       tableMiddleData: [],
-      tableMiddleloading:false,
+      tableMiddleloading: false,
       dialogMiddleEditFormVisible: false,
       editMiddleFormTitle: '',
       editMiddleFrom: {
         Tbname: '',
-        dynamicFiterForm: [],
+        dynamicFiterForm: []
 
       },
       Middlerules: {
@@ -382,7 +417,7 @@ import {
       currentMiddleSelected: [],
       SelectTbnameList: [],
       tableRightData: [],
-      tableRightloading:false,
+      tableRightloading: false,
       dialogRightEditFormVisible: false,
       editRighteFormTitle: '',
       tableRightDetailData: [],
@@ -390,7 +425,7 @@ import {
       currentRightDetailId: '', // 当前操作对象的ID值，主要用于修改
       currentRightDetailSelected: [],
       SelectRightTbNameList: [],
-      tbs:''
+      tbs: ''
     }
   },
   created() {
@@ -404,10 +439,9 @@ import {
        * 初始化数据
        */
     InitDictItem() {
-      
       var seachdata = {
         Filter: {
-          Sysid: this.sid,
+          Sysid: this.sid
         }
       }
       getAlloutModelClassifyTreeTable(seachdata).then(res => {
@@ -417,8 +451,8 @@ import {
     /**
        * 加载页面table数据
        */
-    loadTableData: function () {
-      this.tableloading=true
+    loadTableData: function() {
+      this.tableloading = true
       var seachdata = {
         CurrenetPageIndex: this.pagination.currentPage,
         PageSize: this.pagination.pagesize,
@@ -427,24 +461,23 @@ import {
         Sort: this.sortableData.sort,
         Filter: {
           Sysid: this.sid,
-          Classify_id: this.outselectedclass,
+          Classify_id: this.outselectedclass
         }
       }
       getSys_outmodelListWithPager(seachdata).then(res => {
         this.tableData = res.ResData.Items
         this.pagination.pageTotal = res.ResData.TotalItems
-        this.tableloading=false
+        this.tableloading = false
       })
-      
     },
 
-    ClassifyManage: function () {
-      this.$router.push({ name: 'outModelClassify', params: { sysid: this.sid } })
+    ClassifyManage: function() {
+      this.$router.push({ name: 'outModelClassify', params: { sysid: this.sid }})
     },
     /**
 *选择分类
 */
-    handleOutSelectClassChange: function () {
+    handleOutSelectClassChange: function() {
       this.loadTableData()
     },
 
@@ -613,7 +646,7 @@ import {
     handleSelectClassChange: function() {
       this.editFrom.Classify_id = this.selectedclass
     },
-  
+
     /**
        * 当用户手动勾选checkbox数据行事件
        */
@@ -645,12 +678,12 @@ import {
     /**
    * 加载详情页面table数据
    */
-    loadMiddleTableData: function () {
+    loadMiddleTableData: function() {
       this.tableMiddleloading = true
       var seachdata = {
         Filter: {
-          Sys_outmodel_id: this.currentId,
-        },
+          Sys_outmodel_id: this.currentId
+        }
       }
       getAllEnableByConfId(seachdata).then(res => {
         this.tableMiddleData = res.ResData
@@ -661,12 +694,12 @@ import {
     /**
       * 新增、修改或查看中间列表项（绑定显示数据）     *
       */
-    ShowMiddleDialog: function (view) {
+    ShowMiddleDialog: function(view) {
       if (this.currentId !== undefined && this.currentId !== null && this.currentId.length > 0) {
-        getOutTbNameList({ SysId: this.sid, outModelId:'' }).then(res => {
-          let SelectTbnameListInfo = [];
-          for (let i in res.ResData) {
-            SelectTbnameListInfo.push(res.ResData[i]);
+        getOutTbNameList({ SysId: this.sid, outModelId: '' }).then(res => { 
+          const SelectTbnameListInfo = []
+          for (const i in res.ResData) {
+            SelectTbnameListInfo.push(res.ResData[i])
           }
           this.SelectTbnameList = SelectTbnameListInfo
         })
@@ -689,7 +722,7 @@ import {
         this.$alert('请先在左侧列表中选择一个模型', '提示')
       }
     },
-    bindMiddleEditInfo: function () {
+    bindMiddleEditInfo: function() {
       getSys_outmodel_detailsDetail(this.currentMiddleId).then(res => {
         this.editMiddleFrom.Tbname = res.ResData.Tbname
         this.editMiddleFrom.dynamicFiterForm = JSON.parse(res.ResData.Fiterstr)
@@ -701,21 +734,21 @@ import {
     saveMiddleEditForm() {
       this.$refs['editMiddleFrom'].validate((valid) => {
         if (valid) {
-          var fiterJson = '';
-          fiterJson = this.$refs.mysfc.getResultJson();
-          alert(fiterJson);
-          //const data = {
+          var fiterJson = ''
+          fiterJson = this.$refs.mysfc.getResultJson()
+          alert(fiterJson)
+          // const data = {
           //  'Tbname': this.editMiddleFrom.Tbname,
           //  'Fiterstr': fiterJson,
           //  'Sys_outmodel_id': this.currentId,
           //  'Id': this.currentMiddleId,
-          //}
+          // }
 
-          //var url = 'Sys_outmodel_details/Insert'
-          //if (this.currentMiddleId !== '') {
+          // var url = 'Sys_outmodel_details/Insert'
+          // if (this.currentMiddleId !== '') {
           //  url = 'Sys_outmodel_details/Update?id=' + this.currentMiddleId
-          //}
-          //saveSys_outmodel_details(data, url).then(res => {
+          // }
+          // saveSys_outmodel_details(data, url).then(res => {
           //  if (res.Success) {
           //    this.$message({
           //      message: '恭喜你，操作成功',
@@ -730,7 +763,7 @@ import {
           //      type: 'error'
           //    })
           //  }
-          //})
+          // })
         } else {
           return false
         }
@@ -739,43 +772,43 @@ import {
     closeMiddleEditForm() {
       this.dialogMiddleEditFormVisible = false
       this.$refs['editMiddleFrom'].resetFields()
-      //this.editMiddleFrom.dynamicFiterForm= []
+      // this.editMiddleFrom.dynamicFiterForm= []
     },
-    deleteMiddlePhysics: function () {
-      
+    deleteMiddlePhysics: function() {
+
     },
     /**
       * 当用户手动勾选checkbox数据行事件
       */
-    handleMiddleSelectChange: function (selection, row) {
+    handleMiddleSelectChange: function(selection, row) {
       this.currentMiddleSelected = selection
     },
     /**
        * 当用户手动勾选全选checkbox事件
        */
-    handleMiddleSelectAllChange: function (selection) {
+    handleMiddleSelectAllChange: function(selection) {
       this.currentMiddleSelected = selection
     },
     /**
           *选择表
           */
-    handleSelectTbChange: function () {
+    handleSelectTbChange: function() {
       var res = this.SelectTbnameList.filter(item => {
         if (item.TableName.includes(this.editMiddleFrom.Tbname)) {
           return item
         }
       })
-      this.$refs.mysfc.changeCols(res[0].Fileds);
+      this.$refs.mysfc.changeCols(res[0].Fileds)
     },
     removeDomain(item) {
       var index = this.editMiddleFrom.dynamicFiterForm.indexOf(item)
       if (index !== -1) {
-        if (item.KhType != -1) { //如果是括号
-          var startkh;
-          var endkh;
+        if (item.KhType != -1) { // 如果是括号
+          var startkh
+          var endkh
           var children = this.editMiddleFrom.dynamicFiterForm.filter(tmp => tmp.InKhIndex == item.Kh && tmp.KhType == 0)
           children.forEach(tmp => {
-            this.removeDomain(tmp) //删掉整个括号
+            this.removeDomain(tmp) // 删掉整个括号
           })
           if (item.KhType == 0) {
             startkh = item
@@ -787,22 +820,20 @@ import {
           var startindex = this.editMiddleFrom.dynamicFiterForm.indexOf(startkh)
           var endindex = this.editMiddleFrom.dynamicFiterForm.indexOf(endkh)
           if (startindex != 0) {
-            if (this.editMiddleFrom.dynamicFiterForm[startindex - 1].KhType == 0 && this.editMiddleFrom.dynamicFiterForm[endindex + 1].KhType == 1) { //括号外层也是括号
+            if (this.editMiddleFrom.dynamicFiterForm[startindex - 1].KhType == 0 && this.editMiddleFrom.dynamicFiterForm[endindex + 1].KhType == 1) { // 括号外层也是括号
               var upstartkh = this.editMiddleFrom.dynamicFiterForm[startindex - 1]
               this.editMiddleFrom.dynamicFiterForm = this.editMiddleFrom.dynamicFiterForm.filter(tmp => tmp.Kh != item.Kh)
-              this.removeDomain(upstartkh) //删掉上层括号
+              this.removeDomain(upstartkh) // 删掉上层括号
             } else {
               this.editMiddleFrom.dynamicFiterForm = this.editMiddleFrom.dynamicFiterForm.filter(tmp => tmp.Kh != item.Kh)
             }
           } else {
             this.editMiddleFrom.dynamicFiterForm = this.editMiddleFrom.dynamicFiterForm.filter(tmp => tmp.Kh != item.Kh)
           }
-
-
         } else {
-          if (this.editMiddleFrom.dynamicFiterForm[index - 1].KhType == 0) { //如果上一个是左括号，则删除整个括号，并更新括号序号
-            if (this.editMiddleFrom.dynamicFiterForm[index + 1].KhType == 1) { //如果下一个是右括号，则证明括号内无数据了。
-              this.removeDomain(this.editMiddleFrom.dynamicFiterForm[index - 1]) //删掉整个括号
+          if (this.editMiddleFrom.dynamicFiterForm[index - 1].KhType == 0) { // 如果上一个是左括号，则删除整个括号，并更新括号序号
+            if (this.editMiddleFrom.dynamicFiterForm[index + 1].KhType == 1) { // 如果下一个是右括号，则证明括号内无数据了。
+              this.removeDomain(this.editMiddleFrom.dynamicFiterForm[index - 1]) // 删掉整个括号
             } else {
               this.editMiddleFrom.dynamicFiterForm.splice(index, 1)
             }
@@ -814,205 +845,200 @@ import {
     },
     addDomain(item) {
       var index = this.editMiddleFrom.dynamicFiterForm.indexOf(item)
-      if (item.InKhIndex >= 0) { //括号内，需要插入
-        this.editMiddleFrom.dynamicFiterForm.splice(index+1,0,{
-          columnName: '', //字段名称
-          rex: '', //操作符
-          valuetype: '', //值类型
-          value: '', //值
-          Kh: item.InKhIndex, //括号序号 从1开始
-          KhType: -1, //括号类型，0是起始，1是结束
-          InKhIndex: item.InKhIndex, //属于第几个括号内
+      if (item.InKhIndex >= 0) { // 括号内，需要插入
+        this.editMiddleFrom.dynamicFiterForm.splice(index + 1, 0, {
+          columnName: '', // 字段名称
+          rex: '', // 操作符
+          valuetype: '', // 值类型
+          value: '', // 值
+          Kh: item.InKhIndex, // 括号序号 从1开始
+          KhType: -1, // 括号类型，0是起始，1是结束
+          InKhIndex: item.InKhIndex, // 属于第几个括号内
           NextKhIndex: item.NextKhIndex,
           type: '',
-          showBtn: true, //是否显示按钮
+          showBtn: true // 是否显示按钮
         })
-      } else { //括号外，直接新增
+      } else { // 括号外，直接新增
         this.editMiddleFrom.dynamicFiterForm.push({
-          columnName: '', //字段名称
-          rex: '', //操作符
-          valuetype: '', //值类型
-          value: '', //值
-          Kh: item.InKhIndex, //括号序号 从1开始
-          KhType: -1, //括号类型，0是起始，1是结束
-          InKhIndex: item.InKhIndex, //属于第几个括号内
+          columnName: '', // 字段名称
+          rex: '', // 操作符
+          valuetype: '', // 值类型
+          value: '', // 值
+          Kh: item.InKhIndex, // 括号序号 从1开始
+          KhType: -1, // 括号类型，0是起始，1是结束
+          InKhIndex: item.InKhIndex, // 属于第几个括号内
           NextKhIndex: item.NextKhIndex,
           type: '',
-          showBtn: true, //是否显示按钮
+          showBtn: true // 是否显示按钮
         })
       }
-      
     },
     addDomainKh(item) {
       var index = this.editMiddleFrom.dynamicFiterForm.indexOf(item)
-      if (item.InKhIndex >= 0) { //括号内，需要插入
-        this.editMiddleFrom.dynamicFiterForm.splice(index + 1, 0, { //加左括号
-          columnName: '', //字段名称
-          rex: '', //操作符
-          valuetype: '', //值类型
-          value: '', //值
-          Kh: item.NextKhIndex, //括号序号 从1开始
-          KhType: 0, //括号类型，0是起始，1是结束
-          InKhIndex: item.InKhIndex, //属于第几个括号内
-          NextKhIndex: item.NextKhIndex + 1,
-          type: this.tagType[item.NextKhIndex %5],
-          showBtn: false, //是否显示按钮
-        })
-        this.editMiddleFrom.dynamicFiterForm.splice(index + 2, 0, { //加数据
-          columnName: '', //字段名称
-          rex: '', //操作符
-          valuetype: '', //值类型
-          value: '', //值
-          Kh: item.NextKhIndex, //括号序号 从1开始
-          KhType: -1, //括号类型，0是起始，1是结束
-          InKhIndex: item.NextKhIndex, //属于第几个括号内
-          NextKhIndex: item.NextKhIndex + 1,
-          type: '',
-          showBtn: true, //是否显示按钮
-        })
-        this.editMiddleFrom.dynamicFiterForm.splice(index + 3, 0, { //加右括号
-          columnName: '', //字段名称
-          rex: '', //操作符
-          valuetype: '', //值类型
-          value: '', //值
-          Kh: item.NextKhIndex, //括号序号 从1开始
-          KhType: 1, //括号类型，0是起始，1是结束
-          InKhIndex: item.InKhIndex, //属于第几个括号内
+      if (item.InKhIndex >= 0) { // 括号内，需要插入
+        this.editMiddleFrom.dynamicFiterForm.splice(index + 1, 0, { // 加左括号
+          columnName: '', // 字段名称
+          rex: '', // 操作符
+          valuetype: '', // 值类型
+          value: '', // 值
+          Kh: item.NextKhIndex, // 括号序号 从1开始
+          KhType: 0, // 括号类型，0是起始，1是结束
+          InKhIndex: item.InKhIndex, // 属于第几个括号内
           NextKhIndex: item.NextKhIndex + 1,
           type: this.tagType[item.NextKhIndex % 5],
-          showBtn: true, //是否显示按钮
+          showBtn: false // 是否显示按钮
         })
-      } else { //括号外，直接新增
-        this.editMiddleFrom.dynamicFiterForm.push({ //加左括号
-          columnName: '', //字段名称
-          rex: '', //操作符
-          valuetype: '', //值类型
-          value: '', //值
-          Kh: item.NextKhIndex, //括号序号 从1开始
-          KhType: 0, //括号类型，0是起始，1是结束
-          InKhIndex: item.InKhIndex, //属于第几个括号内
+        this.editMiddleFrom.dynamicFiterForm.splice(index + 2, 0, { // 加数据
+          columnName: '', // 字段名称
+          rex: '', // 操作符
+          valuetype: '', // 值类型
+          value: '', // 值
+          Kh: item.NextKhIndex, // 括号序号 从1开始
+          KhType: -1, // 括号类型，0是起始，1是结束
+          InKhIndex: item.NextKhIndex, // 属于第几个括号内
           NextKhIndex: item.NextKhIndex + 1,
           type: '',
-          showBtn: false, //是否显示按钮
+          showBtn: true // 是否显示按钮
         })
-        this.editMiddleFrom.dynamicFiterForm.push({ //加数据
-          columnName: '', //字段名称
-          rex: '', //操作符
-          valuetype: '', //值类型
-          value: '', //值
-          Kh: item.NextKhIndex, //括号序号 从1开始
-          KhType: -1, //括号类型，0是起始，1是结束
-          InKhIndex: item.NextKhIndex, //属于第几个括号内
+        this.editMiddleFrom.dynamicFiterForm.splice(index + 3, 0, { // 加右括号
+          columnName: '', // 字段名称
+          rex: '', // 操作符
+          valuetype: '', // 值类型
+          value: '', // 值
+          Kh: item.NextKhIndex, // 括号序号 从1开始
+          KhType: 1, // 括号类型，0是起始，1是结束
+          InKhIndex: item.InKhIndex, // 属于第几个括号内
+          NextKhIndex: item.NextKhIndex + 1,
+          type: this.tagType[item.NextKhIndex % 5],
+          showBtn: true // 是否显示按钮
+        })
+      } else { // 括号外，直接新增
+        this.editMiddleFrom.dynamicFiterForm.push({ // 加左括号
+          columnName: '', // 字段名称
+          rex: '', // 操作符
+          valuetype: '', // 值类型
+          value: '', // 值
+          Kh: item.NextKhIndex, // 括号序号 从1开始
+          KhType: 0, // 括号类型，0是起始，1是结束
+          InKhIndex: item.InKhIndex, // 属于第几个括号内
           NextKhIndex: item.NextKhIndex + 1,
           type: '',
-          showBtn: true, //是否显示按钮
+          showBtn: false // 是否显示按钮
         })
-        this.editMiddleFrom.dynamicFiterForm.push({ //加右括号
-          columnName: '', //字段名称
-          rex: '', //操作符
-          valuetype: '', //值类型
-          value: '', //值
-          Kh: item.NextKhIndex, //括号序号 从1开始
-          KhType: 1, //括号类型，0是起始，1是结束
-          InKhIndex: item.InKhIndex, //属于第几个括号内
+        this.editMiddleFrom.dynamicFiterForm.push({ // 加数据
+          columnName: '', // 字段名称
+          rex: '', // 操作符
+          valuetype: '', // 值类型
+          value: '', // 值
+          Kh: item.NextKhIndex, // 括号序号 从1开始
+          KhType: -1, // 括号类型，0是起始，1是结束
+          InKhIndex: item.NextKhIndex, // 属于第几个括号内
           NextKhIndex: item.NextKhIndex + 1,
           type: '',
-          showBtn: true, //是否显示按钮
+          showBtn: true // 是否显示按钮
+        })
+        this.editMiddleFrom.dynamicFiterForm.push({ // 加右括号
+          columnName: '', // 字段名称
+          rex: '', // 操作符
+          valuetype: '', // 值类型
+          value: '', // 值
+          Kh: item.NextKhIndex, // 括号序号 从1开始
+          KhType: 1, // 括号类型，0是起始，1是结束
+          InKhIndex: item.InKhIndex, // 属于第几个括号内
+          NextKhIndex: item.NextKhIndex + 1,
+          type: '',
+          showBtn: true // 是否显示按钮
         })
       }
-      //更新下一个括号Index
+      // 更新下一个括号Index
       this.editMiddleFrom.dynamicFiterForm.forEach(tmp => {
         tmp.NextKhIndex = item.NextKhIndex + 1
       })
-
     },
     addStartDomain() {
-      this.editMiddleFrom.dynamicFiterForm=[{
-        columnName: '', //字段名称
-        rex: '', //操作符
-        valuetype: '', //值类型
-        value: '', //值
-        Kh: -1, //括号序号 从1开始
-        KhType: -1, //括号类型，0是起始，1是结束
-        InKhIndex: -1, //属于第几个括号内
+      this.editMiddleFrom.dynamicFiterForm = [{
+        columnName: '', // 字段名称
+        rex: '', // 操作符
+        valuetype: '', // 值类型
+        value: '', // 值
+        Kh: -1, // 括号序号 从1开始
+        KhType: -1, // 括号类型，0是起始，1是结束
+        InKhIndex: -1, // 属于第几个括号内
         NextKhIndex: 0,
         type: '',
-        showBtn: true, //是否显示按钮
+        showBtn: true // 是否显示按钮
       }]
-
     },
     addStartDomainKh() {
-      this.editMiddleFrom.dynamicFiterForm=[{ //加左括号
-        columnName: '', //字段名称
-        rex: '', //操作符
-        valuetype: '', //值类型
-        value: '', //值
-        Kh: 0, //括号序号 从0开始
-        KhType: 0, //括号类型，0是起始，1是结束
-        InKhIndex: -1, //属于第几个括号内
+      this.editMiddleFrom.dynamicFiterForm = [{ // 加左括号
+        columnName: '', // 字段名称
+        rex: '', // 操作符
+        valuetype: '', // 值类型
+        value: '', // 值
+        Kh: 0, // 括号序号 从0开始
+        KhType: 0, // 括号类型，0是起始，1是结束
+        InKhIndex: -1, // 属于第几个括号内
         NextKhIndex: 1,
         type: '',
-        showBtn: false, //是否显示按钮
+        showBtn: false // 是否显示按钮
       }]
-      this.editMiddleFrom.dynamicFiterForm.push({ //加数据
-        columnName: '', //字段名称
-        rex: '', //操作符
-        valuetype: '', //值类型
-        value: '', //值
-        Kh: 0, //括号序号 从1开始
-        KhType: -1, //括号类型，0是起始，1是结束
-        InKhIndex: 0, //属于第几个括号内
+      this.editMiddleFrom.dynamicFiterForm.push({ // 加数据
+        columnName: '', // 字段名称
+        rex: '', // 操作符
+        valuetype: '', // 值类型
+        value: '', // 值
+        Kh: 0, // 括号序号 从1开始
+        KhType: -1, // 括号类型，0是起始，1是结束
+        InKhIndex: 0, // 属于第几个括号内
         NextKhIndex: 1,
         type: '',
-        showBtn: true, //是否显示按钮
+        showBtn: true // 是否显示按钮
       })
-      this.editMiddleFrom.dynamicFiterForm.push({ //加右括号
-        columnName: '', //字段名称
-        rex: '', //操作符
-        valuetype: '', //值类型
-        value: '', //值
-        Kh: 0, //括号序号 从1开始
-        KhType: 1, //括号类型，0是起始，1是结束
-        InKhIndex: -1, //属于第几个括号内
+      this.editMiddleFrom.dynamicFiterForm.push({ // 加右括号
+        columnName: '', // 字段名称
+        rex: '', // 操作符
+        valuetype: '', // 值类型
+        value: '', // 值
+        Kh: 0, // 括号序号 从1开始
+        KhType: 1, // 括号类型，0是起始，1是结束
+        InKhIndex: -1, // 属于第几个括号内
         NextKhIndex: 1,
         type: '',
-        showBtn: true, //是否显示按钮
+        showBtn: true // 是否显示按钮
       })
-
     },
 
     /**
  * 加载详情页面table数据
  */
-    loadRightTableData: function () {
+    loadRightTableData: function() {
       this.tableRightloading = true
       var seachdata = {
         Filter: {
-          Sys_outmodel_id: this.currentId,
-        },
+          Sys_outmodel_id: this.currentId
+        }
       }
       getByOutModelId(seachdata).then(res => {
         if (res.ResData != undefined && res.ResData != null && res.ResData.Sqlstr != undefined && res.ResData.Sqlstr != null) {
           this.tableRightData = JSON.parse(res.ResData.Sqlstr)
           this.currentRightDetailId = res.ResData.Id
         } else {
-          this.tableRightData =[]
+          this.tableRightData = []
         }
-        
+
         this.tableRightloading = false
       })
-      
     },
 
     /**
       * 新增、修改或查看中间列表项（绑定显示数据）     *
       */
-    ShowRightDialog: function () {
+    ShowRightDialog: function() {
       if (this.currentId !== undefined && this.currentId !== null && this.currentId.length > 0) {
         getOutTbNameList({ SysId: this.sid, outModelId: this.currentId }).then(res => {
-          let SelectTbnameListInfo = [];
-          for (let i in res.ResData) {
-            SelectTbnameListInfo.push(res.ResData[i]);
+          const SelectTbnameListInfo = []
+          for (const i in res.ResData) {
+            SelectTbnameListInfo.push(res.ResData[i])
           }
           this.SelectRightTbNameList = SelectTbnameListInfo
           this.dialogRightEditFormVisible = true
@@ -1032,13 +1058,13 @@ import {
       }
       this.tableRightDetailData.forEach(item => {
         if (item.columnList != undefined && item.columnList != null) {
-          item.columnList=[]
+          item.columnList = []
         }
       })
       var data = {
         Id: this.currentRightDetailId,
         Sys_outmodel_id: this.currentId,
-        Sqlstr: JSON.stringify(this.tableRightDetailData),
+        Sqlstr: JSON.stringify(this.tableRightDetailData)
       }
       saveSys_outmodel_sql(data, url).then(res => {
         if (res.Success) {
@@ -1059,11 +1085,11 @@ import {
     /**
 * 加载详情页面table数据
 */
-    loadRightDetailTableData: function () {
-      this.tableRightDetailloading=true
+    loadRightDetailTableData: function() {
+      this.tableRightDetailloading = true
       this.tableRightDetailData = this.tableRightData
       this.tableRightDetailData.forEach(item => {
-        if (item.columnList != undefined && item.columnList != null && item.columnList.length>0) {
+        if (item.columnList != undefined && item.columnList != null && item.columnList.length > 0) {
 
         } else {
           var res = this.SelectRightTbNameList.filter(TbNameItem => TbNameItem.Tbname.includes(item.Tbname))
@@ -1075,23 +1101,23 @@ import {
     /**
       * 当用户手动勾选checkbox数据行事件
       */
-    handleRightDetailSelectChange: function (selection, row) {
+    handleRightDetailSelectChange: function(selection, row) {
       this.currentRightDetailSelected = selection
     },
     /**
        * 当用户手动勾选全选checkbox事件
        */
-    handleRightDetailSelectAllChange: function (selection) {
+    handleRightDetailSelectAllChange: function(selection) {
       this.currentRightDetailSelected = selection
     },
     AddRightDetail() {
       if (this.tableRightDetailData != null && this.tableRightDetailData != undefined && this.tableRightDetailData.length > 0) {
         this.tableRightDetailData.push({
-          id:this.uuid(),
+          id: this.uuid(),
           Tbname: '',
           ColumnCode: '',
           ColumnDescription: '',
-          columnList: [],
+          columnList: []
         })
       } else {
         this.tableRightDetailData = [{
@@ -1099,7 +1125,7 @@ import {
           Tbname: '',
           ColumnCode: '',
           ColumnDescription: '',
-          columnList: [],
+          columnList: []
         }]
       }
     },
@@ -1117,7 +1143,7 @@ import {
     /**
          *选择表
          */
-    handleSelectRightTbChange: function (row) {
+    handleSelectRightTbChange: function(row) {
       var res = this.SelectRightTbNameList.filter(item => {
         if (item.Tbname.includes(row.Tbname)) {
           return item
@@ -1128,7 +1154,7 @@ import {
     /**
          *选择表
          */
-    handleSelectRightColumnChange: function (row) {
+    handleSelectRightColumnChange: function(row) {
       var res = row.columnList.filter(item => {
         if (item.FieldName.includes(row.ColumnCode)) {
           return item
@@ -1138,19 +1164,19 @@ import {
       row.ColumnName = res[0].Description
     },
     uuid() {
-      var s = [];
-      var hexDigits = '0123456789abcdef';
+      var s = []
+      var hexDigits = '0123456789abcdef'
       for (var i = 0; i < 36; i++) {
-        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1)
       }
-      s[14] = '4';
-      s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);
-      s[8] = s[13] = s[18] = s[23] = '-';
+      s[14] = '4'
+      s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1)
+      s[8] = s[13] = s[18] = s[23] = '-'
 
-      this.uuidA = s.join('');
-      console.log(s.join(''), 's.join("")');
-      return this.uuidA;
-    },
+      this.uuidA = s.join('')
+      console.log(s.join(''), 's.join("")')
+      return this.uuidA
+    }
   }
 }
 </script>
