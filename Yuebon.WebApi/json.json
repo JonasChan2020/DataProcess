@@ -1,71 +1,34 @@
 [
   {
-    "columnName": "dscode",
-    "rex": "=",
-    "value": "1",
-    "Kh": -1,
-    "KhType": -1,
-    "InKhIndex": -1,
-    "NextKhIndex": 1,
-    "type": "",
-    "showBtn": true,
-    "aon": "and"
+    "id": "1de5f6bb-e83a-4c12-8dc9-a370184e2b7b",
+    "Tbname": "1.dp_ds_ds",
+    "ColumnCode": "dscode",
+    "ColumnDescription": "数据源编码",
+    "columnList": [],
+    "ColumnName": "数据源编码"
   },
   {
-    "columnName": "dsname",
-    "rex": "包含",
-    "value": "2",
-    "Kh": -1,
-    "KhType": -1,
-    "InKhIndex": -1,
-    "NextKhIndex": 1,
-    "type": "",
-    "showBtn": true,
-    "aon": "and"
+    "id": "0a739cac-e2b1-42b9-8fe5-3292f28151ab",
+    "Tbname": "1.dp_ds_ds",
+    "ColumnCode": "dsdesc",
+    "ColumnDescription": "数据源描述",
+    "columnList": [],
+    "ColumnName": "数据源描述"
   },
   {
-    "columnName": "",
-    "rex": "",
-    "value": "",
-    "Kh": 0,
-    "KhType": 0,
-    "InKhIndex": -1,
-    "NextKhIndex": 2,
-    "type": "",
-    "showBtn": false
+    "id": "f5317edd-c1d3-4f0f-9ea8-ae82d5a08020",
+    "Tbname": "2.dp_ds_classify",
+    "ColumnCode": "dtname",
+    "ColumnDescription": "类型名称",
+    "columnList": [],
+    "ColumnName": "类型名称"
   },
   {
-    "columnName": "dscode",
-    "rex": ">=",
-    "value": "1",
-    "Kh": 0,
-    "KhType": -1,
-    "InKhIndex": 0,
-    "NextKhIndex": 2,
-    "type": "",
-    "showBtn": true
-  },
-  {
-    "columnName": "",
-    "rex": "",
-    "value": "",
-    "Kh": 0,
-    "KhType": 1,
-    "InKhIndex": -1,
-    "NextKhIndex": 2,
-    "type": "",
-    "showBtn": true,
-    "aon": "and"
-  },
-  {
-    "columnName": "dsdesc",
-    "rex": "=",
-    "value": "1",
-    "Kh": -1,
-    "KhType": -1,
-    "InKhIndex": -1,
-    "NextKhIndex": 2,
-    "type": "",
-    "showBtn": true
+    "id": "a0184788-347e-48fb-8aba-9a1370b00046",
+    "Tbname": "2.dp_ds_classify",
+    "ColumnCode": "orgid",
+    "ColumnDescription": "所属组织ID",
+    "columnList": [],
+    "ColumnName": "所属组织ID"
   }
 ]

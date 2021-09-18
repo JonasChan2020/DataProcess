@@ -213,14 +213,14 @@ namespace Yuebon.WebApi.Areas.DataProcess.Controllers
                                 DbFieldInfo itemConfig = dbFieldList.Find(x =>
                                       x.TableLevelNum == item.TableLevelNum &&
                                       x.WriteTableName == item.WriteTableName &&
-                                      x.FieldName == item.FieldName &&
-                                      (
-                                          (x.ReadFieldInfo != null && !string.IsNullOrEmpty(x.ReadFieldInfo.FieldName)) || !string.IsNullOrEmpty(x.DefaultValue)
-                                      )
+                                      x.FieldName == item.FieldName /*&&*/
+                                      //(
+                                      //    (x.ReadFieldInfo != null && !string.IsNullOrEmpty(x.ReadFieldInfo.FieldName)) || !string.IsNullOrEmpty(x.DefaultValue)
+                                      //)
                                   );
                                 if (itemConfig != null)
                                 {
-                                    item.ReadFieldInfo = itemConfig.ReadFieldInfo;
+                                    //item.ReadFieldInfo = itemConfig.ReadFieldInfo;
                                     item.DefaultValue = itemConfig.DefaultValue;
                                     item.Is_DynamicSingle = itemConfig.Is_DynamicSingle;
                                     item.SyncDataConfParamter = itemConfig.SyncDataConfParamter;
